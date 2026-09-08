@@ -208,7 +208,7 @@ with center_col:
                     # 2. Secondo box (intervallo G16:J24 a 4 colonne)
                     raw_box2 = target_ws.get("G16:J24")
                     for r in raw_box2:
-                        if any(r):  # Se la riga non è completamente vuota
+                        if any(r):
                             box2_rows.append([
                                 r[0] if len(r) > 0 else "",
                                 r[1] if len(r) > 1 else "",
@@ -243,34 +243,74 @@ with center_col:
         </div>
         """, unsafe_allow_html=True)
 
-        # Funzione di supporto per generare le tabelle in stile HTML/CSS personalizzato
+        # ==========================================
+        # REGISTRO ATTIVITA' COMPILABILE DA PARTE DEGLI ALLIEVI
+        # ==========================================
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
+                REGISTRO ATTIVITA'
+            </div>
+        """, unsafe_allow_html=True)
+
+        with st.form("form_registro_attivita"):
+            st.markdown("<p style='color: #93c5fd; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px;'>Inserisci i tuoi dati:</p>", unsafe_allow_html=True)
+            
+            # Intestazioni delle colonne come da immagine: allievi a carico, giorni dispo, mappa, recensione
+            col_in1, col_in2 = st.columns(2)
+            with col_in1:
+                val_allievi = st.text_input("Allievi a carico", placeholder="Es. 3")
+                val_mappa = st.text_input("Mappa", placeholder="Nome mappa")
+            with col_in2:
+                val_giorni = st.text_input("Giorni dispo", placeholder="Es. L/M/G/D")
+                val_recensione = st.text_input("Recensione", placeholder="Note / Recensione")
+
+            submitted_registro = st.form_submit_button("INVIA DATI REGISTRO")
+            if submitted_registro:
+                # Esempio di azione di salvataggio (puoi personalizzare la cella di destinazione su Google Sheets)
+                try:
+                    scrivi_cella_per_gid(GID_ACADEMY, "G17", val_allievi)
+                    scrivi_cella_per_gid(GID_ACADEMY, "H17", val_giorni)
+                    scrivi_cella_per_gid(GID_ACADEMY, "I17", val_mappa)
+                    scrivi_cella_per_gid(GID_ACADEMY, "J17", val_recensione)
+                    st.success("Dati del registro inviati con successo!")
+                    time.sleep(1)
+                    st.rerun()
+                except Exception as ex:
+                    st.error(f"Errore durante il salvataggio: {ex}")
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        # Funzione di supporto per generare tabelle di sola lettura
         def render_custom_table(title_text, rows_data):
             html = f"""
             <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
                 <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
                     {title_text}
                 </div>
-                <table style='width: 100%; border-collapse: collapse; color: #FFFFFF; font-size: 0.85rem;'>
-                    <thead>
-                        <tr style='border-bottom: 1px solid #ff0000;'>
-                            <th style='padding: 8px; text-align: left;'>allievi a carico</th>
-                            <th style='padding: 8px; text-align: left;'>giorni dispo</th>
-                            <th style='padding: 8px; text-align: left;'>mappa</th>
-                            <th style='padding: 8px; text-align: left;'>recensione</th>
-                        </tr>
-                    </thead>
+                <table style='width: 100%; border-collapse: collapse; font-size: 0.85rem;'>
                     <tbody>
             """
             if rows_data:
-                for row in rows_data:
-                    html += f"""
-                        <tr style='border-bottom: 1px solid #330000;'>
-                            <td style='padding: 6px 8px;'>{row[0]}</td>
-                            <td style='padding: 6px 8px;'>{row[1]}</td>
-                            <td style='padding: 6px 8px;'>{row[2]}</td>
-                            <td style='padding: 6px 8px;'>{row[3]}</td>
-                        </tr>
-                    """
+                for idx, row in enumerate(rows_data):
+                    if idx == 0:
+                        html += f"""
+                            <tr style='background-color: #FFFF00; color: #000000; font-weight: bold; border-bottom: 1px solid #ff0000;'>
+                                <td style='padding: 8px;'>{row[0]}</td>
+                                <td style='padding: 8px;'>{row[1]}</td>
+                                <td style='padding: 8px;'>{row[2]}</td>
+                                <td style='padding: 8px;'>{row[3]}</td>
+                            </tr>
+                        """
+                    else:
+                        html += f"""
+                            <tr style='color: #FFFFFF; border-bottom: 1px solid #330000;'>
+                                <td style='padding: 6px 8px;'>{row[0]}</td>
+                                <td style='padding: 6px 8px;'>{row[1]}</td>
+                                <td style='padding: 6px 8px;'>{row[2]}</td>
+                                <td style='padding: 6px 8px;'>{row[3]}</td>
+                            </tr>
+                        """
             else:
                 html += """
                         <tr>
@@ -285,12 +325,7 @@ with center_col:
             st.markdown(html, unsafe_allow_html=True)
 
         # ==========================================
-        # BOX 2: TABELLA DATI DAL PRIMO INTERVALLO
-        # ==========================================
-        render_custom_table("REGISTRO ATTIVITA'", box2_rows)
-
-        # ==========================================
-        # BOX 3: TABELLA DATI DAL SECONDO INTERVALLO
+        # BOX 3: SECONDO GRUPPO ATTIVITA'
         # ==========================================
         render_custom_table("SECONDO GRUPPO ATTIVITA'", box3_rows)
 
