@@ -204,7 +204,7 @@ with center_col:
                     f14_val = target_ws.acell("F14").value or ""
                     h14_val = target_ws.acell("H14").value or ""
 
-                    # Dati fissi di esempio per ARES PIX (senza recensione)
+                    # Dati fissi di esempio per ARES PIX
                     box_pix_rows = [
                         ["JFF_CLIP", "L/M/G/D", "DOJO MAP"],
                         ["itaboyz_Casco", "L/M/G/D", "DOJO MAP"],
@@ -213,7 +213,7 @@ with center_col:
                         ["itaboyz_gallo", "L/M/G/D", "DOJO MAP"]
                     ]
 
-                    # Dati fissi di esempio per ARES NINO (senza recensione)
+                    # Dati fissi di esempio per ARES NINO
                     box_nino_rows = [
                         ["JFF_SINNER", "L/M/G/D", "DOJO MAP"],
                         ["JFF_POTA", "L/M/G/D", "DOJO MAP"],
@@ -301,44 +301,39 @@ with center_col:
         # 3. REGISTRO ATTIVITA' (EDITABILE) - C27:E50
         # ==========================================
         st.markdown("""
-        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 5px;'>
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
                 REGISTRO ATTIVITA'
             </div>
-        </div>
+            <div class='fixed-box-header'>
+                <span style='flex: 2;'>allievi a carico</span>
+                <span style='flex: 1; text-align: center;'>giorni dispo</span>
+                <span style='flex: 1; text-align: right;'>mappa</span>
+            </div>
         """, unsafe_allow_html=True)
 
         if box2_rows and len(box2_rows) > 0:
             raw_header = box2_rows[0]
-            clean_header = []
-            seen = set()
-            for idx, h in enumerate(raw_header):
-                col_name = str(h).strip() if h and str(h).strip() != "" else f"col_{idx}"
-                base_name = col_name
-                counter = 1
-                while col_name in seen:
-                    col_name = f"{base_name}_{counter}"
-                    counter += 1
-                seen.add(col_name)
-                clean_header.append(col_name)
-            
-            header_cols = clean_header
             data_rows = box2_rows[1:] if len(box2_rows) > 1 else [["", "", ""]]
         else:
-            header_cols = ["allievi a carico", "giorni dispo", "mappa"]
+            raw_header = ["allievi a carico", "giorni dispo", "mappa"]
             data_rows = [["", "", ""]] * 10
 
-        df_registro = pd.DataFrame(data_rows, columns=header_cols)
+        df_registro = pd.DataFrame(data_rows, columns=["allievi a carico", "giorni dispo", "mappa"])
 
         edited_df = st.data_editor(
             df_registro,
             use_container_width=True,
             num_rows="dynamic",
-            key="editor_registro_attivita"
+            key="editor_registro_attivita",
+            hide_index=True
         )
+
+        st.markdown("</div>", unsafe_allow_html=True)
 
         if st.button("💾 SALVA MODIFICHE REGISTRO"):
             try:
+                # Ricostruiamo i dati da inviare a Google Sheets (inclusa la riga di intestazione a riga 27)
                 full_data_to_write = [raw_header] + edited_df.values.tolist()
                 creds = ottieni_credenziali()
                 if creds:
@@ -348,7 +343,7 @@ with center_col:
                     if target_ws:
                         end_row = 27 + len(full_data_to_write) - 1
                         target_ws.update(f"C27:E{end_row}", full_data_to_write)
-                        st.success("Modifiche salvate con successo sul Google Sheet (C27:E...)!")
+                        st.success("Modifiche salvate con successo su Google Sheet (C27:E...)!")
                         time.sleep(1)
                         st.rerun()
             except Exception as ex:
