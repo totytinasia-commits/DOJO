@@ -183,13 +183,13 @@ with center_col:
 
     current = st.session_state.current_section
 
-    if current == "🏫 ACADEMY":
+    elif current == "🏫 ACADEMY":
         st.subheader("🏫 Academy")
 
         f13_val, h13_val = "", ""
         f14_val, h14_val = "", ""
-        g_rows = []
-        c_rows = []
+        box2_rows = []
+        box3_rows = []
 
         try:
             creds = ottieni_credenziali()
@@ -199,47 +199,101 @@ with center_col:
                 target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ACADEMY).strip()), None)
 
                 if target_ws:
+                    # 1. Box principale (F13, H13, F14, H14)
                     f13_val = target_ws.acell("F13").value or ""
                     h13_val = target_ws.acell("H13").value or ""
                     f14_val = target_ws.acell("F14").value or ""
                     h14_val = target_ws.acell("H14").value or ""
 
-                    g_data = target_ws.get("G16:G24")
-                    g_rows = [row[0] for row in g_data if row and len(row) > 0]
+                    # 2. Secondo box (es. intervallo G16:J24 o simile strutturato a 4 colonne)
+                    # Leggiamo le righe complete per formare la tabella stile immagini 2, 3 e 4
+                    raw_box2 = target_ws.get("G16:J24")
+                    for r in raw_box2:
+                        if any(r):  # Se la riga non è completamente vuota
+                            box2_rows.append([
+                                r[0] if len(r) > 0 else "",
+                                r[1] if len(r) > 1 else "",
+                                r[2] if len(r) > 2 else "",
+                                r[3] if len(r) > 3 else ""
+                            ])
 
-                    c_data = target_ws.get("C26:C49")
-                    c_rows = [row[0] for row in c_data if row and len(row) > 0]
+                    # 3. Terzo box (es. intervallo C26:F49 o corrispondente a 4 colonne)
+                    raw_box3 = target_ws.get("C26:F49")
+                    for r in raw_box3:
+                        if any(r):
+                            box3_rows.append([
+                                r[0] if len(r) > 0 else "",
+                                r[1] if len(r) > 1 else "",
+                                r[2] if len(r) > 2 else "",
+                                r[3] if len(r) > 3 else ""
+                            ])
         except Exception as e:
             st.warning(f"Errore nel caricamento dati Academy (GID {GID_ACADEMY}): {e}")
 
+        # ==========================================
+        # BOX 1: INTESTAZIONE GIALLA PRINCIPALE
+        # ==========================================
         st.markdown(f"""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; padding: 0px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.2rem; padding: 10px;'>
                 {f13_val} {h13_val}
             </div>
-            <div style='color: #FFFFFF; text-align: center; font-size: 0.95rem; padding: 8px; border-bottom: 1px solid #333333;'>
+            <div style='color: #FFFFFF; text-align: center; font-size: 0.95rem; padding: 8px;'>
                 {f14_val} &nbsp;&nbsp; {h14_val}
             </div>
+        </div>
         """, unsafe_allow_html=True)
 
-        st.markdown("<div style='padding: 10px 15px; color: #FFFFFF;'>", unsafe_allow_html=True)
-        st.markdown("<p style='color: #FFD700; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;'>DATI G16:G24</p>", unsafe_allow_html=True)
-        if g_rows:
-            for val in g_rows:
-                st.markdown(f"<p style='margin: 4px 0; color: #FFFFFF; font-size: 0.9rem;'>• {val}</p>", unsafe_allow_html=True)
-        else:
-            st.markdown("<p style='color: #8b949e; font-size: 0.85rem;'>Nessun dato disponibile</p>", unsafe_allow_html=True)
-        
-        st.markdown("---", unsafe_allow_html=True)
+        # Funzione di supporto per generare le tabelle in stile HTML/CSS personalizzato
+        def render_custom_table(title_text, rows_data):
+            html = f"""
+            <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+                <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
+                    {title_text}
+                </div>
+                <table style='width: 100%; border-collapse: collapse; color: #FFFFFF; font-size: 0.85rem;'>
+                    <thead>
+                        <tr style='border-bottom: 1px solid #ff0000;'>
+                            <th style='padding: 8px; text-align: left;'>allievi a carico</th>
+                            <th style='padding: 8px; text-align: left;'>giorni dispo</th>
+                            <th style='padding: 8px; text-align: left;'>mappa</th>
+                            <th style='padding: 8px; text-align: left;'>recensione</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            """
+            if rows_data:
+                for row in rows_data:
+                    html += f"""
+                        <tr style='border-bottom: 1px solid #330000;'>
+                            <td style='padding: 6px 8px;'>{row[0]}</td>
+                            <td style='padding: 6px 8px;'>{row[1]}</td>
+                            <td style='padding: 6px 8px;'>{row[2]}</td>
+                            <td style='padding: 6px 8px;'>{row[3]}</td>
+                        </tr>
+                    """
+            else:
+                html += """
+                        <tr>
+                            <td colspan='4' style='padding: 10px; text-align: center; color: #8b949e;'>Nessun dato disponibile</td>
+                        </tr>
+                """
+            html += """
+                    </tbody>
+                </table>
+            </div>
+            """
+            st.markdown(html, unsafe_allow_html=True)
 
-        st.markdown("<p style='color: #FFD700; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;'>DATI C26:C49</p>", unsafe_allow_html=True)
-        if c_rows:
-            for val in c_rows:
-                st.markdown(f"<p style='margin: 4px 0; color: #FFFFFF; font-size: 0.9rem;'>- {val}</p>", unsafe_allow_html=True)
-        else:
-            st.markdown("<p style='color: #8b949e; font-size: 0.85rem;'>Nessun dato disponibile</p>", unsafe_allow_html=True)
+        # ==========================================
+        # BOX 2: TABELLA DATI DAL PRIMO INTERVALLO
+        # ==========================================
+        render_custom_table("REGISTRO ATTIVITA'", box2_rows)
 
-        st.markdown("</div></div>", unsafe_allow_html=True)
+        # ==========================================
+        # BOX 3: TABELLA DATI DAL SECONDO INTERVALLO
+        # ==========================================
+        render_custom_table("SECONDO GRUPPO ATTIVITA'", box3_rows)
 
     elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
