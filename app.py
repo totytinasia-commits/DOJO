@@ -145,7 +145,8 @@ SECTIONS = [
     "🏫 ACADEMY",
     "📋 ANAGRAFICA",
     "📈 PROGRESSI",
-    "📜 CERTIFICAZIONI ESERCIZI",
+    "📜 CERTIFICAZIONI",
+    "🏋️ ESERCIZI",
     "👤 SCHEDE GIOCATORE",
     "📊 STATISTICHE"
 ]
@@ -506,8 +507,21 @@ with center_col:
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-    elif current == "📜 CERTIFICAZIONI ESERCIZI":
-        st.subheader("📜 Certificazioni")
+    elif current == "📜 CERTIFICAZIONI":
+        st.markdown("""
+        <div style='background-color: #161b22; border: 2px dashed #ff9900; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px;'>
+            <h3 style='color: #FFD700; margin: 0; text-transform: uppercase;'>📜 Certificazioni</h3>
+            <p style='color: #8b949e; font-size: 1.1rem; margin-top: 10px; font-weight: bold;'>PRESTO IN ARRIVO</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    elif current == "🏋️ ESERCIZI":
+        st.markdown("""
+        <div style='background-color: #161b22; border: 2px dashed #ff9900; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px;'>
+            <h3 style='color: #FFD700; margin: 0; text-transform: uppercase;'>🏋️ Esercizi</h3>
+            <p style='color: #8b949e; font-size: 1.1rem; margin-top: 10px; font-weight: bold;'>PRESTO IN ARRIVO</p>
+        </div>
+        """, unsafe_allow_html=True)
 
     elif current == "👤 SCHEDE GIOCATORE":
         st.subheader("👤 Schede Giocatore")
