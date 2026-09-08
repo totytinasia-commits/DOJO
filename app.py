@@ -157,9 +157,9 @@ left_space, center_col, right_space = st.columns([1, 2, 1])
 
 with center_col:
     try:
-        st.image("assets/logo.png", width="stretch")
+        st.image("assets/logo.png", use_container_width=True)
     except Exception:
-        st.image("https://via.placeholder.com/300x300.png?text=DOJO+ACADEMY", width="stretch")
+        st.image("https://via.placeholder.com/300x300.png?text=DOJO+ACADEMY", use_container_width=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -223,7 +223,7 @@ with center_col:
 
         elif st.session_state.stat_tab == "🏆 STATCOMP":
             # ==========================================
-            # --- INTEGRAGIONE STATCOMP (PERSONAL STATS) ---
+            # --- INTEGRAZIONE STATCOMP (PERSONAL STATS) ---
             # ==========================================
             st.markdown("<div style='background-color: #0e1117; border: 2px solid #262730; border-radius: 12px; padding: 15px;'>", unsafe_allow_html=True)
             st.markdown("### 👤 Personal Stats Dashboard")
@@ -474,7 +474,6 @@ with center_col:
                     "SHOT ONE", "SHOT HIT ONE", "ACC% ONE", "SHOT TWO", "SHOT HIT TWO", "ACC% TWO"
                 ])
 
-            # AGGIORNATO QUI: Sostituito use_container_width=True con width="stretch"
-            st.dataframe(df_weapons_final, width="stretch", hide_index=True)
+            st.dataframe(df_weapons_final, use_container_width=True, hide_index=True)
 
             st.markdown("</div>", unsafe_allow_html=True)
