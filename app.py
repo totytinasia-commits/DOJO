@@ -222,8 +222,8 @@ with center_col:
                         ["itaboyz_faire", "L/M/G/D", "DOJO MAP"]
                     ]
 
-                    # Preleviamo l'intervallo C27:E50 per il Registro Attività
-                    raw_box2 = target_ws.get("C27:E50")
+                    # Preleviamo esattamente l'intervallo C28:E50 per il Registro Attività
+                    raw_box2 = target_ws.get("C28:E50")
                     for r in raw_box2:
                         box2_rows.append([
                             r[0] if len(r) > 0 else "",
@@ -298,7 +298,7 @@ with center_col:
         st.markdown("</div>", unsafe_allow_html=True)
 
         # ==========================================
-        # 3. REGISTRO ATTIVITA' (EDITABILE) - C27:E50
+        # 3. REGISTRO ATTIVITA' (EDITABILE) - C28:E50
         # ==========================================
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
@@ -312,14 +312,10 @@ with center_col:
             </div>
         """, unsafe_allow_html=True)
 
-        if box2_rows and len(box2_rows) > 0:
-            raw_header = box2_rows[0]
-            data_rows = box2_rows[1:] if len(box2_rows) > 1 else [["", "", ""]]
-        else:
-            raw_header = ["allievi a carico", "giorni", "mappa"]
-            data_rows = [["", "", ""]] * 10
+        if not box2_rows:
+            box2_rows = [["", "", ""]] * 10
 
-        df_registro = pd.DataFrame(data_rows, columns=["allievi a carico", "giorni", "mappa"])
+        df_registro = pd.DataFrame(box2_rows, columns=["allievi a carico", "giorni", "mappa"])
 
         edited_df = st.data_editor(
             df_registro,
@@ -333,16 +329,16 @@ with center_col:
 
         if st.button("💾 SALVA MODIFICHE REGISTRO"):
             try:
-                full_data_to_write = [raw_header] + edited_df.values.tolist()
+                data_to_write = edited_df.values.tolist()
                 creds = ottieni_credenziali()
                 if creds:
                     client = gspread.authorize(creds)
                     sheet = client.open_by_key(SHEET_ID)
                     target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ACADEMY).strip()), None)
                     if target_ws:
-                        end_row = 27 + len(full_data_to_write) - 1
-                        target_ws.update(f"C27:E{end_row}", full_data_to_write)
-                        st.success("Modifiche salvate con successo su Google Sheet (C27:E...)!")
+                        end_row = 28 + len(data_to_write) - 1
+                        target_ws.update(f"C28:E{end_row}", data_to_write)
+                        st.success("Modifiche salvate con successo su Google Sheet (C28:E50)!")
                         time.sleep(1)
                         st.rerun()
             except Exception as ex:
