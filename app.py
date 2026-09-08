@@ -19,6 +19,7 @@ GID_PERSONAL_STATS = "1148983819"
 GID_ACADEMY = "625069530"
 GID_ANAGRAFICA = "1502613256"
 GID_PROGRESSI = "797090179"
+GID_CERTIFICAZIONI = "886238750"
 
 # ==========================================
 # 2. FUNZIONI HELPER GOOGLE SHEETS
@@ -508,12 +509,76 @@ with center_col:
         st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "📜 CERTIFICAZIONI":
+        st.subheader("📜 Certificazioni")
+
         st.markdown("""
-        <div style='background-color: #161b22; border: 2px dashed #ff9900; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px;'>
-            <h3 style='color: #FFD700; margin: 0; text-transform: uppercase;'>📜 Certificazioni</h3>
-            <p style='color: #8b949e; font-size: 1.1rem; margin-top: 10px; font-weight: bold;'>PRESTO IN ARRIVO</p>
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
+                TABELLA CERTIFICAZIONI
+            </div>
         </div>
         """, unsafe_allow_html=True)
+
+        cert_rows = []
+        try:
+            creds = ottieni_credenziali()
+            if creds:
+                client = gspread.authorize(creds)
+                sheet = client.open_by_key(SHEET_ID)
+                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_CERTIFICAZIONI).strip()), None)
+
+                if target_ws:
+                    raw_cert = target_ws.get("B18:O40")
+                    for r in raw_cert:
+                        row_padded = []
+                        for idx in range(14): # Da colonna B a O sono 14 colonne
+                            row_padded.append(r[idx] if idx < len(r) and r[idx] is not None else "")
+                        cert_rows.append(row_padded)
+        except Exception as e:
+            st.warning(f"Errore nel caricamento dati Certificazioni: {e}")
+
+        expected_cert_columns = [
+            "Allievo", "Bronze Aim", "Silver Aim", "Gold Aim", 
+            "SWITCH VELOCE ARMI", "BUILD DI PROTEZIONE", "BUILD PER PUSH", 
+            "USO DI BUILD COMPLESSIVO", "MIRA", "LOOT", "SNIPER", 
+            "TEORIA ARMI", "USO DELLE ARMI COMPLESSIVO", "TEAM WORK"
+        ]
+
+        if not cert_rows:
+            df_certificazioni = pd.DataFrame(columns=expected_cert_columns)
+        else:
+            data_cert = cert_rows[1:] if len(cert_rows) > 1 else cert_rows
+            
+            cleaned_cert_data = []
+            for row in data_cert:
+                new_row = list(row)
+                while len(new_row) < 14:
+                    new_row.append("")
+                cleaned_cert_data.append(new_row[:14])
+
+            df_certificazioni = pd.DataFrame(cleaned_cert_data, columns=expected_cert_columns)
+
+        # Rimuove eventuali righe completamente vuote
+        df_certificazioni = df_certificazioni.replace(r'^\s*$', pd.NA, regex=True)
+        df_certificazioni = df_certificazioni.dropna(how='all').fillna("")
+
+        # Configurazione colonne (la prima colonna text, le restanti larghe per leggere i titoli estesi)
+        config_cert_cols = {}
+        for i, col_name in enumerate(df_certificazioni.columns):
+            if i == 0:
+                config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="medium")
+            else:
+                config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="large")
+
+        with st.container():
+            st.dataframe(
+                df_certificazioni,
+                use_container_width=True,
+                hide_index=True,
+                column_config=config_cert_cols
+            )
+
+        st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "🏋️ ESERCIZI":
         st.markdown("""
