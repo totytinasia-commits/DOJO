@@ -353,7 +353,6 @@ with center_col:
     elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
 
-        # Contenitore personalizzato in stile con i bordi rossi e titolo giallo
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
@@ -371,7 +370,6 @@ with center_col:
                 target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ANAGRAFICA).strip()), None)
 
                 if target_ws:
-                    # Leggiamo l'intervallo C13:L35 (10 colonne: C, D, E, F, G, H, I, J, K, L)
                     raw_anagrafica = target_ws.get("C13:L35")
                     for r in raw_anagrafica:
                         anagrafica_rows.append([
@@ -390,16 +388,27 @@ with center_col:
             st.warning(f"Errore nel caricamento dati Anagrafica: {e}")
 
         if not anagrafica_rows:
-            # Fallback se vuoto o errore di connessione iniziale
             cols_names = ["ID", "Nickname", "Nome Reale", "Paese", "Data Ingresso", "Livello Attuale", "Coach", "Ore Totali", "Obiettivo", "Certificazione"]
             df_anagrafica = pd.DataFrame(columns=cols_names)
         else:
-            # La prima riga del range C13:L13 è l'intestazione
             header_anagrafica = anagrafica_rows[0] if len(anagrafica_rows) > 0 else ["ID", "Nickname", "Nome Reale", "Paese", "Data Ingresso", "Livello Attuale", "Coach", "Ore Totali", "Obiettivo", "Certificazione"]
             data_anagrafica = anagrafica_rows[1:] if len(anagrafica_rows) > 1 else [[""] * 10]
-            df_anagrafica = pd.DataFrame(data_anagrafica, columns=header_anagrafica)
+            
+            # Sostituiamo gli asterischi con le stelline (⭐) nella colonna "Livello Attuale" (indice 5)
+            cleaned_data = []
+            for row in data_anagrafica:
+                new_row = list(row)
+                while len(new_row) < 10:
+                    new_row.append("")
+                # Convertiamo gli asterischi in stelline nella sesta colonna (indice 5)
+                val_livello = str(new_row[5])
+                count_stars = val_livello.count('*')
+                if count_stars > 0:
+                    new_row[5] = "⭐" * count_stars
+                cleaned_data.append(new_row)
 
-        # Tabella in sola lettura (disabled=True)
+            df_anagrafica = pd.DataFrame(cleaned_data, columns=header_anagrafica)
+
         st.dataframe(
             df_anagrafica,
             use_container_width=True,
