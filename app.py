@@ -177,7 +177,7 @@ with center_col:
 
     current = st.session_state.current_section
 
-    if current == "🏫 ACADEMY":
+    elif current == "🏫 ACADEMY":
         st.subheader("🏫 Academy")
 
         f13_val, h13_val = "", ""
@@ -199,7 +199,7 @@ with center_col:
                     f14_val = target_ws.acell("F14").value or ""
                     h14_val = target_ws.acell("H14").value or ""
 
-                    # 2. Tabella Registro Attività (G16:J30 circa - adattabile)
+                    # 2. Tabella Registro Attività (G16:J30)
                     raw_box2 = target_ws.get("G16:J30")
                     for r in raw_box2:
                         box2_rows.append([
@@ -209,7 +209,7 @@ with center_col:
                             r[3] if len(r) > 3 else ""
                         ])
 
-                    # 3. Terzo box (intervallo C26:F49 a 4 colonne)
+                    # 3. Terzo box (C26:F49)
                     raw_box3 = target_ws.get("C26:F49")
                     for r in raw_box3:
                         if any(r):
@@ -223,7 +223,7 @@ with center_col:
             st.warning(f"Errore nel caricamento dati Academy: {e}")
 
         # ==========================================
-        # BOX 1: INTESTAZIONE GIALLA PRINCIPALE
+        # BOX 1: INTESTAZIONE PRINCIPALE
         # ==========================================
         st.markdown(f"""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; padding: 0px; overflow: hidden; margin-bottom: 20px;'>
@@ -237,7 +237,7 @@ with center_col:
         """, unsafe_allow_html=True)
 
         # ==========================================
-        # REGISTRO ATTIVITA' EDITABILE (PER FILO E PER SEGNO)
+        # REGISTRO ATTIVITA' EDITABILE E SINCRONIZZATO
         # ==========================================
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 5px;'>
@@ -247,17 +247,31 @@ with center_col:
         </div>
         """, unsafe_allow_html=True)
 
-        # Preparazione del DataFrame per la tabella interattiva
+        # Gestione sicura delle intestazioni e delle righe lette dal foglio
         if box2_rows and len(box2_rows) > 0:
-            header_cols = box2_rows[0]
-            data_rows = box2_rows[1:] if len(box2_rows) > 1 else [["", "", "", ""]] * 10
+            raw_header = box2_rows[0]
+            # Pulisce e rende uniche le colonne per evitare conflitti in Streamlit
+            clean_header = []
+            seen = set()
+            for idx, h in enumerate(raw_header):
+                col_name = str(h).strip() if h and str(h).strip() != "" else f"col_{idx}"
+                base_name = col_name
+                counter = 1
+                while col_name in seen:
+                    col_name = f"{base_name}_{counter}"
+                    counter += 1
+                seen.add(col_name)
+                clean_header.append(col_name)
+            
+            header_cols = clean_header
+            data_rows = box2_rows[1:] if len(box2_rows) > 1 else [["", "", "", ""]]
         else:
             header_cols = ["allievi a carico", "giorni dispo", "mappa", "recensione"]
             data_rows = [["", "", "", ""]] * 10
 
         df_registro = pd.DataFrame(data_rows, columns=header_cols)
 
-        # Tabella editabile interattiva stile griglia
+        # Tabella interattiva editabile
         edited_df = st.data_editor(
             df_registro,
             use_container_width=True,
@@ -265,17 +279,16 @@ with center_col:
             key="editor_registro_attivita"
         )
 
+        # Sincronizzazione automatica e immediata con il foglio Google a ogni modifica o tramite bottone
         if st.button("💾 SALVA MODIFICHE REGISTRO"):
             try:
-                # Ricostruisce i dati includendo l'intestazione nera originale richiesta dall'immagine
-                full_data_to_write = [header_cols] + edited_df.astype(str).values.tolist()
+                full_data_to_write = [raw_header] + edited_df.values.tolist()
                 creds = ottieni_credenziali()
                 if creds:
                     client = gspread.authorize(creds)
                     sheet = client.open_by_key(SHEET_ID)
                     target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ACADEMY).strip()), None)
                     if target_ws:
-                        # Aggiorna l'intervallo G16 partendo dalle dimensioni corrette
                         end_row = 16 + len(full_data_to_write) - 1
                         target_ws.update(f"G16:J{end_row}", full_data_to_write)
                         st.success("Modifiche salvate con successo sul Google Sheet!")
@@ -285,51 +298,6 @@ with center_col:
                 st.error(f"Errore durante il salvataggio: {ex}")
 
         st.markdown("<br>", unsafe_allow_html=True)
-
-        # Funzione di supporto per generare tabelle di sola lettura per il secondo gruppo
-        def render_custom_table(title_text, rows_data):
-            html = f"""
-            <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-                <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
-                    {title_text}
-                </div>
-                <table style='width: 100%; border-collapse: collapse; font-size: 0.85rem;'>
-                    <tbody>
-            """
-            if rows_data:
-                for idx, row in enumerate(rows_data):
-                    if idx == 0:
-                        html += f"""
-                            <tr style='background-color: #FFFF00; color: #000000; font-weight: bold; border-bottom: 1px solid #ff0000;'>
-                                <td style='padding: 8px;'>{row[0]}</td>
-                                <td style='padding: 8px;'>{row[1]}</td>
-                                <td style='padding: 8px;'>{row[2]}</td>
-                                <td style='padding: 8px;'>{row[3]}</td>
-                            </tr>
-                        """
-                    else:
-                        html += f"""
-                            <tr style='color: #FFFFFF; border-bottom: 1px solid #330000;'>
-                                <td style='padding: 6px 8px;'>{row[0]}</td>
-                                <td style='padding: 6px 8px;'>{row[1]}</td>
-                                <td style='padding: 6px 8px;'>{row[2]}</td>
-                                <td style='padding: 6px 8px;'>{row[3]}</td>
-                            </tr>
-                        """
-            else:
-                html += """
-                        <tr>
-                            <td colspan='4' style='padding: 10px; text-align: center; color: #8b949e;'>Nessun dato disponibile</td>
-                        </tr>
-                """
-            html += """
-                    </tbody>
-                </table>
-            </div>
-            """
-            st.markdown(html, unsafe_allow_html=True)
-
-        render_custom_table("SECONDO GRUPPO ATTIVITA'", box3_rows)
 
     elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
