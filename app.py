@@ -18,6 +18,7 @@ SHEET_ID = "1ul4pI3QDqGYz7kjj6p-QLgLXMkMMR3anv4JdEP0lI48"
 GID_PERSONAL_STATS = "1148983819"
 GID_ACADEMY = "625069530"
 GID_ANAGRAFICA = "1502613256"
+GID_PROGRESSI = "797090179"
 
 # ==========================================
 # 2. FUNZIONI HELPER GOOGLE SHEETS
@@ -205,7 +206,6 @@ with center_col:
                     f14_val = target_ws.acell("F14").value or ""
                     h14_val = target_ws.acell("H14").value or ""
 
-                    # Dati fissi per ARES PIX
                     box_pix_rows = [
                         ["JFF_CLIP", "L/M/G/D", "DOJO MAP"],
                         ["itaboyz_Casco", "L/M/G/D", "DOJO MAP"],
@@ -214,7 +214,6 @@ with center_col:
                         ["itaboyz_gallo", "L/M/G/D", "DOJO MAP"]
                     ]
 
-                    # Dati fissi per ARES NINO
                     box_nino_rows = [
                         ["JFF_SINNER", "L/M/G/D", "DOJO MAP"],
                         ["JFF_POTA", "L/M/G/D", "DOJO MAP"],
@@ -223,7 +222,6 @@ with center_col:
                         ["itaboyz_faire", "L/M/G/D", "DOJO MAP"]
                     ]
 
-                    # Preleviamo l'intervallo C28:E50 per il Registro Attività
                     raw_box2 = target_ws.get("C28:E50")
                     for r in raw_box2:
                         box2_rows.append([
@@ -234,7 +232,6 @@ with center_col:
         except Exception as e:
             st.warning(f"Errore nel caricamento dati Academy: {e}")
 
-        # Header principale superiore
         st.markdown(f"""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.2rem; padding: 10px;'>
@@ -246,9 +243,6 @@ with center_col:
         </div>
         """, unsafe_allow_html=True)
 
-        # ==========================================
-        # 1. SEZIONE FISSA: ARES PIX
-        # ==========================================
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
@@ -272,9 +266,6 @@ with center_col:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # ==========================================
-        # 2. SEZIONE FISSA: ARES NINO
-        # ==========================================
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
@@ -298,9 +289,6 @@ with center_col:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # ==========================================
-        # 3. REGISTRO ATTIVITA' (EDITABILE) - C28:E50
-        # ==========================================
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
@@ -394,13 +382,11 @@ with center_col:
             header_anagrafica = anagrafica_rows[0] if len(anagrafica_rows) > 0 else ["ID", "Nickname", "Nome Reale", "Paese", "Data Ingresso", "Livello Attuale", "Coach", "Ore Totali", "Obiettivo", "Certificazione"]
             data_anagrafica = anagrafica_rows[1:] if len(anagrafica_rows) > 1 else [[""] * 10]
             
-            # Sostituiamo gli asterischi con le stelline (⭐) nella colonna "Livello Attuale" (indice 5)
             cleaned_data = []
             for row in data_anagrafica:
                 new_row = list(row)
                 while len(new_row) < 10:
                     new_row.append("")
-                # Convertiamo gli asterischi in stelline nella sesta colonna (indice 5)
                 val_livello = str(new_row[5])
                 count_stars = val_livello.count('*')
                 if count_stars > 0:
@@ -419,6 +405,88 @@ with center_col:
 
     elif current == "📈 PROGRESSI":
         st.subheader("📈 Progressi")
+
+        # Visualizzazione della Legenda
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px; max-width: 250px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1rem; padding: 6px;'>
+                LEGGENDA
+            </div>
+            <div style='background-color: #ff0000; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
+                0-40%
+            </div>
+            <div style='background-color: #ffaa00; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
+                40-80%
+            </div>
+            <div style='background-color: #90ee90; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
+                80-100%
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
+                TABELLA PROGRESSI
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        progressi_rows = []
+        try:
+            creds = ottieni_credenziali()
+            if creds:
+                client = gspread.authorize(creds)
+                sheet = client.open_by_key(SHEET_ID)
+                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_PROGRESSI).strip()), None)
+
+                if target_ws:
+                    # Leggiamo l'intervallo B12:I35 (colonne da B a I)
+                    raw_progressi = target_ws.get("B12:I35")
+                    for r in raw_progressi:
+                        progressi_rows.append([
+                            r[0] if len(r) > 0 else "",
+                            r[1] if len(r) > 1 else "",
+                            r[2] if len(r) > 2 else "",
+                            r[3] if len(r) > 3 else "",
+                            r[4] if len(r) > 4 else "",
+                            r[5] if len(r) > 5 else "",
+                            r[6] if len(r) > 6 else "",
+                            r[7] if len(r) > 7 else ""
+                        ])
+        except Exception as e:
+            st.warning(f"Errore nel caricamento dati Progressi: {e}")
+
+        if not progressi_rows:
+            df_progressi = pd.DataFrame(columns=["Col1", "Col2", "Col3", "Col4", "Col5", "Col6", "Col7", "Col8"])
+        else:
+            header_progressi = progressi_rows[0] if len(progressi_rows) > 0 else [f"Col{i}" for i in range(8)]
+            data_progressi = progressi_rows[1:] if len(progressi_rows) > 1 else [[""] * 8]
+            df_progressi = pd.DataFrame(data_progressi, columns=header_progressi)
+
+        # Funzione per colorare le celle in base alla percentuale
+        def color_percentage(val):
+            try:
+                # Pulisce la stringa per estrarre il valore numerico
+                clean_val = str(val).replace("%", "").replace(",", ".").strip()
+                num = float(clean_val)
+                if num <= 40:
+                    return 'background-color: #ff0000; color: #000000; font-weight: bold;'
+                elif num <= 80:
+                    return 'background-color: #ffaa00; color: #000000; font-weight: bold;'
+                else:
+                    return 'background-color: #90ee90; color: #000000; font-weight: bold;'
+            except Exception:
+                return ''
+
+        # Applichiamo la formattazione al DataFrame se possibile
+        try:
+            styled_df = df_progressi.style.map(color_percentage)
+            st.dataframe(styled_df, use_container_width=True, hide_index=True)
+        except Exception:
+            st.dataframe(df_progressi, use_container_width=True, hide_index=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "📜 CERTIFICAZIONI ESERCIZI":
         st.subheader("📜 Certificazioni")
