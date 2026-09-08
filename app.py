@@ -20,6 +20,7 @@ GID_ACADEMY = "625069530"
 GID_ANAGRAFICA = "1502613256"
 GID_PROGRESSI = "797090179"
 GID_CERTIFICAZIONI = "886238750"
+GID_ESERCIZI = "1935989008"
 
 # ==========================================
 # 2. FUNZIONI HELPER GOOGLE SHEETS
@@ -531,7 +532,7 @@ with center_col:
                     raw_cert = target_ws.get("B18:O40")
                     for r in raw_cert:
                         row_padded = []
-                        for idx in range(14): # Da colonna B a O sono 14 colonne
+                        for idx in range(14):
                             row_padded.append(r[idx] if idx < len(r) and r[idx] is not None else "")
                         cert_rows.append(row_padded)
         except Exception as e:
@@ -558,11 +559,9 @@ with center_col:
 
             df_certificazioni = pd.DataFrame(cleaned_cert_data, columns=expected_cert_columns)
 
-        # Rimuove eventuali righe completamente vuote
         df_certificazioni = df_certificazioni.replace(r'^\s*$', pd.NA, regex=True)
         df_certificazioni = df_certificazioni.dropna(how='all').fillna("")
 
-        # Configurazione colonne (la prima colonna text, le restanti larghe per leggere i titoli estesi)
         config_cert_cols = {}
         for i, col_name in enumerate(df_certificazioni.columns):
             if i == 0:
@@ -581,12 +580,131 @@ with center_col:
         st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "🏋️ ESERCIZI":
+        st.subheader("🏋️ Esercizi")
+
         st.markdown("""
-        <div style='background-color: #161b22; border: 2px dashed #ff9900; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px;'>
-            <h3 style='color: #FFD700; margin: 0; text-transform: uppercase;'>🏋️ Esercizi</h3>
-            <p style='color: #8b949e; font-size: 1.1rem; margin-top: 10px; font-weight: bold;'>PRESTO IN ARRIVO</p>
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
+                TABELLA ESERCIZI
+            </div>
         </div>
         """, unsafe_allow_html=True)
+
+        esercizi_rows = []
+        try:
+            creds = ottieni_credenziali()
+            if creds:
+                client = gspread.authorize(creds)
+                sheet = client.open_by_key(SHEET_ID)
+                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ESERCIZI).strip()), None)
+
+                if target_ws:
+                    # Da C17 a M40 (11 colonne: C, D, E, F, G, H, I, J, K, L, M)
+                    raw_es = target_ws.get("C17:M40")
+                    for r in raw_es:
+                        row_padded = []
+                        for idx in range(11):
+                            row_padded.append(r[idx] if idx < len(r) and r[idx] is not None else "")
+                        esercizi_rows.append(row_padded)
+        except Exception as e:
+            st.warning(f"Errore nel caricamento dati Esercizi: {e}")
+
+        # Intestazioni come da foto: Allievo, Esercizio, Check, Esercizio, Check, Esercizio, Check, Esercizio, Check, Esercizio, Check
+        expected_es_columns = [
+            "Allievo", 
+            "ESERCIZIO 1", "CHECK 1", 
+            "ESERCIZIO 2", "CHECK 2", 
+            "ESERCIZIO 3", "CHECK 3", 
+            "ESERCIZIO 4", "CHECK 4", 
+            "ESERCIZIO 5", "CHECK 5"
+        ]
+
+        if not esercizi_rows:
+            df_esercizi = pd.DataFrame(columns=expected_es_columns)
+        else:
+            data_es = esercizi_rows[1:] if len(esercizi_rows) > 1 else esercizi_rows
+            
+            cleaned_es_data = []
+            for row in data_es:
+                new_row = list(row)
+                while len(new_row) < 11:
+                    new_row.append("")
+                
+                # Convertiamo le colonne di check (indici 2, 4, 6, 8, 10) in booleani reali per le checkbox
+                for check_idx in [2, 4, 6, 8, 10]:
+                    val = str(new_row[check_idx]).strip().upper()
+                    if val in ["TRUE", "VERO", "1", "V", "YES", "X", "ON"]:
+                        new_row[check_idx] = True
+                    else:
+                        new_row[check_idx] = False
+                        
+                cleaned_es_data.append(new_row[:11])
+
+            df_esercizi = pd.DataFrame(cleaned_es_data, columns=expected_es_columns)
+
+        df_esercizi = df_esercizi.replace(r'^\s*$', pd.NA, regex=True)
+        # Rimuove righe interamente vuote tenendo conto dei valori booleani
+        df_esercizi = df_esercizi.dropna(subset=["Allievo"], how='all').fillna({
+            "Allievo": "",
+            "ESERCIZIO 1": "", "CHECK 1": False,
+            "ESERCIZIO 2": "", "CHECK 2": False,
+            "ESERCIZIO 3": "", "CHECK 3": False,
+            "ESERCIZIO 4": "", "CHECK 4": False,
+            "ESERCIZIO 5": "", "CHECK 5": False
+        })
+
+        config_es_cols = {
+            "Allievo": st.column_config.TextColumn("Allievo", width="medium"),
+            "ESERCIZIO 1": st.column_config.TextColumn("ESERCIZIO", width="large"),
+            "CHECK 1": st.column_config.CheckboxColumn("CHECK", default=False),
+            "ESERCIZIO 2": st.column_config.TextColumn("ESERCIZIO", width="large"),
+            "CHECK 2": st.column_config.CheckboxColumn("CHECK", default=False),
+            "ESERCIZIO 3": st.column_config.TextColumn("ESERCIZIO", width="large"),
+            "CHECK 3": st.column_config.CheckboxColumn("CHECK", default=False),
+            "ESERCIZIO 4": st.column_config.TextColumn("ESERCIZIO", width="large"),
+            "CHECK 4": st.column_config.CheckboxColumn("CHECK", default=False),
+            "ESERCIZIO 5": st.column_config.TextColumn("ESERCIZIO", width="large"),
+            "CHECK 5": st.column_config.CheckboxColumn("CHECK", default=False),
+        }
+
+        with st.container():
+            edited_df_es = st.data_editor(
+                df_esercizi,
+                use_container_width=True,
+                hide_index=True,
+                column_config=config_es_cols,
+                key="editor_esercizi"
+            )
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        if st.button("💾 SALVA MODIFICHE ESERCIZI"):
+            try:
+                # Prepariamo i dati convertendo i booleani per Google Sheets
+                df_to_save = edited_df_es.copy()
+                for check_idx in [2, 4, 6, 8, 10]:
+                    col_name = df_to_save.columns[check_idx]
+                    df_to_save[col_name] = df_to_save[col_name].apply(lambda x: TRUE if x else FALSE)
+
+                data_to_write = df_to_save.values.tolist()
+                creds = ottieni_credenziali()
+                if creds:
+                    client = gspread.authorize(creds)
+                    sheet = client.open_by_key(SHEET_ID)
+                    target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ESERCIZI).strip()), None)
+                    if target_ws:
+                        end_row = 17 + len(data_to_write) - 1
+                        target_ws.update(f"C17:M{end_row}", data_to_write)
+                        
+                        st.toast("✅ Modifiche Esercizi effettuate con successo!", icon="🎉")
+                        st.success("Modifiche salvate con successo su Google Sheet (C17:M40)!")
+                        
+                        time.sleep(1)
+                        st.rerun()
+            except Exception as ex:
+                st.error(f"Errore durante il salvataggio degli esercizi: {ex}")
+
+        st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "👤 SCHEDE GIOCATORE":
         st.subheader("👤 Schede Giocatore")
