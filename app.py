@@ -45,19 +45,6 @@ def scrivi_cella_per_gid(gid, cella, valore):
     except Exception as e:
         st.error(f"Errore nella scrittura della cella {cella}: {e}")
 
-def aggiorna_intervallo_da_dataframe(gid, range_name, df):
-    try:
-        creds = ottieni_credenziali()
-        if creds:
-            client = gspread.authorize(creds)
-            sheet = client.open_by_key(SHEET_ID)
-            target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(gid).strip()), None)
-            if target_ws:
-                data_to_write = [df.columns.tolist()] + df.astype(str).values.tolist()
-                target_ws.update(range_name, data_to_write)
-    except Exception as e:
-        st.error(f"Errore nell'aggiornamento del foglio: {e}")
-
 # ==========================================
 # 3. CSS PERSONALIZZATO
 # ==========================================
@@ -127,6 +114,25 @@ st.markdown("""
             font-weight: bold;
             margin-top: 4px;
         }
+        .fixed-box-row {
+            display: flex;
+            justify-content: space-between;
+            background-color: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+        .fixed-box-header {
+            display: flex;
+            justify-content: space-between;
+            background-color: #21262d;
+            border-bottom: 2px solid #30363d;
+            padding: 8px 12px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            color: #8b949e;
+            text-transform: uppercase;
+        }
     </style>
 """, unsafe_allow_html=True)
 
@@ -181,8 +187,9 @@ with center_col:
 
         f13_val, h13_val = "", ""
         f14_val, h14_val = "", ""
+        box_pix_rows = []
+        box_nino_rows = []
         box2_rows = []
-        box3_rows = []
 
         try:
             creds = ottieni_credenziali()
@@ -197,6 +204,24 @@ with center_col:
                     f14_val = target_ws.acell("F14").value or ""
                     h14_val = target_ws.acell("H14").value or ""
 
+                    # Dati fissi di esempio per ARES PIX (puoi personalizzare o leggere da foglio se necessario)
+                    box_pix_rows = [
+                        ["JFF_CLIP", "L/M/G/D", "DOJO MAP", "-"],
+                        ["itaboyz_Casco", "L/M/G/D", "DOJO MAP", "-"],
+                        ["itaBOYZ_VIN", "L/M/G/D", "DOJO MAP", "-"],
+                        ["itaboyz_imperat", "L/M/G/D", "DOJO MAP", "-"],
+                        ["itaboyz_gallo", "L/M/G/D", "DOJO MAP", "-"]
+                    ]
+
+                    # Dati fissi di esempio per ARES NINO
+                    box_nino_rows = [
+                        ["JFF_SINNER", "L/M/G/D", "DOJO MAP", "-"],
+                        ["JFF_POTA", "L/M/G/D", "DOJO MAP", "-"],
+                        ["JFF_ANDERWAL", "L/M/G/D", "DOJO MAP", "-"],
+                        ["JFF_DANI", "L/M/G/D", "DOJO MAP", "-"],
+                        ["itaboyz_faire", "L/M/G/D", "DOJO MAP", "-"]
+                    ]
+
                     raw_box2 = target_ws.get("G16:J30")
                     for r in raw_box2:
                         box2_rows.append([
@@ -205,21 +230,12 @@ with center_col:
                             r[2] if len(r) > 2 else "",
                             r[3] if len(r) > 3 else ""
                         ])
-
-                    raw_box3 = target_ws.get("C26:F49")
-                    for r in raw_box3:
-                        if any(r):
-                            box3_rows.append([
-                                r[0] if len(r) > 0 else "",
-                                r[1] if len(r) > 1 else "",
-                                r[2] if len(r) > 2 else "",
-                                r[3] if len(r) > 3 else ""
-                            ])
         except Exception as e:
             st.warning(f"Errore nel caricamento dati Academy: {e}")
 
+        # Header principale superiore
         st.markdown(f"""
-        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; padding: 0px; overflow: hidden; margin-bottom: 20px;'>
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.2rem; padding: 10px;'>
                 {f13_val} {h13_val}
             </div>
@@ -229,6 +245,65 @@ with center_col:
         </div>
         """, unsafe_allow_html=True)
 
+        # ==========================================
+        # 1. SEZIONE FISSA: ARES PIX
+        # ==========================================
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
+                ARES PIX
+            </div>
+            <div class='fixed-box-header'>
+                <span style='flex: 2;'>Allievi a carico</span>
+                <span style='flex: 1; text-align: center;'>Giorni dispo</span>
+                <span style='flex: 1; text-align: center;'>Mappa</span>
+                <span style='flex: 1; text-align: right;'>Recensione</span>
+            </div>
+        """, unsafe_allow_html=True)
+
+        for row in box_pix_rows:
+            st.markdown(f"""
+            <div class='fixed-box-row'>
+                <span style='flex: 2; color: #FFFFFF;'>{row[0]}</span>
+                <span style='flex: 1; text-align: center; color: #8b949e;'>{row[1]}</span>
+                <span style='flex: 1; text-align: center; color: #58a6ff;'>{row[2]}</span>
+                <span style='flex: 1; text-align: right; color: #FFFFFF;'>{row[3]}</span>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        # ==========================================
+        # 2. SEZIONE FISSA: ARES NINO
+        # ==========================================
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
+                ARES NINO
+            </div>
+            <div class='fixed-box-header'>
+                <span style='flex: 2;'>Allievi a carico</span>
+                <span style='flex: 1; text-align: center;'>Giorni dispo</span>
+                <span style='flex: 1; text-align: center;'>Mappa</span>
+                <span style='flex: 1; text-align: right;'>Recensione</span>
+            </div>
+        """, unsafe_allow_html=True)
+
+        for row in box_nino_rows:
+            st.markdown(f"""
+            <div class='fixed-box-row'>
+                <span style='flex: 2; color: #FFFFFF;'>{row[0]}</span>
+                <span style='flex: 1; text-align: center; color: #8b949e;'>{row[1]}</span>
+                <span style='flex: 1; text-align: center; color: #58a6ff;'>{row[2]}</span>
+                <span style='flex: 1; text-align: right; color: #FFFFFF;'>{row[3]}</span>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        # ==========================================
+        # 3. REGISTRO ATTIVITA' (EDITABILE)
+        # ==========================================
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 5px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
