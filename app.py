@@ -465,14 +465,22 @@ with center_col:
             data_progressi = progressi_rows[1:] if len(progressi_rows) > 1 else [[""] * 8]
             df_progressi = pd.DataFrame(data_progressi, columns=header_progressi)
 
-        # Pulizia, conversione in stringa e GARANZIA DI NOMI DI COLONNA UNIVOCI (evita Duplicate column names)
+        # Pulizia, conversione in stringa e gestione sicura di nomi di colonna unici (evita errori PyArrow / Pandas)
         df_progressi = df_progressi.astype(str).fillna("")
         
-        # Rendi unici i nomi delle colonne aggiungendo un suffisso se ci sono duplicati
-        cols = pd.Series(df_progressi.columns)
-        for dup in cols[cols.duplicated()].unique():
-            cols[cols == dup] = [dup + f'_{i}' if i != 0 else dup for i in range(sum(cols == dup))]
-        df_progressi.columns = cols
+        seen_cols = {}
+        unique_cols = []
+        for col in df_progressi.columns:
+            c_name = str(col).strip()
+            if not c_name or c_name.lower() in ["nan", "none"]:
+                c_name = "Col"
+            if c_name in seen_cols:
+                seen_cols[c_name] += 1
+                unique_cols.append(f"{c_name}_{seen_cols[c_name]}")
+            else:
+                seen_cols[c_name] = 0
+                unique_cols.append(c_name)
+        df_progressi.columns = unique_cols
 
         st.dataframe(df_progressi, use_container_width=True, hide_index=True)
 
