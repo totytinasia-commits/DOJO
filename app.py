@@ -53,7 +53,6 @@ def aggiorna_intervallo_da_dataframe(gid, range_name, df):
             sheet = client.open_by_key(SHEET_ID)
             target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(gid).strip()), None)
             if target_ws:
-                # Converte il DataFrame in una lista di liste includendo i dati modificati
                 data_to_write = [df.columns.tolist()] + df.astype(str).values.tolist()
                 target_ws.update(range_name, data_to_write)
     except Exception as e:
@@ -177,7 +176,7 @@ with center_col:
 
     current = st.session_state.current_section
 
-    elif current == "🏫 ACADEMY":
+    if current == "🏫 ACADEMY":
         st.subheader("🏫 Academy")
 
         f13_val, h13_val = "", ""
@@ -193,13 +192,11 @@ with center_col:
                 target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ACADEMY).strip()), None)
 
                 if target_ws:
-                    # 1. Box principale (F13, H13, F14, H14)
                     f13_val = target_ws.acell("F13").value or ""
                     h13_val = target_ws.acell("H13").value or ""
                     f14_val = target_ws.acell("F14").value or ""
                     h14_val = target_ws.acell("H14").value or ""
 
-                    # 2. Tabella Registro Attività (G16:J30)
                     raw_box2 = target_ws.get("G16:J30")
                     for r in raw_box2:
                         box2_rows.append([
@@ -209,7 +206,6 @@ with center_col:
                             r[3] if len(r) > 3 else ""
                         ])
 
-                    # 3. Terzo box (C26:F49)
                     raw_box3 = target_ws.get("C26:F49")
                     for r in raw_box3:
                         if any(r):
@@ -222,9 +218,6 @@ with center_col:
         except Exception as e:
             st.warning(f"Errore nel caricamento dati Academy: {e}")
 
-        # ==========================================
-        # BOX 1: INTESTAZIONE PRINCIPALE
-        # ==========================================
         st.markdown(f"""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; padding: 0px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.2rem; padding: 10px;'>
@@ -236,9 +229,6 @@ with center_col:
         </div>
         """, unsafe_allow_html=True)
 
-        # ==========================================
-        # REGISTRO ATTIVITA' EDITABILE E SINCRONIZZATO
-        # ==========================================
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 5px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
@@ -247,10 +237,8 @@ with center_col:
         </div>
         """, unsafe_allow_html=True)
 
-        # Gestione sicura delle intestazioni e delle righe lette dal foglio
         if box2_rows and len(box2_rows) > 0:
             raw_header = box2_rows[0]
-            # Pulisce e rende uniche le colonne per evitare conflitti in Streamlit
             clean_header = []
             seen = set()
             for idx, h in enumerate(raw_header):
@@ -271,7 +259,6 @@ with center_col:
 
         df_registro = pd.DataFrame(data_rows, columns=header_cols)
 
-        # Tabella interattiva editabile
         edited_df = st.data_editor(
             df_registro,
             use_container_width=True,
@@ -279,7 +266,6 @@ with center_col:
             key="editor_registro_attivita"
         )
 
-        # Sincronizzazione automatica e immediata con il foglio Google a ogni modifica o tramite bottone
         if st.button("💾 SALVA MODIFICHE REGISTRO"):
             try:
                 full_data_to_write = [raw_header] + edited_df.values.tolist()
@@ -420,20 +406,20 @@ with center_col:
                     f16_s16 = target_ws.get("F16:S16")
                     if f16_s16 and len(f16_s16) > 0:
                         rv = f16_s16[0]
-                        summary_fired   = format_val(rv[0] if len(rv) > 0 else 0)
-                        summary_hit     = format_val(rv[1] if len(rv) > 1 else 0)
-                        summary_acc     = format_val(rv[2] if len(rv) > 2 else 0, is_percentage=True)
-                        summary_kill    = format_val(rv[3] if len(rv) > 3 else 0)
-                        summary_dmg     = format_val(rv[4] if len(rv) > 4 else 0)
-                        summary_mvp     = format_val(rv[5] if len(rv) > 5 else 0)
-                        summary_death   = format_val(rv[6] if len(rv) > 6 else 0)
-                        summary_revive  = format_val(rv[7] if len(rv) > 7 else 0)
-                        summary_oh_shots= format_val(rv[8] if len(rv) > 8 else 0)
-                        summary_oh_hit  = format_val(rv[9] if len(rv) > 9 else 0)
-                        summary_oh_acc  = format_val(rv[10] if len(rv) > 10 else 0, is_percentage=True)
-                        summary_th_shots= format_val(rv[11] if len(rv) > 11 else 0)
-                        summary_th_hit  = format_val(rv[12] if len(rv) > 12 else 0)
-                        summary_th_acc  = format_val(rv[13] if len(rv) > 13 else 0, is_percentage=True)
+                        summary_fired    = format_val(rv[0] if len(rv) > 0 else 0)
+                        summary_hit      = format_val(rv[1] if len(rv) > 1 else 0)
+                        summary_acc      = format_val(rv[2] if len(rv) > 2 else 0, is_percentage=True)
+                        summary_kill     = format_val(rv[3] if len(rv) > 3 else 0)
+                        summary_dmg      = format_val(rv[4] if len(rv) > 4 else 0)
+                        summary_mvp      = format_val(rv[5] if len(rv) > 5 else 0)
+                        summary_death    = format_val(rv[6] if len(rv) > 6 else 0)
+                        summary_revive   = format_val(rv[7] if len(rv) > 7 else 0)
+                        summary_oh_shots = format_val(rv[8] if len(rv) > 8 else 0)
+                        summary_oh_hit   = format_val(rv[9] if len(rv) > 9 else 0)
+                        summary_oh_acc   = format_val(rv[10] if len(rv) > 10 else 0, is_percentage=True)
+                        summary_th_shots = format_val(rv[11] if len(rv) > 11 else 0)
+                        summary_th_hit   = format_val(rv[12] if len(rv) > 12 else 0)
+                        summary_th_acc   = format_val(rv[13] if len(rv) > 13 else 0, is_percentage=True)
 
                     j18_l18 = target_ws.get("J18:L18")
                     if j18_l18 and len(j18_l18) > 0 and len(j18_l18[0]) > 0:
@@ -499,7 +485,7 @@ with center_col:
                                         "ACC%": format_val(r_data[3] if len(r_data) > 3 else 0, is_percentage=True),
                                         "DMG": format_val(r_data[4] if len(r_data) > 4 else 0),
                                         "HEADSHOT": format_val(r_data[5] if len(r_data) > 5 else 0),
-                                        "MAX DISTANCE": format_val(r_data[6] if len(r_data) > 6 else 0),
+                                        "MAX DISTANCE": format_val(r_data[6] if len(r_data) > 6 else 0), 
                                         "SHOT ONE": format_val(r_data[8] if len(r_data) > 8 else 0),
                                         "SHOT HIT ONE": format_val(r_data[9] if len(r_data) > 9 else 0),
                                         "ACC% ONE": format_val(r_data[10] if len(r_data) > 10 else 0, is_percentage=True),
