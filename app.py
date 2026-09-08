@@ -458,48 +458,40 @@ with center_col:
         except Exception as e:
             st.warning(f"Errore nel caricamento dati Progressi: {e}")
 
-        if not progressi_rows:
-            df_progressi = pd.DataFrame(columns=["Allievo", "AIM", "Building", "Movimento", "Teamwork", "Game Sense", "Leadership", "Media"])
-        else:
-            header_progressi = progressi_rows[0] if len(progressi_rows) > 0 else [f"Col{i}" for i in range(8)]
-            data_progressi = progressi_rows[1:] if len(progressi_rows) > 1 else [[""] * 8]
-            df_progressi = pd.DataFrame(data_progressi, columns=header_progressi)
+        # Definiamo direttamente i nomi corretti delle colonne richiesti
+        expected_columns = ["Allievo", "AIM", "Building", "Movimento", "Teamwork", "Game Sense", "Leadership", "Media"]
 
-        # Pulizia righe completamente vuote (rimuove le righe vuote in cima o in mezzo)
+        if not progressi_rows:
+            df_progressi = pd.DataFrame(columns=expected_columns)
+        else:
+            # I dati effettivi iniziano saltando la prima riga se contiene l'intestazione precedente, oppure li prendiamo tutti se sono già righe di dati
+            data_progressi = progressi_rows[1:] if len(progressi_rows) > 1 else progressi_rows
+            
+            cleaned_data = []
+            for row in data_progressi:
+                new_row = list(row)
+                while len(new_row) < 8:
+                    new_row.append("")
+                cleaned_data.append(new_row[:8])
+
+            df_progressi = pd.DataFrame(cleaned_data, columns=expected_columns)
+
+        # Rimuove eventuali righe completamente vuote
         df_progressi = df_progressi.replace(r'^\s*$', pd.NA, regex=True)
         df_progressi = df_progressi.dropna(how='all').fillna("")
 
-        # Normalizzazione nomi colonne unici
-        seen_cols = {}
-        unique_cols = []
-        for col in df_progressi.columns:
-            c_name = str(col).strip()
-            if not c_name or c_name.lower() in ["nan", "none"]:
-                c_name = "Col"
-            if c_name in seen_cols:
-                seen_cols[c_name] += 1
-                unique_cols.append(f"{c_name}_{seen_cols[c_name]}")
-            else:
-                seen_cols[c_name] = 0
-                unique_cols.append(c_name)
-        df_progressi.columns = unique_cols
-
-        # Configurazione di visualizzazione per espandere le celle ed applicare i colori percentuali
+        # Configurazione delle colonne per espanderle e colorare le percentuali
         config_cols = {}
         for i, col_name in enumerate(df_progressi.columns):
             if i == 0:
-                # La prima colonna (Allievo) è testuale e viene lasciata estesa
                 config_cols[col_name] = st.column_config.TextColumn(col_name, width="medium")
             else:
-                # Le colonne successive con percentuali vengono visualizzate come barre colorate / metriche percentuali leggibili
                 config_cols[col_name] = st.column_config.ProgressColumn(
                     col_name,
                     min_value=0,
                     max_value=100,
                     format="%s"
                 )
-                
-                # Converte i valori percentuali testuali (es. "35%") in float numerici per colorare correttamente le celle
                 def parse_pct(val):
                     try:
                         clean = str(val).replace("%", "").replace(",", ".").strip()
@@ -508,7 +500,7 @@ with center_col:
                         return 0.0
                 df_progressi[col_name] = df_progressi[col_name].apply(parse_pct)
 
-        # Container a larghezza estesa per leggere comodamente tutto il contenuto senza restrizioni
+        # Visualizzazione della tabella espansa
         with st.container():
             st.dataframe(
                 df_progressi,
