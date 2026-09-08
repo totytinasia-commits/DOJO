@@ -222,7 +222,8 @@ with center_col:
                         ["itaboyz_faire", "L/M/G/D", "DOJO MAP"]
                     ]
 
-                    raw_box2 = target_ws.get("G16:I30")  # Preleviamo 3 colonne (G, H, I)
+                    # Preleviamo l'intervallo C27:E50 per il Registro Attività
+                    raw_box2 = target_ws.get("C27:E50")
                     for r in raw_box2:
                         box2_rows.append([
                             r[0] if len(r) > 0 else "",
@@ -297,7 +298,7 @@ with center_col:
         st.markdown("</div>", unsafe_allow_html=True)
 
         # ==========================================
-        # 3. REGISTRO ATTIVITA' (EDITABILE)
+        # 3. REGISTRO ATTIVITA' (EDITABILE) - C27:E50
         # ==========================================
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 5px;'>
@@ -345,9 +346,9 @@ with center_col:
                     sheet = client.open_by_key(SHEET_ID)
                     target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ACADEMY).strip()), None)
                     if target_ws:
-                        end_row = 16 + len(full_data_to_write) - 1
-                        target_ws.update(f"G16:I{end_row}", full_data_to_write)
-                        st.success("Modifiche salvate con successo sul Google Sheet!")
+                        end_row = 27 + len(full_data_to_write) - 1
+                        target_ws.update(f"C27:E{end_row}", full_data_to_write)
+                        st.success("Modifiche salvate con successo sul Google Sheet (C27:E...)!")
                         time.sleep(1)
                         st.rerun()
             except Exception as ex:
