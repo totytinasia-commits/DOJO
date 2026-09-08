@@ -465,8 +465,14 @@ with center_col:
             data_progressi = progressi_rows[1:] if len(progressi_rows) > 1 else [[""] * 8]
             df_progressi = pd.DataFrame(data_progressi, columns=header_progressi)
 
-        # Pulizia e conversione sicura a stringa per evitare qualsiasi errore di Arrow
+        # Pulizia, conversione in stringa e GARANZIA DI NOMI DI COLONNA UNIVOCI (evita Duplicate column names)
         df_progressi = df_progressi.astype(str).fillna("")
+        
+        # Rendi unici i nomi delle colonne aggiungendo un suffisso se ci sono duplicati
+        cols = pd.Series(df_progressi.columns)
+        for dup in cols[cols.duplicated()].unique():
+            cols[cols == dup] = [dup + f'_{i}' if i != 0 else dup for i in range(sum(cols == dup))]
+        df_progressi.columns = cols
 
         st.dataframe(df_progressi, use_container_width=True, hide_index=True)
 
