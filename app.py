@@ -222,7 +222,7 @@ with center_col:
                         ["itaboyz_faire", "L/M/G/D", "DOJO MAP"]
                     ]
 
-                    # Preleviamo esattamente l'intervallo C28:E50 per il Registro Attività
+                    # Preleviamo l'intervallo C28:E50 per il Registro Attività
                     raw_box2 = target_ws.get("C28:E50")
                     for r in raw_box2:
                         box2_rows.append([
@@ -338,7 +338,11 @@ with center_col:
                     if target_ws:
                         end_row = 28 + len(data_to_write) - 1
                         target_ws.update(f"C28:E{end_row}", data_to_write)
+                        
+                        # Mostra il popup di successo (toast e messaggio a schermo)
+                        st.toast("✅ Modifiche effettuate con successo!", icon="🎉")
                         st.success("Modifiche salvate con successo su Google Sheet (C28:E50)!")
+                        
                         time.sleep(1)
                         st.rerun()
             except Exception as ex:
