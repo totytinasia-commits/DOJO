@@ -465,29 +465,10 @@ with center_col:
             data_progressi = progressi_rows[1:] if len(progressi_rows) > 1 else [[""] * 8]
             df_progressi = pd.DataFrame(data_progressi, columns=header_progressi)
 
+        # Pulizia e conversione sicura a stringa per evitare qualsiasi errore di Arrow
         df_progressi = df_progressi.astype(str).fillna("")
 
-        # Funzione di colorazione delle celle percentuali basata sui valori della legenda
-        def color_progress_cells(val):
-            try:
-                clean_val = str(val).replace("%", "").replace(",", ".").strip()
-                num = float(clean_val)
-                if num <= 40:
-                    return 'background-color: #ff0000; color: #000000; font-weight: bold;'
-                elif num <= 80:
-                    return 'background-color: #ffaa00; color: #000000; font-weight: bold;'
-                else:
-                    return 'background-color: #90ee90; color: #000000; font-weight: bold;'
-            except Exception:
-                return ''
-
-        try:
-            # Applichiamo lo stile alle colonne numeriche/percentuali (dalla seconda colonna in poi)
-            cols_to_style = df_progressi.columns[1:] if len(df_progressi.columns) > 1 else df_progressi.columns
-            styled_df = df_progressi.style.map(color_progress_cells, subset=cols_to_style)
-            st.dataframe(styled_df, use_container_width=True, hide_index=True)
-        except Exception:
-            st.dataframe(df_progressi, use_container_width=True, hide_index=True)
+        st.dataframe(df_progressi, use_container_width=True, hide_index=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
