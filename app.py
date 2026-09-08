@@ -458,13 +458,11 @@ with center_col:
         except Exception as e:
             st.warning(f"Errore nel caricamento dati Progressi: {e}")
 
-        # Definiamo direttamente i nomi corretti delle colonne richiesti
         expected_columns = ["Allievo", "AIM", "Building", "Movimento", "Teamwork", "Game Sense", "Leadership", "Media"]
 
         if not progressi_rows:
             df_progressi = pd.DataFrame(columns=expected_columns)
         else:
-            # I dati effettivi iniziano saltando la prima riga se contiene l'intestazione precedente, oppure li prendiamo tutti se sono già righe di dati
             data_progressi = progressi_rows[1:] if len(progressi_rows) > 1 else progressi_rows
             
             cleaned_data = []
@@ -476,11 +474,9 @@ with center_col:
 
             df_progressi = pd.DataFrame(cleaned_data, columns=expected_columns)
 
-        # Rimuove eventuali righe completamente vuote
         df_progressi = df_progressi.replace(r'^\s*$', pd.NA, regex=True)
         df_progressi = df_progressi.dropna(how='all').fillna("")
 
-        # Configurazione delle colonne per espanderle e colorare le percentuali
         config_cols = {}
         for i, col_name in enumerate(df_progressi.columns):
             if i == 0:
@@ -500,7 +496,6 @@ with center_col:
                         return 0.0
                 df_progressi[col_name] = df_progressi[col_name].apply(parse_pct)
 
-        # Visualizzazione della tabella espansa
         with st.container():
             st.dataframe(
                 df_progressi,
@@ -544,7 +539,12 @@ with center_col:
         st.markdown("---")
 
         if st.session_state.stat_tab == "🏋️ TRAINING":
-            st.write("Vista selezionata: **TRAINING**")
+            st.markdown("""
+            <div style='background-color: #161b22; border: 2px dashed #ff9900; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px;'>
+                <h3 style='color: #FFD700; margin: 0; text-transform: uppercase;'>🏋️ Training</h3>
+                <p style='color: #8b949e; font-size: 1.1rem; margin-top: 10px; font-weight: bold;'>PRESTO IN ARRIVO</p>
+            </div>
+            """, unsafe_allow_html=True)
 
         elif st.session_state.stat_tab == "🏆 STATCOMP":
             st.markdown("<div style='background-color: #0e1117; border: 2px solid #262730; border-radius: 12px; padding: 15px;'>", unsafe_allow_html=True)
