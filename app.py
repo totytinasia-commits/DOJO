@@ -406,20 +406,22 @@ with center_col:
     elif current == "📈 PROGRESSI":
         st.subheader("📈 Progressi")
 
-        # Visualizzazione della Legenda
+        # Legenda Centrata
         st.markdown("""
-        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px; max-width: 250px;'>
-            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1rem; padding: 6px;'>
-                LEGGENDA
-            </div>
-            <div style='background-color: #ff0000; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
-                0-40%
-            </div>
-            <div style='background-color: #ffaa00; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
-                40-80%
-            </div>
-            <div style='background-color: #90ee90; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
-                80-100%
+        <div style='display: flex; justify-content: center; margin-bottom: 20px;'>
+            <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; width: 220px;'>
+                <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1rem; padding: 6px;'>
+                    LEGGENDA
+                </div>
+                <div style='background-color: #ff0000; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
+                    0-40%
+                </div>
+                <div style='background-color: #ffaa00; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
+                    40-80%
+                </div>
+                <div style='background-color: #90ee90; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
+                    80-100%
+                </div>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -441,7 +443,6 @@ with center_col:
                 target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_PROGRESSI).strip()), None)
 
                 if target_ws:
-                    # Leggiamo l'intervallo B12:I35 (colonne da B a I)
                     raw_progressi = target_ws.get("B12:I35")
                     for r in raw_progressi:
                         progressi_rows.append([
@@ -458,16 +459,17 @@ with center_col:
             st.warning(f"Errore nel caricamento dati Progressi: {e}")
 
         if not progressi_rows:
-            df_progressi = pd.DataFrame(columns=["Col1", "Col2", "Col3", "Col4", "Col5", "Col6", "Col7", "Col8"])
+            df_progressi = pd.DataFrame(columns=["Allievo", "AIM", "Building", "Movimento", "Teamwork", "Game Sense", "Leadership", "Media"])
         else:
             header_progressi = progressi_rows[0] if len(progressi_rows) > 0 else [f"Col{i}" for i in range(8)]
             data_progressi = progressi_rows[1:] if len(progressi_rows) > 1 else [[""] * 8]
             df_progressi = pd.DataFrame(data_progressi, columns=header_progressi)
 
-        # Funzione per colorare le celle in base alla percentuale
-        def color_percentage(val):
+        df_progressi = df_progressi.astype(str).fillna("")
+
+        # Funzione di colorazione delle celle percentuali basata sui valori della legenda
+        def color_progress_cells(val):
             try:
-                # Pulisce la stringa per estrarre il valore numerico
                 clean_val = str(val).replace("%", "").replace(",", ".").strip()
                 num = float(clean_val)
                 if num <= 40:
@@ -479,9 +481,10 @@ with center_col:
             except Exception:
                 return ''
 
-        # Applichiamo la formattazione al DataFrame se possibile
         try:
-            styled_df = df_progressi.style.map(color_percentage)
+            # Applichiamo lo stile alle colonne numeriche/percentuali (dalla seconda colonna in poi)
+            cols_to_style = df_progressi.columns[1:] if len(df_progressi.columns) > 1 else df_progressi.columns
+            styled_df = df_progressi.style.map(color_progress_cells, subset=cols_to_style)
             st.dataframe(styled_df, use_container_width=True, hide_index=True)
         except Exception:
             st.dataframe(df_progressi, use_container_width=True, hide_index=True)
