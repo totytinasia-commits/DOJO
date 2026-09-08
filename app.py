@@ -186,6 +186,76 @@ with center_col:
     if current == "🏫 ACADEMY":
         st.subheader("🏫 Academy")
 
+        # ==========================================
+        # BOX PERSONALIZZATO ACADEMY (F13:H14 + G16:G24 + C26:C49)
+        # ==========================================
+        
+        # 1. Recupero dati da Google Sheets
+        f13_val, h13_val = "", ""
+        f14_val, h14_val = "", ""
+        g_rows = []
+        c_rows = []
+
+        try:
+            creds = ottieni_credenziali()
+            if creds:
+                client = gspread.authorize(creds)
+                sheet = client.open_by_key(SHEET_ID)
+                # Usa il foglio attivo o seleziona quello dell'Academy (modifica il GID se necessario)
+                target_ws = sheet.get_worksheet(0) 
+
+                if target_ws:
+                    # Legge le etichette/valori in F13, H13, F14, H14
+                    f13_val = target_ws.acell("F13").value or ""
+                    h13_val = target_ws.acell("H13").value or ""
+                    f14_val = target_ws.acell("F14").value or ""
+                    h14_val = target_ws.acell("H14").value or ""
+
+                    # Legge l'intervallo da G16 a G24
+                    g_data = target_ws.get("G16:G24")
+                    g_rows = [row[0] for row in g_data if row and len(row) > 0]
+
+                    # Legge l'intervallo da C26 a C49 (come da tua richiesta "da C26 a 749" inteso come C49)
+                    c_data = target_ws.get("C26:C49")
+                    c_rows = [row[0] for row in c_data if row and len(row) > 0]
+
+        except Exception as e:
+            st.warning(f"Errore nel caricamento dati Academy: {e}")
+
+        # 2. Renderizzazione del Box Principale (stile immagine allegata)
+        st.markdown(f"""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; padding: 0px; overflow: hidden; margin-bottom: 20px;'>
+            <!-- Intestazione Gialla Centrale -->
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.2rem; padding: 10px;'>
+                {f13_val} {h13_val}
+            </div>
+            <!-- Sottotitolo / Riga 14 in bianco su nero -->
+            <div style='color: #FFFFFF; text-align: center; font-size: 0.95rem; padding: 8px; border-bottom: 1px solid #333333;'>
+                {f14_val} &nbsp;&nbsp; {h14_val}
+            </div>
+        """, unsafe_allow_html=True)
+
+        # 3. Blocco dati G16:G24
+        st.markdown("<div style='padding: 10px 15px; color: #FFFFFF;'>", unsafe_allow_html=True)
+        st.markdown("<p style='color: #FFD700; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;'>DATI G16:G24</p>", unsafe_allow_html=True)
+        if g_rows:
+            for val in g_rows:
+                st.markdown(f"<p style='margin: 4px 0; color: #FFFFFF; font-size: 0.9rem;'>• {val}</p>", unsafe_allow_html=True)
+        else:
+            st.markdown("<p style='color: #8b949e; font-size: 0.85rem;'>Nessun dato disponibile</p>", unsafe_allow_html=True)
+        
+        st.markdown("---", unsafe_allow_html=True)
+
+        # 4. Blocco dati C26:C49
+        st.markdown("<p style='color: #FFD700; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;'>DATI C26:C49</p>", unsafe_allow_html=True)
+        if c_rows:
+            for val in c_rows:
+                st.markdown(f"<p style='margin: 4px 0; color: #FFFFFF; font-size: 0.9rem;'>- {val}</p>", unsafe_allow_html=True)
+        else:
+            st.markdown("<p style='color: #8b949e; font-size: 0.85rem;'>Nessun dato disponibile</p>", unsafe_allow_html=True)
+
+        st.markdown("</div></div>", unsafe_allow_html=True)
+
     elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
 
