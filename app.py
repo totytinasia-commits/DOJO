@@ -17,6 +17,7 @@ st.set_page_config(
 SHEET_ID = "1ul4pI3QDqGYz7kjj6p-QLgLXMkMMR3anv4JdEP0lI48"
 GID_PERSONAL_STATS = "1148983819"
 GID_ACADEMY = "625069530"
+GID_ANAGRAFICA = "1502613256"
 
 # ==========================================
 # 2. FUNZIONI HELPER GOOGLE SHEETS
@@ -339,7 +340,6 @@ with center_col:
                         end_row = 28 + len(data_to_write) - 1
                         target_ws.update(f"C28:E{end_row}", data_to_write)
                         
-                        # Mostra il popup di successo (toast e messaggio a schermo)
                         st.toast("✅ Modifiche effettuate con successo!", icon="🎉")
                         st.success("Modifiche salvate con successo su Google Sheet (C28:E50)!")
                         
@@ -352,6 +352,61 @@ with center_col:
 
     elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
+
+        # Contenitore personalizzato in stile con i bordi rossi e titolo giallo
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
+                ANAGRAFICA ALLIEVI
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        anagrafica_rows = []
+        try:
+            creds = ottieni_credenziali()
+            if creds:
+                client = gspread.authorize(creds)
+                sheet = client.open_by_key(SHEET_ID)
+                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ANAGRAFICA).strip()), None)
+
+                if target_ws:
+                    # Leggiamo l'intervallo C13:L35 (10 colonne: C, D, E, F, G, H, I, J, K, L)
+                    raw_anagrafica = target_ws.get("C13:L35")
+                    for r in raw_anagrafica:
+                        anagrafica_rows.append([
+                            r[0] if len(r) > 0 else "",
+                            r[1] if len(r) > 1 else "",
+                            r[2] if len(r) > 2 else "",
+                            r[3] if len(r) > 3 else "",
+                            r[4] if len(r) > 4 else "",
+                            r[5] if len(r) > 5 else "",
+                            r[6] if len(r) > 6 else "",
+                            r[7] if len(r) > 7 else "",
+                            r[8] if len(r) > 8 else "",
+                            r[9] if len(r) > 9 else ""
+                        ])
+        except Exception as e:
+            st.warning(f"Errore nel caricamento dati Anagrafica: {e}")
+
+        if not anagrafica_rows:
+            # Fallback se vuoto o errore di connessione iniziale
+            cols_names = ["ID", "Nickname", "Nome Reale", "Paese", "Data Ingresso", "Livello Attuale", "Coach", "Ore Totali", "Obiettivo", "Certificazione"]
+            df_anagrafica = pd.DataFrame(columns=cols_names)
+        else:
+            # La prima riga del range C13:L13 è l'intestazione
+            header_anagrafica = anagrafica_rows[0] if len(anagrafica_rows) > 0 else ["ID", "Nickname", "Nome Reale", "Paese", "Data Ingresso", "Livello Attuale", "Coach", "Ore Totali", "Obiettivo", "Certificazione"]
+            data_anagrafica = anagrafica_rows[1:] if len(anagrafica_rows) > 1 else [[""] * 10]
+            df_anagrafica = pd.DataFrame(data_anagrafica, columns=header_anagrafica)
+
+        # Tabella in sola lettura (disabled=True)
+        st.dataframe(
+            df_anagrafica,
+            use_container_width=True,
+            hide_index=True
+        )
+
+        st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "📈 PROGRESSI":
         st.subheader("📈 Progressi")
