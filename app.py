@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import time
 import gspread
+from google.oauth2.service_account import Credentials
 
 # ==========================================
 # 1. CONFIGURAZIONE PAGINA
@@ -21,8 +22,13 @@ GID_PERSONAL_STATS = "1148983819"
 # ==========================================
 def ottieni_credenziali():
     try:
-        # Recupera le credenziali dai secrets di Streamlit
-        return st.secrets["gcp_service_account"]
+        # Converte il dizionario dei secrets di Streamlit in un oggetto Credentials valido
+        creds_dict = dict(st.secrets["gcp_service_account"])
+        scopes = [
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive"
+        ]
+        return Credentials.from_service_account_info(creds_dict, scopes=scopes)
     except Exception as e:
         st.error(f"Impossibile caricare le credenziali: {e}")
         return None
