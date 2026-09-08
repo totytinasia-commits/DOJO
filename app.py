@@ -45,18 +45,29 @@ def scrivi_cella_per_gid(gid, cella, valore):
     except Exception as e:
         st.error(f"Errore nella scrittura della cella {cella}: {e}")
 
+def aggiorna_intervallo_da_dataframe(gid, range_name, df):
+    try:
+        creds = ottieni_credenziali()
+        if creds:
+            client = gspread.authorize(creds)
+            sheet = client.open_by_key(SHEET_ID)
+            target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(gid).strip()), None)
+            if target_ws:
+                # Converte il DataFrame in una lista di liste includendo i dati modificati
+                data_to_write = [df.columns.tolist()] + df.astype(str).values.tolist()
+                target_ws.update(range_name, data_to_write)
+    except Exception as e:
+        st.error(f"Errore nell'aggiornamento del foglio: {e}")
+
 # ==========================================
-# 3. CSS STRETTO E STILI PER METRIC CARD
+# 3. CSS PERSONALIZZATO
 # ==========================================
 st.markdown("""
     <style>
-        /* Sfondo generale nero */
         .stApp {
             background-color: #0d0d0d !important;
             color: #FFFFFF !important;
         }
-
-        /* Contenitore principale mobile-first */
         .main .block-container {
             max-width: 500px !important;
             padding-left: 1rem !important;
@@ -64,21 +75,15 @@ st.markdown("""
             padding-top: 1rem !important;
             margin: 0 auto !important;
         }
-
-        /* Nasconde la sidebar */
         [data-testid="stSidebar"] {
             display: none !important;
         }
-
-        /* Forza i contenitori Streamlit ad occupare la larghezza disponibile */
         div[data-testid="stElementContainer"],
         div[data-testid="stColumn"],
         div.stButton {
             width: 100% !important;
             display: block !important;
         }
-
-        /* Pulsanti GIALLI full-width */
         div.stButton > button {
             width: 100% !important;
             display: block !important;
@@ -93,26 +98,16 @@ st.markdown("""
             text-transform: uppercase !important;
             text-align: center !important;
             box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.6) !important;
-            transition: all 0.2s ease-in-out !important;
         }
-
-        div.stButton > button:hover,
-        div.stButton > button:active,
-        div.stButton > button:focus {
+        div.stButton > button:hover {
             background-color: #FFC107 !important;
             color: #000000 !important;
-            box-shadow: 0px 0px 10px #FFD700 !important;
         }
-
-        /* Pulsante selezionato */
         div.stButton > button[kind="primary"] {
             background-color: #FF9900 !important;
             color: #000000 !important;
             border: 2px solid #FFFFFF !important;
-            box-shadow: 0px 0px 12px #FF9900 !important;
         }
-
-        /* Stili Card per Statistiche */
         .stat-card {
             background-color: #161b22;
             border: 1px solid #30363d;
@@ -169,7 +164,6 @@ with center_col:
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Inizializzazione navigazione
     if "current_section" not in st.session_state:
         st.session_state.current_section = "🏫 ACADEMY"
 
@@ -205,16 +199,15 @@ with center_col:
                     f14_val = target_ws.acell("F14").value or ""
                     h14_val = target_ws.acell("H14").value or ""
 
-                    # 2. Secondo box (intervallo G16:J24 a 4 colonne)
-                    raw_box2 = target_ws.get("G16:J24")
+                    # 2. Tabella Registro Attività (G16:J30 circa - adattabile)
+                    raw_box2 = target_ws.get("G16:J30")
                     for r in raw_box2:
-                        if any(r):
-                            box2_rows.append([
-                                r[0] if len(r) > 0 else "",
-                                r[1] if len(r) > 1 else "",
-                                r[2] if len(r) > 2 else "",
-                                r[3] if len(r) > 3 else ""
-                            ])
+                        box2_rows.append([
+                            r[0] if len(r) > 0 else "",
+                            r[1] if len(r) > 1 else "",
+                            r[2] if len(r) > 2 else "",
+                            r[3] if len(r) > 3 else ""
+                        ])
 
                     # 3. Terzo box (intervallo C26:F49 a 4 colonne)
                     raw_box3 = target_ws.get("C26:F49")
@@ -227,7 +220,7 @@ with center_col:
                                 r[3] if len(r) > 3 else ""
                             ])
         except Exception as e:
-            st.warning(f"Errore nel caricamento dati Academy (GID {GID_ACADEMY}): {e}")
+            st.warning(f"Errore nel caricamento dati Academy: {e}")
 
         # ==========================================
         # BOX 1: INTESTAZIONE GIALLA PRINCIPALE
@@ -244,44 +237,56 @@ with center_col:
         """, unsafe_allow_html=True)
 
         # ==========================================
-        # REGISTRO ATTIVITA' COMPILABILE DA PARTE DEGLI ALLIEVI
+        # REGISTRO ATTIVITA' EDITABILE (PER FILO E PER SEGNO)
         # ==========================================
         st.markdown("""
-        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 5px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
                 REGISTRO ATTIVITA'
             </div>
+        </div>
         """, unsafe_allow_html=True)
 
-        with st.form("form_registro_attivita"):
-            st.markdown("<p style='color: #93c5fd; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px;'>Inserisci i tuoi dati:</p>", unsafe_allow_html=True)
-            
-            # Intestazioni delle colonne come da immagine: allievi a carico, giorni dispo, mappa, recensione
-            col_in1, col_in2 = st.columns(2)
-            with col_in1:
-                val_allievi = st.text_input("Allievi a carico", placeholder="Es. 3")
-                val_mappa = st.text_input("Mappa", placeholder="Nome mappa")
-            with col_in2:
-                val_giorni = st.text_input("Giorni dispo", placeholder="Es. L/M/G/D")
-                val_recensione = st.text_input("Recensione", placeholder="Note / Recensione")
+        # Preparazione del DataFrame per la tabella interattiva
+        if box2_rows and len(box2_rows) > 0:
+            header_cols = box2_rows[0]
+            data_rows = box2_rows[1:] if len(box2_rows) > 1 else [["", "", "", ""]] * 10
+        else:
+            header_cols = ["allievi a carico", "giorni dispo", "mappa", "recensione"]
+            data_rows = [["", "", "", ""]] * 10
 
-            submitted_registro = st.form_submit_button("INVIA DATI REGISTRO")
-            if submitted_registro:
-                # Esempio di azione di salvataggio (puoi personalizzare la cella di destinazione su Google Sheets)
-                try:
-                    scrivi_cella_per_gid(GID_ACADEMY, "G17", val_allievi)
-                    scrivi_cella_per_gid(GID_ACADEMY, "H17", val_giorni)
-                    scrivi_cella_per_gid(GID_ACADEMY, "I17", val_mappa)
-                    scrivi_cella_per_gid(GID_ACADEMY, "J17", val_recensione)
-                    st.success("Dati del registro inviati con successo!")
-                    time.sleep(1)
-                    st.rerun()
-                except Exception as ex:
-                    st.error(f"Errore durante il salvataggio: {ex}")
+        df_registro = pd.DataFrame(data_rows, columns=header_cols)
 
-        st.markdown("</div>", unsafe_allow_html=True)
+        # Tabella editabile interattiva stile griglia
+        edited_df = st.data_editor(
+            df_registro,
+            use_container_width=True,
+            num_rows="dynamic",
+            key="editor_registro_attivita"
+        )
 
-        # Funzione di supporto per generare tabelle di sola lettura
+        if st.button("💾 SALVA MODIFICHE REGISTRO"):
+            try:
+                # Ricostruisce i dati includendo l'intestazione nera originale richiesta dall'immagine
+                full_data_to_write = [header_cols] + edited_df.astype(str).values.tolist()
+                creds = ottieni_credenziali()
+                if creds:
+                    client = gspread.authorize(creds)
+                    sheet = client.open_by_key(SHEET_ID)
+                    target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ACADEMY).strip()), None)
+                    if target_ws:
+                        # Aggiorna l'intervallo G16 partendo dalle dimensioni corrette
+                        end_row = 16 + len(full_data_to_write) - 1
+                        target_ws.update(f"G16:J{end_row}", full_data_to_write)
+                        st.success("Modifiche salvate con successo sul Google Sheet!")
+                        time.sleep(1)
+                        st.rerun()
+            except Exception as ex:
+                st.error(f"Errore durante il salvataggio: {ex}")
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # Funzione di supporto per generare tabelle di sola lettura per il secondo gruppo
         def render_custom_table(title_text, rows_data):
             html = f"""
             <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
@@ -324,9 +329,6 @@ with center_col:
             """
             st.markdown(html, unsafe_allow_html=True)
 
-        # ==========================================
-        # BOX 3: SECONDO GRUPPO ATTIVITA'
-        # ==========================================
         render_custom_table("SECONDO GRUPPO ATTIVITA'", box3_rows)
 
     elif current == "📋 ANAGRAFICA":
@@ -371,9 +373,6 @@ with center_col:
             st.write("Vista selezionata: **TRAINING**")
 
         elif st.session_state.stat_tab == "🏆 STATCOMP":
-            # ==========================================
-            # --- INTEGRAZIONE STATCOMP (PERSONAL STATS) ---
-            # ==========================================
             st.markdown("<div style='background-color: #0e1117; border: 2px solid #262730; border-radius: 12px; padding: 15px;'>", unsafe_allow_html=True)
             st.markdown("### 👤 Personal Stats Dashboard")
 
@@ -543,7 +542,6 @@ with center_col:
             except Exception as e:
                 st.warning(f"Error reading dashboard data: {e}")
 
-            # RENDER UI: MATCH SUMMARY
             st.markdown("<h4 style='color: #93c5fd; font-size: 1rem;'>MATCH SUMMARY</h4>", unsafe_allow_html=True)
             
             def render_metric_row(m1, m2, m3):
@@ -561,7 +559,6 @@ with center_col:
             render_metric_row(("ONEHAND SHOTS", summary_oh_shots), ("ONEHAND HIT", summary_oh_hit), ("ONEHAND ACC%", summary_oh_acc))
             render_metric_row(("TWOHAND SHOTS", summary_th_shots), ("TWOHAND HIT", summary_th_hit), ("TWOHAND ACC%", summary_th_acc))
 
-            # RENDER UI: TOTAL ASSIST
             st.markdown(f"""
             <div class='stat-card' style='width: 100%; height: 85px; margin-top: 10px;'>
                 <div class='stat-label'>TOTAL ASSIST</div>
@@ -570,8 +567,6 @@ with center_col:
             """, unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
-
-            # RENDER UI: DEADLIEST WEAPONS
             st.markdown("<h4 style='color: #93c5fd; font-size: 1rem;'>DEADLIEST WEAPONS</h4>", unsafe_allow_html=True)
             
             for i, dw in enumerate(deadliest_weapons):
@@ -611,8 +606,6 @@ with center_col:
                 st.markdown("</div>", unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
-
-            # RENDER UI: WEAPON PERFORMANCE TABLE
             st.markdown("<h4 style='color: #93c5fd; text-align: center;'>WEAPON PERFORMANCE</h4>", unsafe_allow_html=True)
             
             if weapon_rows_data:
@@ -624,5 +617,4 @@ with center_col:
                 ])
 
             st.dataframe(df_weapons_final, use_container_width=True, hide_index=True)
-
             st.markdown("</div>", unsafe_allow_html=True)
