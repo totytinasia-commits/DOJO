@@ -204,31 +204,30 @@ with center_col:
                     f14_val = target_ws.acell("F14").value or ""
                     h14_val = target_ws.acell("H14").value or ""
 
-                    # Dati fissi di esempio per ARES PIX (puoi personalizzare o leggere da foglio se necessario)
+                    # Dati fissi di esempio per ARES PIX (senza recensione)
                     box_pix_rows = [
-                        ["JFF_CLIP", "L/M/G/D", "DOJO MAP", "-"],
-                        ["itaboyz_Casco", "L/M/G/D", "DOJO MAP", "-"],
-                        ["itaBOYZ_VIN", "L/M/G/D", "DOJO MAP", "-"],
-                        ["itaboyz_imperat", "L/M/G/D", "DOJO MAP", "-"],
-                        ["itaboyz_gallo", "L/M/G/D", "DOJO MAP", "-"]
+                        ["JFF_CLIP", "L/M/G/D", "DOJO MAP"],
+                        ["itaboyz_Casco", "L/M/G/D", "DOJO MAP"],
+                        ["itaBOYZ_VIN", "L/M/G/D", "DOJO MAP"],
+                        ["itaboyz_imperat", "L/M/G/D", "DOJO MAP"],
+                        ["itaboyz_gallo", "L/M/G/D", "DOJO MAP"]
                     ]
 
-                    # Dati fissi di esempio per ARES NINO
+                    # Dati fissi di esempio per ARES NINO (senza recensione)
                     box_nino_rows = [
-                        ["JFF_SINNER", "L/M/G/D", "DOJO MAP", "-"],
-                        ["JFF_POTA", "L/M/G/D", "DOJO MAP", "-"],
-                        ["JFF_ANDERWAL", "L/M/G/D", "DOJO MAP", "-"],
-                        ["JFF_DANI", "L/M/G/D", "DOJO MAP", "-"],
-                        ["itaboyz_faire", "L/M/G/D", "DOJO MAP", "-"]
+                        ["JFF_SINNER", "L/M/G/D", "DOJO MAP"],
+                        ["JFF_POTA", "L/M/G/D", "DOJO MAP"],
+                        ["JFF_ANDERWAL", "L/M/G/D", "DOJO MAP"],
+                        ["JFF_DANI", "L/M/G/D", "DOJO MAP"],
+                        ["itaboyz_faire", "L/M/G/D", "DOJO MAP"]
                     ]
 
-                    raw_box2 = target_ws.get("G16:J30")
+                    raw_box2 = target_ws.get("G16:I30")  # Preleviamo 3 colonne (G, H, I)
                     for r in raw_box2:
                         box2_rows.append([
                             r[0] if len(r) > 0 else "",
                             r[1] if len(r) > 1 else "",
-                            r[2] if len(r) > 2 else "",
-                            r[3] if len(r) > 3 else ""
+                            r[2] if len(r) > 2 else ""
                         ])
         except Exception as e:
             st.warning(f"Errore nel caricamento dati Academy: {e}")
@@ -256,8 +255,7 @@ with center_col:
             <div class='fixed-box-header'>
                 <span style='flex: 2;'>Allievi a carico</span>
                 <span style='flex: 1; text-align: center;'>Giorni dispo</span>
-                <span style='flex: 1; text-align: center;'>Mappa</span>
-                <span style='flex: 1; text-align: right;'>Recensione</span>
+                <span style='flex: 1; text-align: right;'>Mappa</span>
             </div>
         """, unsafe_allow_html=True)
 
@@ -266,8 +264,7 @@ with center_col:
             <div class='fixed-box-row'>
                 <span style='flex: 2; color: #FFFFFF;'>{row[0]}</span>
                 <span style='flex: 1; text-align: center; color: #8b949e;'>{row[1]}</span>
-                <span style='flex: 1; text-align: center; color: #58a6ff;'>{row[2]}</span>
-                <span style='flex: 1; text-align: right; color: #FFFFFF;'>{row[3]}</span>
+                <span style='flex: 1; text-align: right; color: #58a6ff;'>{row[2]}</span>
             </div>
             """, unsafe_allow_html=True)
 
@@ -284,8 +281,7 @@ with center_col:
             <div class='fixed-box-header'>
                 <span style='flex: 2;'>Allievi a carico</span>
                 <span style='flex: 1; text-align: center;'>Giorni dispo</span>
-                <span style='flex: 1; text-align: center;'>Mappa</span>
-                <span style='flex: 1; text-align: right;'>Recensione</span>
+                <span style='flex: 1; text-align: right;'>Mappa</span>
             </div>
         """, unsafe_allow_html=True)
 
@@ -294,8 +290,7 @@ with center_col:
             <div class='fixed-box-row'>
                 <span style='flex: 2; color: #FFFFFF;'>{row[0]}</span>
                 <span style='flex: 1; text-align: center; color: #8b949e;'>{row[1]}</span>
-                <span style='flex: 1; text-align: center; color: #58a6ff;'>{row[2]}</span>
-                <span style='flex: 1; text-align: right; color: #FFFFFF;'>{row[3]}</span>
+                <span style='flex: 1; text-align: right; color: #58a6ff;'>{row[2]}</span>
             </div>
             """, unsafe_allow_html=True)
 
@@ -327,10 +322,10 @@ with center_col:
                 clean_header.append(col_name)
             
             header_cols = clean_header
-            data_rows = box2_rows[1:] if len(box2_rows) > 1 else [["", "", "", ""]]
+            data_rows = box2_rows[1:] if len(box2_rows) > 1 else [["", "", ""]]
         else:
-            header_cols = ["allievi a carico", "giorni dispo", "mappa", "recensione"]
-            data_rows = [["", "", "", ""]] * 10
+            header_cols = ["allievi a carico", "giorni dispo", "mappa"]
+            data_rows = [["", "", ""]] * 10
 
         df_registro = pd.DataFrame(data_rows, columns=header_cols)
 
@@ -351,7 +346,7 @@ with center_col:
                     target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ACADEMY).strip()), None)
                     if target_ws:
                         end_row = 16 + len(full_data_to_write) - 1
-                        target_ws.update(f"G16:J{end_row}", full_data_to_write)
+                        target_ws.update(f"G16:I{end_row}", full_data_to_write)
                         st.success("Modifiche salvate con successo sul Google Sheet!")
                         time.sleep(1)
                         st.rerun()
