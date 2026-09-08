@@ -183,7 +183,7 @@ with center_col:
 
     current = st.session_state.current_section
 
-    elif current == "🏫 ACADEMY":
+    if current == "🏫 ACADEMY":
         st.subheader("🏫 Academy")
 
         f13_val, h13_val = "", ""
@@ -205,8 +205,7 @@ with center_col:
                     f14_val = target_ws.acell("F14").value or ""
                     h14_val = target_ws.acell("H14").value or ""
 
-                    # 2. Secondo box (es. intervallo G16:J24 o simile strutturato a 4 colonne)
-                    # Leggiamo le righe complete per formare la tabella stile immagini 2, 3 e 4
+                    # 2. Secondo box (intervallo G16:J24 a 4 colonne)
                     raw_box2 = target_ws.get("G16:J24")
                     for r in raw_box2:
                         if any(r):  # Se la riga non è completamente vuota
@@ -217,7 +216,7 @@ with center_col:
                                 r[3] if len(r) > 3 else ""
                             ])
 
-                    # 3. Terzo box (es. intervallo C26:F49 o corrispondente a 4 colonne)
+                    # 3. Terzo box (intervallo C26:F49 a 4 colonne)
                     raw_box3 = target_ws.get("C26:F49")
                     for r in raw_box3:
                         if any(r):
@@ -358,7 +357,7 @@ with center_col:
                         d13_raw = target_ws.acell("D13").value
                         if d13_raw is not None and str(d13_raw).strip() != "":
                             current_d13_val = str(d13_raw).strip()
-                        
+                    
                         col_c_values = target_ws.get("C12:C60")
                         for row in col_c_values:
                             if row and len(row) > 0:
