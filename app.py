@@ -157,7 +157,7 @@ PLAYERS = [
     "ITABOYZ_CASCO", "JFF_CIKKO", "JFF_SINNER"
 ]
 
-STATS_OPTIONS = ["🏋️ TRAINING", "🏆 STATCOMP"]
+STATS_OPTIONS = ["⚙️ SETTINGS", "🏋️ TRAINING", "🏆 STATCOMP"]
 
 # ==========================================
 # 5. STRUTTURA A 3 COLONNE (LAYOUT CENTRATO)
@@ -552,7 +552,15 @@ with center_col:
 
         st.markdown("---")
 
-        if st.session_state.stat_tab == "🏋️ TRAINING":
+        if st.session_state.stat_tab == "⚙️ SETTINGS":
+            st.markdown("""
+            <div style='background-color: #161b22; border: 2px dashed #ff9900; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px;'>
+                <h3 style='color: #FFD700; margin: 0; text-transform: uppercase;'>⚙️ Settings</h3>
+                <p style='color: #8b949e; font-size: 1.1rem; margin-top: 10px; font-weight: bold;'>PRESTO IN ARRIVO</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        elif st.session_state.stat_tab == "🏋️ TRAINING":
             st.markdown("""
             <div style='background-color: #161b22; border: 2px dashed #ff9900; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px;'>
                 <h3 style='color: #FFD700; margin: 0; text-transform: uppercase;'>🏋️ Training</h3>
