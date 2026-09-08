@@ -465,9 +465,11 @@ with center_col:
             data_progressi = progressi_rows[1:] if len(progressi_rows) > 1 else [[""] * 8]
             df_progressi = pd.DataFrame(data_progressi, columns=header_progressi)
 
-        # Pulizia, conversione in stringa e gestione sicura di nomi di colonna unici (evita errori PyArrow / Pandas)
-        df_progressi = df_progressi.astype(str).fillna("")
-        
+        # Pulizia righe completamente vuote (rimuove le righe vuote in cima o in mezzo)
+        df_progressi = df_progressi.replace(r'^\s*$', pd.NA, regex=True)
+        df_progressi = df_progressi.dropna(how='all').fillna("")
+
+        # Normalizzazione nomi colonne unici
         seen_cols = {}
         unique_cols = []
         for col in df_progressi.columns:
@@ -482,7 +484,38 @@ with center_col:
                 unique_cols.append(c_name)
         df_progressi.columns = unique_cols
 
-        st.dataframe(df_progressi, use_container_width=True, hide_index=True)
+        # Configurazione di visualizzazione per espandere le celle ed applicare i colori percentuali
+        config_cols = {}
+        for i, col_name in enumerate(df_progressi.columns):
+            if i == 0:
+                # La prima colonna (Allievo) è testuale e viene lasciata estesa
+                config_cols[col_name] = st.column_config.TextColumn(col_name, width="medium")
+            else:
+                # Le colonne successive con percentuali vengono visualizzate come barre colorate / metriche percentuali leggibili
+                config_cols[col_name] = st.column_config.ProgressColumn(
+                    col_name,
+                    min_value=0,
+                    max_value=100,
+                    format="%s"
+                )
+                
+                # Converte i valori percentuali testuali (es. "35%") in float numerici per colorare correttamente le celle
+                def parse_pct(val):
+                    try:
+                        clean = str(val).replace("%", "").replace(",", ".").strip()
+                        return float(clean)
+                    except:
+                        return 0.0
+                df_progressi[col_name] = df_progressi[col_name].apply(parse_pct)
+
+        # Container a larghezza estesa per leggere comodamente tutto il contenuto senza restrizioni
+        with st.container():
+            st.dataframe(
+                df_progressi,
+                use_container_width=True,
+                hide_index=True,
+                column_config=config_cols
+            )
 
         st.markdown("<br>", unsafe_allow_html=True)
 
