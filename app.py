@@ -680,11 +680,11 @@ with center_col:
 
         if st.button("💾 SALVA MODIFICHE ESERCIZI"):
             try:
-                # Prepariamo i dati convertendo i booleani per Google Sheets
+                # Prepariamo i dati convertendo i booleani in stringhe "TRUE"/"FALSE" per Google Sheets
                 df_to_save = edited_df_es.copy()
                 for check_idx in [2, 4, 6, 8, 10]:
                     col_name = df_to_save.columns[check_idx]
-                    df_to_save[col_name] = df_to_save[col_name].apply(lambda x: TRUE if x else FALSE)
+                    df_to_save[col_name] = df_to_save[col_name].apply(lambda x: "TRUE" if x else "FALSE")
 
                 data_to_write = df_to_save.values.tolist()
                 creds = ottieni_credenziali()
