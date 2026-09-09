@@ -791,7 +791,7 @@ with center_col:
                 if target_ws:
                     ruolo_consigliato = target_ws.acell("F19").value if target_ws.acell("F19") else ""
                     punti_di_forza_text = target_ws.acell("F21").value if target_ws.acell("F21") else ""
-                    aree_miglioramento_text = target_ws.acell("F23").value if target_ws.acell("F23") else ""
+                    aree_miglioramento_text = target_ws.acell("F23").value if target_ws.acell("F29") else ""
         except Exception as e:
             st.warning(f"Errore nel caricamento dati per {st.session_state.selected_player}: {e}")
 
