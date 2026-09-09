@@ -551,75 +551,93 @@ with center_col:
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-    elif current == "📜 CERTIFICAZIONI":
-        st.subheader("📜 Certificazioni")
+    st.markdown("<br>", unsafe_allow_html=True)
 
-        st.markdown("""
-        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
-                TABELLA CERTIFICAZIONI
-            </div>
+elif current == "📜 CERTIFICAZIONI":
+    st.subheader("📜 Certificazioni")
+
+    st.markdown("""
+        <style>
+            [data-testid="stDataFrame"] [data-fixed-column="true"], 
+            [data-testid="stDataFrame"] th[aria-pinned="true"], 
+            [data-testid="stDataFrame"] td[aria-pinned="true"] {
+                background-color: #161b22 !important;
+                border-right: 2px solid #30363d !important;
+            }
+            [data-testid="stDataFrame"] [data-testid="stTable"] td, 
+            [data-testid="stDataFrame"] div[data-baseweb="data-table"] th {
+                max-width: 90px !important;
+                min-width: 70px !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+    <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+        <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
+            TABELLA CERTIFICAZIONI
         </div>
-        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
-        cert_rows = []
-        try:
-            creds = ottieni_credenziali()
-            if creds:
-                client = gspread.authorize(creds)
-                sheet = client.open_by_key(SHEET_ID)
-                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_CERTIFICAZIONI).strip()), None)
+    cert_rows = []
+    try:
+        creds = ottieni_credenziali()
+        if creds:
+            client = gspread.authorize(creds)
+            sheet = client.open_by_key(SHEET_ID)
+            target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_CERTIFICAZIONI).strip()), None)
 
-                if target_ws:
-                    raw_cert = target_ws.get("B18:O40")
-                    for r in raw_cert:
-                        row_padded = []
-                        for idx in range(14):
-                            row_padded.append(r[idx] if idx < len(r) and r[idx] is not None else "")
-                        cert_rows.append(row_padded)
-        except Exception as e:
-            st.warning(f"Errore nel caricamento dati Certificazioni: {e}")
+            if target_ws:
+                raw_cert = target_ws.get("B18:O40")
+                for r in raw_cert:
+                    row_padded = []
+                    for idx in range(14):
+                        row_padded.append(r[idx] if idx < len(r) and r[idx] is not None else "")
+                    cert_rows.append(row_padded)
+    except Exception as e:
+        st.warning(f"Errore nel caricamento dati Certificazioni: {e}")
 
-        expected_cert_columns = [
-            "Allievo", "Bronze Aim", "Silver Aim", "Gold Aim", 
-            "SWITCH VELOCE ARMI", "BUILD DI PROTEZIONE", "BUILD PER PUSH", 
-            "USO DI BUILD COMPLESSIVO", "MIRA", "LOOT", "SNIPER", 
-            "TEORIA ARMI", "USO DELLE ARMI COMPLESSIVO", "TEAM WORK"
-        ]
+    expected_cert_columns = [
+        "Allievo", "Bronze Aim", "Silver Aim", "Gold Aim", 
+        "SWITCH VELOCE ARMI", "BUILD DI PROTEZIONE", "BUILD PER PUSH", 
+        "USO DI BUILD COMPLESSIVO", "MIRA", "LOOT", "SNIPER", 
+        "TEORIA ARMI", "USO DELLE ARMI COMPLESSIVO", "TEAM WORK"
+    ]
 
-        if not cert_rows:
-            df_certificazioni = pd.DataFrame(columns=expected_cert_columns)
+    if not cert_rows:
+        df_certificazioni = pd.DataFrame(columns=expected_cert_columns)
+    else:
+        data_cert = cert_rows[1:] if len(cert_rows) > 1 else cert_rows
+        
+        cleaned_cert_data = []
+        for row in data_cert:
+            new_row = list(row)
+            while len(new_row) < 14:
+                new_row.append("")
+            cleaned_cert_data.append(new_row[:14])
+
+        df_certificazioni = pd.DataFrame(cleaned_cert_data, columns=expected_cert_columns)
+
+    df_certificazioni = df_certificazioni.replace(r'^\s*$', pd.NA, regex=True)
+    df_certificazioni = df_certificazioni.dropna(how='all').fillna("")
+
+    config_cert_cols = {}
+    for i, col_name in enumerate(df_certificazioni.columns):
+        if i == 0:
+            config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="small", pinned=True)
         else:
-            data_cert = cert_rows[1:] if len(cert_rows) > 1 else cert_rows
-            
-            cleaned_cert_data = []
-            for row in data_cert:
-                new_row = list(row)
-                while len(new_row) < 14:
-                    new_row.append("")
-                cleaned_cert_data.append(new_row[:14])
+            config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="small")
 
-            df_certificazioni = pd.DataFrame(cleaned_cert_data, columns=expected_cert_columns)
+    with st.container():
+        st.dataframe(
+            df_certificazioni,
+            use_container_width=True,
+            hide_index=True,
+            column_config=config_cert_cols
+        )
 
-        df_certificazioni = df_certificazioni.replace(r'^\s*$', pd.NA, regex=True)
-        df_certificazioni = df_certificazioni.dropna(how='all').fillna("")
-
-        config_cert_cols = {}
-        for i, col_name in enumerate(df_certificazioni.columns):
-            if i == 0:
-                config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="medium")
-            else:
-                config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="large")
-
-        with st.container():
-            st.dataframe(
-                df_certificazioni,
-                use_container_width=True,
-                hide_index=True,
-                column_config=config_cert_cols
-            )
-
-        st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "🏋️ ESERCIZI":
         st.subheader("🏋️ Esercizi")
