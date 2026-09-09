@@ -619,7 +619,9 @@ with center_col:
                 column_config=config_cert_cols
             )
 
-      elif current == "🏋️ ESERCIZI":
+        st.markdown("<br>", unsafe_allow_html=True)
+
+    elif current == "🏋️ ESERCIZI":
         st.subheader("🏋️ Esercizi")
 
         st.markdown("""
@@ -748,6 +750,34 @@ with center_col:
 
     elif current == "👤 SCHEDE GIOCATORE":
         # Codice per la sezione successiva...
+        try:
+            # Prepariamo i dati convertendo i booleani in stringhe "TRUE"/"FALSE" per Google Sheets
+            df_to_save = edited_df_es.copy()
+            for check_idx in [2, 4, 6, 8, 10]:
+                col_name = df_to_save.columns[check_idx]
+                df_to_save[col_name] = df_to_save[col_name].apply(lambda x: "TRUE" if x else "FALSE")
+
+            data_to_write = df_to_save.values.tolist()
+            creds = ottieni_credenziali()
+            if creds:
+                client = gspread.authorize(creds)
+                sheet = client.open_by_key(SHEET_ID)
+                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ESERCIZI).strip()), None)
+                if target_ws:
+                    end_row = 17 + len(data_to_write) - 1
+                    target_ws.update(f"C17:M{end_row}", data_to_write)
+                    
+                    st.toast("✅ Modifiche Esercizi effettuate con successo!", icon="🎉")
+                    st.success("Modifiche salvate con successo su Google Sheet (C17:M40)!")
+                    
+                    time.sleep(1)
+                    st.rerun()
+        except Exception as ex:
+            st.error(f"Errore durante il salvataggio degli esercizi: {ex}")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    elif current == "👤 SCHEDE GIOCATORE":
         st.subheader("👤 Schede Giocatore")
 
         if "selected_player" not in st.session_state:
