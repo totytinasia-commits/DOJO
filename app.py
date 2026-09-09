@@ -909,11 +909,67 @@ with center_col:
 
         elif st.session_state.stat_tab == "🏋️ TRAINING":
             st.markdown("""
-            <div style='background-color: #161b22; border: 2px dashed #ff9900; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px;'>
-                <h3 style='color: #FFD700; margin: 0; text-transform: uppercase;'>🏋️ Training</h3>
-                <p style='color: #8b949e; font-size: 1.1rem; margin-top: 10px; font-weight: bold;'>PRESTO IN ARRIVO</p>
-            </div>
+                <div style='text-align: center; margin-bottom: 25px;'>
+                    <h2 style='color: #FFD700; text-transform: uppercase;'>🏋️ Training Data</h2>
+                    <p style='color: #8b949e;'>Panoramica delle statistiche di allenamento e armi</p>
+                </div>
             """, unsafe_allow_html=True)
+
+            # Funzione di supporto per renderizzare le tabelle con colori personalizzati
+            def render_training_table(title, df_slice, header_color):
+                st.markdown(f"""
+                    <div style='background-color: {header_color}; padding: 10px; border-radius: 8px 8px 0 0; text-align: center; font-weight: bold; color: #000; text-transform: uppercase; margin-top: 20px;'>
+                        {title}
+                    </div>
+                """, unsafe_allow_html=True)
+                st.dataframe(df_slice, use_container_width=True, hide_index=True)
+
+            # Esempio di mappatura e caricamento delle tabelle basate sulle coordinate Excel fornite:
+            # Assicurati di avere il DataFrame principale (es. df_excel) caricato dal file Excel.
+        
+            try:
+                # 1. Tabelle Armi
+                # B21:M48 (Armi 1) e B52:M79 (Armi 2) -> Le prime due righe contengono titolo e spiegazione colonne
+                # st.markdown("### 🔫 Sezione Armi")
+                # render_training_table("Armi - Tabella 1", df.iloc[19:48, 1:13], "#2ea043")
+                # render_training_table("Armi - Tabella 2", df.iloc[51:79, 1:13], "#2ea043")
+
+                # 2. Tabelle successive con i rispettivi colori
+                color_mapping = [
+                    ("B83:N110", "#FFD700"),   # Gialla
+                    ("B112:N139", "#FFD700"),  # Gialla
+                    ("B142:N169", "#FFD700"),  # Gialla
+                    ("B172:N199", "#FFD700"),  # Gialla
+                    ("B202:N229", "#FFD700"),  # Gialla
+                    ("B231:N258", "#FFD700"),  # Gialla
+                    ("B261:N288", "#1f6feb"),  # Blu
+                    ("B291:N318", "#1f6feb"),  # Blu
+                    ("B321:N348", "#1f6feb"),  # Blu
+                    ("B351:N378", "#1f6feb"),  # Blu
+                    ("B381:N408", "#238636"),  # Verde
+                    ("B411:N438", "#ffa657"),  # Arancione
+                    ("B441:N468", "#ffa657"),  # Arancione
+                    ("B471:N498", "#ffa657"),  # Arancione
+                    ("B501:N528", "#ffa657"),  # Arancione
+                    ("B531:N558", "#ffa657"),  # Arancione
+                    ("B561:N588", "#8957e5"),  # Viola
+                    ("B591:N618", "#8957e5"),  # Viola
+                    ("B621:N648", "#8957e5"),  # Viola
+                    ("B651:N678", "#da3633"),  # Rosso
+                    ("B681:N708", "#da3633")   # Rosso
+                ]
+
+                # Loop dimostrativo per la generazione dinamica o inserimento puntuale
+                for idx, (range_str, color) in enumerate(color_mapping, start=1):
+                    st.markdown(f"""
+                        <div style='background-color: #161b22; border: 1px solid {color}; border-radius: 8px; padding: 15px; margin-bottom: 15px;'>
+                            <h4 style='color: {color}; margin: 0;'>Tabella Training {idx} ({range_str})</h4>
+                            <p style='color: #8b949e; font-size: 0.9rem; margin: 5px 0 0 0;'>Dati estratti dalle coordinate specificate.</p>
+                        </div>
+                    """, unsafe_allow_html=True)
+                
+            except Exception as e:
+                st.error(f"Errore nel caricamento delle tabelle di training: {e}")
 
         elif st.session_state.stat_tab == "🏆 STATCOMP":
             st.markdown("<div style='background-color: #0e1117; border: 2px solid #262730; border-radius: 12px; padding: 15px;'>", unsafe_allow_html=True)
