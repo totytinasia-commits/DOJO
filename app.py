@@ -341,8 +341,20 @@ with center_col:
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-    elif current == "📋 ANAGRAFICA":
+   elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
+
+        # --> INCOLLA QUI IL CSS PER LA LEGGIBILITÀ DELLE COLONNE FISSE <--
+        st.markdown("""
+            <style>
+                [data-testid="stDataFrame"] [data-fixed-column="true"], 
+                [data-testid="stDataFrame"] th[aria-pinned="true"], 
+                [data-testid="stDataFrame"] td[aria-pinned="true"] {
+                    background-color: #161b22 !important;
+                    border-right: 2px solid #30363d !important;
+                }
+            </style>
+        """, unsafe_allow_html=True)
 
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
@@ -351,68 +363,8 @@ with center_col:
             </div>
         </div>
         """, unsafe_allow_html=True)
-
-        anagrafica_rows = []
-        try:
-            creds = ottieni_credenziali()
-            if creds:
-                client = gspread.authorize(creds)
-                sheet = client.open_by_key(SHEET_ID)
-                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ANAGRAFICA).strip()), None)
-
-                if target_ws:
-                    raw_anagrafica = target_ws.get("C13:L35")
-                    for r in raw_anagrafica:
-                        anagrafica_rows.append([
-                            r[0] if len(r) > 0 else "",
-                            r[1] if len(r) > 1 else "",
-                            r[2] if len(r) > 2 else "",
-                            r[3] if len(r) > 3 else "",
-                            r[4] if len(r) > 4 else "",
-                            r[5] if len(r) > 5 else "",
-                            r[6] if len(r) > 6 else "",
-                            r[7] if len(r) > 7 else "",
-                            r[8] if len(r) > 8 else "",
-                            r[9] if len(r) > 9 else ""
-                        ])
-        except Exception as e:
-            st.warning(f"Errore nel caricamento dati Anagrafica: {e}")
-
-        cols_names = ["ID", "Nickname", "Nome Reale", "Paese", "Data Ingresso", "Livello Attuale", "Coach", "Ore Totali", "Obiettivo", "Certificazione"]
-
-        if not anagrafica_rows:
-            df_anagrafica = pd.DataFrame(columns=cols_names)
-        else:
-            header_anagrafica = anagrafica_rows[0] if len(anagrafica_rows) > 0 else cols_names
-            data_anagrafica = anagrafica_rows[1:] if len(anagrafica_rows) > 1 else [[""] * 10]
-            
-            cleaned_data = []
-            for row in data_anagrafica:
-                new_row = list(row)
-                while len(new_row) < 10:
-                    new_row.append("")
-                val_livello = str(new_row[5])
-                count_stars = val_livello.count('*')
-                if count_stars > 0:
-                    new_row[5] = "⭐" * count_stars
-                cleaned_data.append(new_row)
-
-            df_anagrafica = pd.DataFrame(cleaned_data, columns=header_anagrafica)
-
-        # Configurazione per bloccare ID e Nickname a sinistra
-        config_anagrafica_cols = {
-            "ID": st.column_config.TextColumn("ID", width="small", pinned=True),
-            "Nickname": st.column_config.TextColumn("Nickname", width="medium", pinned=True),
-        }
-
-        st.dataframe(
-            df_anagrafica,
-            use_container_width=True,
-            hide_index=True,
-            column_config=config_anagrafica_cols
-        )
-
-        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # ... (il resto del codice continua qui sotto)
 
     elif current == "📈 PROGRESSI":
         st.subheader("📈 Progressi")
