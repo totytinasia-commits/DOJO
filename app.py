@@ -315,9 +315,9 @@ with center_col:
         """, unsafe_allow_html=True)
 
         with st.form("form_nuovo_registro", clear_on_submit=True):
-            nuovo_allievo = st.text_input("Allievo a carico")
-            nuovo_giorni = st.text_input("Giorni")
-            nuova_mappa = st.text_input("Mappa")
+            nuovo_allievo = st.text_input("Allievo")
+            nuovo_giorni = st.text_input("Data e ora allenamento")
+            nuova_mappa = st.text_input("Mappa preferita")
 
             submit_button = st.form_submit_button("➕")
 
