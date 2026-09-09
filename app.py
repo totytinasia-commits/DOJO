@@ -913,7 +913,7 @@ with center_col:
                         val_e6 = target_ws.acell("E6").value
                         if val_e6 is not None:
                             stanza_attuale = str(val_e6).strip()
-            except Exception as e:
+                except Exception as e:
                 st.warning(f"Errore nel caricamento dei dati da Google Sheets: {e}")
 
             if not lista_eventi:
@@ -922,15 +922,13 @@ with center_col:
             st.markdown("### 📋 Lista degli Eventi")
             selected_evento = st.selectbox("Seleziona Evento", options=lista_eventi, key="select_evento_setting")
 
-            st.markdown("<br>", unsafe_allow_html=True)
+                st.markdown("<br>", unsafe_allow_html=True)
 
             st.markdown("### 🏠 Gestione Stanza")
         
-            # Lista di stanze tra cui scegliere (puoi modificarla o caricarla dinamicamente se preferisci)
-            # Qui mettiamo alcune opzioni di esempio o la stanza attuale come default
             opzioni_stanze = ["O97BBA", "STANZA_01", "STANZA_02", "STANZA_03"] 
             if stanza_attuale and stanza_attuale not in opzioni_stanze:
-            opzioni_stanze.insert(0, stanza_attuale)
+                opzioni_stanze.insert(0, stanza_attuale)
 
             index_stanza = 0
             if stanza_attuale in opzioni_stanze:
@@ -960,6 +958,14 @@ with center_col:
                     st.error(f"Errore durante la scrittura della stanza: {ex}")
 
             st.markdown("<br>", unsafe_allow_html=True)
+
+    elif st.session_state.stat_tab == "🏋️ TRAINING":
+        st.markdown("""
+        <div style='background-color: #161b22; border: 2px dashed #ff9900; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px;'>
+            <h3 style='color: #FFD700; margin: 0; text-transform: uppercase;'>🏋️ Training</h3>
+            <p style='color: #8b949e; font-size: 1.1rem; margin-top: 10px; font-weight: bold;'>PRESTO IN ARRIVO</p>
+        </div>
+        """, unsafe_allow_html=True)
         
         elif st.session_state.stat_tab == "🏋️ TRAINING":
             st.markdown("""
