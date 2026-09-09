@@ -435,7 +435,6 @@ with center_col:
 elif current == "📈 PROGRESSI":
         st.subheader("📈 Progressi")
 
-        # CSS per bloccare la colonna "Allievo" e rimpicciolire del 20% le altre colonne
         st.markdown("""
             <style>
                 [data-testid="stDataFrame"] [data-fixed-column="true"], 
@@ -444,7 +443,6 @@ elif current == "📈 PROGRESSI":
                     background-color: #161b22 !important;
                     border-right: 2px solid #30363d !important;
                 }
-                /* Riduce del 20% circa la larghezza delle celle della tabella dati */
                 [data-testid="stDataFrame"] [data-testid="stTable"] td, 
                 [data-testid="stDataFrame"] div[data-baseweb="data-table"] th {
                     max-width: 90px !important;
@@ -453,7 +451,6 @@ elif current == "📈 PROGRESSI":
             </style>
         """, unsafe_allow_html=True)
 
-        # Legenda Centrata
         st.markdown("""
         <div style='display: flex; justify-content: center; margin-bottom: 20px;'>
             <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; width: 220px;'>
@@ -527,7 +524,6 @@ elif current == "📈 PROGRESSI":
         config_cols = {}
         for i, col_name in enumerate(df_progressi.columns):
             if i == 0:
-                # Fissa la colonna "Allievo" a sinistra (pinned=True)
                 config_cols[col_name] = st.column_config.TextColumn(col_name, width="small", pinned=True)
             else:
                 config_cols[col_name] = st.column_config.ProgressColumn(
