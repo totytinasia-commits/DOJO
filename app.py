@@ -869,12 +869,11 @@ with center_col:
 
         st.markdown("---")
 
-        elif st.session_state.stat_tab == "⚙️ SETTINGS":
+        if st.session_state.stat_tab == "⚙️ SETTINGS":
             st.markdown("<div style='background-color: #0e1117; border: 2px solid #262730; border-radius: 12px; padding: 15px;'>", unsafe_allow_html=True)
             st.markdown("### ⚙️ Settings")
 
             settings_options = []
-            option_to_date = {}
             try:
                 creds = ottieni_credenziali()
                 if creds:
@@ -882,14 +881,12 @@ with center_col:
                     sheet = client.open_by_key(SHEET_ID)
                     target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_SETTINGS).strip()), None)
                     if target_ws:
-                        raw_data = target_ws.get("B6:C40")
-                        for row in raw_data:
-                            if len(row) >= 2:
-                                date_val = str(row[0]).strip()
-                                opt_val = str(row[1]).strip()
-                                if opt_val and opt_val.lower() not in ["nan", "none", ""]:
-                                    settings_options.append(opt_val)
-                                    option_to_date[opt_val] = date_val if date_val.lower() not in ["nan", "none", ""] else "N/A"
+                        raw_c6_c30 = target_ws.get("C6:C30")
+                        for row in raw_c6_c30:
+                            if row and len(row) > 0:
+                                val = str(row[0]).strip()
+                                if val and val.lower() not in ["nan", "none", ""]:
+                                    settings_options.append(val)
             except Exception as e:
                 st.warning(f"Errore nel caricamento delle opzioni da Settings: {e}")
 
@@ -897,13 +894,6 @@ with center_col:
                 settings_options = ["Nessun valore disponibile"]
 
             selected_setting = st.selectbox("Seleziona valore da C6:C30", settings_options, key="sb_settings_c6_c30")
-
-            event_date = option_to_date.get(selected_setting, "N/A")
-            st.markdown(f"""
-                <div style='background-color: #161b22; padding: 10px 14px; border-radius: 6px; margin: 10px 0 15px 0; border: 1px solid #30363d;'>
-                    <span style='color: #8b949e;'>📅 Data dell'evento:</span> <strong style='color: #58a6ff;'>{event_date}</strong>
-                 </div>
-            """, unsafe_allow_html=True)
 
             if st.button("SCEGLI", key="btn_scegli_settings"):
                 try:
@@ -915,7 +905,7 @@ with center_col:
                 except Exception as ex:
                     st.error(f"Errore durante l'impostazione del valore: {ex}")
 
-            st.markdown("</div>", unsafe_allow_html=True) 
+            st.markdown("</div>", unsafe_allow_html=True)
 
         elif st.session_state.stat_tab == "🏋️ TRAINING":
             st.markdown("""
