@@ -924,12 +924,14 @@ with center_col:
 
             st.markdown("<br>", unsafe_allow_html=True)
 
-            st.markdown("### 🏠 Gestione Stanza")
-            nuova_stanza = st.text_input("Inserisci la stanza che vuoi esaminare", value=stanza_attuale, key="input_stanza_e6")
+            st.markdown("### 🏠 Gestione Stanza (Salvataggio Automatico in E6)")
+        
+            # Esempio di stanze rapide o inserimento pulito che aggiorna subito E6 al cambio
+            # Se preferisci una lista predefinita o un input che scrive al cambio:
+            nuova_stanza = st.text_input("Inserisci o seleziona il numero stanza", value=stanza_attuale, key="input_stanza_e6")
 
-            st.markdown("<br>", unsafe_allow_html=True)
-
-            if st.button("💾 SALVA IMPOSTAZIONI STANZA"):
+            # Salvataggio automatico immediato non appena il valore cambia rispetto a quello letto dal foglio
+            if nuova_stanza and nuova_stanza != stanza_attuale:
                 try:
                     creds = ottieni_credenziali()
                     if creds:
@@ -939,17 +941,14 @@ with center_col:
                     
                         if target_ws:
                             target_ws.update("E6", [[nuova_stanza]], value_input_option='USER_ENTERED')
-                        
-                            st.toast("✅ Stanza salvata con successo in E6!", icon="🎉")
-                            st.success(f"La stanza '{nuova_stanza}' è stata salvata correttamente nel foglio!")
-                        
-                            time.sleep(1)
+                            st.toast(f"✅ Stanza '{nuova_stanza}' impostata in E6!", icon="🎉")
+                            time.sleep(0.5)
                             st.rerun()
                 except Exception as ex:
-                    st.error(f"Errore durante il salvataggio della stanza: {ex}")
+                    st.error(f"Errore durante l'aggiornamento automatico della stanza: {ex}")
 
             st.markdown("<br>", unsafe_allow_html=True)
-
+        
         elif st.session_state.stat_tab == "🏋️ TRAINING":
             st.markdown("""
             <div style='background-color: #161b22; border: 2px dashed #ff9900; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px;'>
