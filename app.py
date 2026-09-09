@@ -607,9 +607,9 @@ with center_col:
         config_cert_cols = {}
         for i, col_name in enumerate(df_certificazioni.columns):
             if i == 0:
-                config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="medium", pinned=True)
+                config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="small", pinned=True)
             else:
-                config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="large")
+                config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="medium")
 
         with st.container():
             st.dataframe(
