@@ -189,153 +189,153 @@ with center_col:
     current = st.session_state.current_section
 
     if current == "🏫 ACADEMY":
-    st.subheader("🏫 Academy")
+        st.subheader("🏫 Academy")
 
-    f13_val, h13_val = "", ""
-    f14_val, h14_val = "", ""
-    box_pix_rows = []
-    box_nino_rows = []
-    target_ws_obj = None
+        f13_val, h13_val = "", ""
+        f14_val, h14_val = "", ""
+        box_pix_rows = []
+        box_nino_rows = []
+        target_ws_obj = None
 
-    try:
-        creds = ottieni_credenziali()
-        if creds:
-            client = gspread.authorize(creds)
-            sheet = client.open_by_key(SHEET_ID)
-            target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ACADEMY).strip()), None)
-            target_ws_obj = target_ws
+        try:
+            creds = ottieni_credenziali()
+            if creds:
+                client = gspread.authorize(creds)
+                sheet = client.open_by_key(SHEET_ID)
+                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ACADEMY).strip()), None)
+                target_ws_obj = target_ws
 
-            if target_ws:
-                f13_val = target_ws.acell("F13").value or ""
-                h13_val = target_ws.acell("H13").value or ""
-                f14_val = target_ws.acell("F14").value or ""
-                h14_val = target_ws.acell("H14").value or ""
+                if target_ws:
+                    f13_val = target_ws.acell("F13").value or ""
+                    h13_val = target_ws.acell("H13").value or ""
+                    f14_val = target_ws.acell("F14").value or ""
+                    h14_val = target_ws.acell("H14").value or ""
 
-                box_pix_rows = [
-                    ["JFF_CLIP", "L/M/G/D", "DOJO MAP"],
-                    ["itaboyz_Casco", "L/M/G/D", "DOJO MAP"],
-                    ["itaBOYZ_VIN", "L/M/G/D", "DOJO MAP"],
-                    ["itaboyz_imperat", "L/M/G/D", "DOJO MAP"],
-                    ["itaboyz_gallo", "L/M/G/D", "DOJO MAP"]
-                ]
+                    box_pix_rows = [
+                        ["JFF_CLIP", "L/M/G/D", "DOJO MAP"],
+                        ["itaboyz_Casco", "L/M/G/D", "DOJO MAP"],
+                        ["itaBOYZ_VIN", "L/M/G/D", "DOJO MAP"],
+                        ["itaboyz_imperat", "L/M/G/D", "DOJO MAP"],
+                        ["itaboyz_gallo", "L/M/G/D", "DOJO MAP"]
+                    ]
 
-                box_nino_rows = [
-                    ["JFF_SINNER", "L/M/G/D", "DOJO MAP"],
-                    ["JFF_POTA", "L/M/G/D", "DOJO MAP"],
-                    ["JFF_ANDERWAL", "L/M/G/D", "DOJO MAP"],
-                    ["JFF_DANI", "L/M/G/D", "DOJO MAP"],
-                    ["itaboyz_faire", "L/M/G/D", "DOJO MAP"]
-                ]
-    except Exception as e:
-        st.warning(f"Errore nel caricamento dati Academy: {e}")
+                    box_nino_rows = [
+                        ["JFF_SINNER", "L/M/G/D", "DOJO MAP"],
+                        ["JFF_POTA", "L/M/G/D", "DOJO MAP"],
+                        ["JFF_ANDERWAL", "L/M/G/D", "DOJO MAP"],
+                        ["JFF_DANI", "L/M/G/D", "DOJO MAP"],
+                        ["itaboyz_faire", "L/M/G/D", "DOJO MAP"]
+                    ]
+        except Exception as e:
+            st.warning(f"Errore nel caricamento dati Academy: {e}")
 
-    st.markdown(f"""
-    <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-        <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.2rem; padding: 10px;'>
-            {f13_val} {h13_val}
-        </div>
-        <div style='color: #FFFFFF; text-align: center; font-size: 0.95rem; padding: 8px;'>
-            {f14_val} &nbsp;&nbsp; {h14_val}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("""
-    <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-        <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
-            ARES PIX
-        </div>
-        <div class='fixed-box-header'>
-            <span style='flex: 2;'>Allievi a carico</span>
-            <span style='flex: 1; text-align: center;'>giorni</span>
-            <span style='flex: 1; text-align: right;'>Mappa</span>
-        </div>
-    """, unsafe_allow_html=True)
-
-    for row in box_pix_rows:
         st.markdown(f"""
-        <div class='fixed-box-row'>
-            <span style='flex: 2; color: #FFFFFF;'>{row[0]}</span>
-            <span style='flex: 1; text-align: center; color: #8b949e;'>{row[1]}</span>
-            <span style='flex: 1; text-align: right; color: #58a6ff;'>{row[2]}</span>
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.2rem; padding: 10px;'>
+                {f13_val} {h13_val}
+            </div>
+            <div style='color: #FFFFFF; text-align: center; font-size: 0.95rem; padding: 8px;'>
+                {f14_val} &nbsp;&nbsp; {h14_val}
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
+                ARES PIX
+            </div>
+            <div class='fixed-box-header'>
+                <span style='flex: 2;'>Allievi a carico</span>
+                <span style='flex: 1; text-align: center;'>giorni</span>
+                <span style='flex: 1; text-align: right;'>Mappa</span>
+            </div>
+        """, unsafe_allow_html=True)
 
-    st.markdown("""
-    <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-        <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
-            ARES NINO
-        </div>
-        <div class='fixed-box-header'>
-            <span style='flex: 2;'>Allievi a carico</span>
-            <span style='flex: 1; text-align: center;'>giorni</span>
-            <span style='flex: 1; text-align: right;'>Mappa</span>
-        </div>
-    """, unsafe_allow_html=True)
+        for row in box_pix_rows:
+            st.markdown(f"""
+            <div class='fixed-box-row'>
+                <span style='flex: 2; color: #FFFFFF;'>{row[0]}</span>
+                <span style='flex: 1; text-align: center; color: #8b949e;'>{row[1]}</span>
+                <span style='flex: 1; text-align: right; color: #58a6ff;'>{row[2]}</span>
+            </div>
+            """, unsafe_allow_html=True)
 
-    for row in box_nino_rows:
-        st.markdown(f"""
-        <div class='fixed-box-row'>
-            <span style='flex: 2; color: #FFFFFF;'>{row[0]}</span>
-            <span style='flex: 1; text-align: center; color: #8b949e;'>{row[1]}</span>
-            <span style='flex: 1; text-align: right; color: #58a6ff;'>{row[2]}</span>
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
+                ARES NINO
+            </div>
+            <div class='fixed-box-header'>
+                <span style='flex: 2;'>Allievi a carico</span>
+                <span style='flex: 1; text-align: center;'>giorni</span>
+                <span style='flex: 1; text-align: right;'>Mappa</span>
+            </div>
+        """, unsafe_allow_html=True)
+
+        for row in box_nino_rows:
+            st.markdown(f"""
+            <div class='fixed-box-row'>
+                <span style='flex: 2; color: #FFFFFF;'>{row[0]}</span>
+                <span style='flex: 1; text-align: center; color: #8b949e;'>{row[1]}</span>
+                <span style='flex: 1; text-align: right; color: #58a6ff;'>{row[2]}</span>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        # --- SEZIONE MODULO DI INSERIMENTO REGISTRO ATTIVITA' ---
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
+                REGISTRO ATTIVITA' - NUOVA VOCE
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
+        with st.form("form_nuovo_registro", clear_on_submit=True):
+            nuovo_allievo = st.text_input("Allievo a carico")
+            nuovo_giorni = st.text_input("Giorni")
+            nuova_mappa = st.text_input("Mappa")
 
-    # --- SEZIONE MODULO DI INSERIMENTO REGISTRO ATTIVITA' ---
-    st.markdown("""
-    <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-        <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
-            REGISTRO ATTIVITA' - NUOVA VOCE
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+            submit_button = st.form_submit_button("➕ Invia")
 
-    with st.form("form_nuovo_registro", clear_on_submit=True):
-        nuovo_allievo = st.text_input("Allievo a carico")
-        nuovo_giorni = st.text_input("Giorni")
-        nuova_mappa = st.text_input("Mappa")
-
-        submit_button = st.form_submit_button("➕ Invia")
-
-        if submit_button:
-            if not nuovo_allievo.strip() and not nuovo_giorni.strip() and not nuova_mappa.strip():
-                st.warning("Compila almeno un campo prima di inviare.")
-            else:
-                try:
-                    if target_ws_obj:
-                        range_data = target_ws_obj.get("C28:E50", value_render_option='UNFORMATTED_VALUE')
+            if submit_button:
+                if not nuovo_allievo.strip() and not nuovo_giorni.strip() and not nuova_mappa.strip():
+                    st.warning("Compila almeno un campo prima di inviare.")
+                else:
+                    try:
+                        if target_ws_obj:
+                            range_data = target_ws_obj.get("C28:E50", value_render_option='UNFORMATTED_VALUE')
                         
-                        next_row_index = 28
-                        found_empty = False
+                            next_row_index = 28
+                            found_empty = False
                         
-                        for i, row in enumerate(range_data):
-                            if not row or all(str(cell).strip() == "" for cell in row):
-                                next_row_index = 28 + i
-                                found_empty = True
-                                break
+                            for i, row in enumerate(range_data):
+                                if not row or all(str(cell).strip() == "" for cell in row):
+                                    next_row_index = 28 + i
+                                    found_empty = True
+                                    break
                         
-                        if not found_empty:
-                            next_row_index = 28 + len(range_data)
-                            if next_row_index > 50:
-                                st.error("Il registro (C28:E50) è pieno!")
-                                st.stop()
+                            if not found_empty:
+                                next_row_index = 28 + len(range_data)
+                                if next_row_index > 50:
+                                    st.error("Il registro (C28:E50) è pieno!")
+                                    st.stop()
 
-                        target_ws_obj.update(f"C{next_row_index}:E{next_row_index}", [[nuovo_allievo, nuovo_giorni, nuova_mappa]])
+                            target_ws_obj.update(f"C{next_row_index}:E{next_row_index}", [[nuovo_allievo, nuovo_giorni, nuova_mappa]])
                         
-                        st.toast("✅ Nuova voce aggiunta con successo!", icon="🎉")
-                        st.success(f"Dati inseriti correttamente alla riga {next_row_index}!")
+                            st.toast("✅ Nuova voce aggiunta con successo!", icon="🎉")
+                            st.success(f"Dati inseriti correttamente alla riga {next_row_index}!")
                         
-                        time.sleep(1)
-                        st.rerun()
-                except Exception as ex:
-                    st.error(f"Errore durante l'inserimento: {ex}")
+                            time.sleep(1)
+                            st.rerun()
+                    except Exception as ex:
+                        st.error(f"Errore durante l'inserimento: {ex}")
 
-    st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
