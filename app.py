@@ -750,7 +750,7 @@ with center_col:
         if "selected_player" not in st.session_state:
             st.session_state.selected_player = PLAYERS[0]
 
-        # Mappatura dei GID associati a ciascun giocatore (puoi aggiornare gli altri GID quando pronti)
+        # Mappatura dei GID associati a ciascun giocatore
         player_gids = {
             "JFF_ANDERWAL": "341001551",
             "ITABOYZ_VIN": "",       # Inserisci qui il GID corrispondente
@@ -763,7 +763,7 @@ with center_col:
             "JFF_SINNER": ""         # Inserisci qui il GID corrispondente
         }
 
-        # Visualizzazione dei pulsanti dei giocatori come da tua interfaccia
+        # Visualizzazione dei pulsanti dei giocatori
         for player_name in PLAYERS:
             btn_type = "primary" if st.session_state.selected_player == player_name else "secondary"
             if st.button(player_name, key=f"btn_p_{player_name}", type=btn_type):
@@ -789,15 +789,13 @@ with center_col:
                 target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(current_gid).strip()), None)
                 
                 if target_ws:
-                    # Legge i campi richiesti dalla pagina del giocatore
-                    # (Regola le celle F9/F19 o analoghe in base alla struttura del tuo foglio)
                     ruolo_consigliato = target_ws.acell("F19").value if target_ws.acell("F19") else ""
                     punti_di_forza_text = target_ws.acell("F21").value if target_ws.acell("F21") else ""
-                    aree_miglioramento_text = target_ws.acell("F23").value if target_ws.acell("F23") else "" # Modifica la cella se necessario
+                    aree_miglioramento_text = target_ws.acell("F23").value if target_ws.acell("F23") else ""
         except Exception as e:
             st.warning(f"Errore nel caricamento dati per {st.session_state.selected_player}: {e}")
 
-        # Funzione di formattazione per colorare in giallo la parte prima dei due punti ":"
+        # Funzione di formattazione per colorare in giallo tutto ciò che precede i due punti ":" compresa l'eventuale parola dopo il punto
         def format_custom_box_text(raw_text):
             if not raw_text:
                 return "<span style='color: #888;'>Nessun dato inserito per questo giocatore.</span>"
@@ -817,39 +815,39 @@ with center_col:
                     formatted_lines.append(f"<div style='margin-bottom: 12px;'>{line}</div>")
             return "".join(formatted_lines)
 
-        # 1. BOX RUOLO CONSIGLIATO
+        # 1. BOX RUOLO CONSIGLIATO (Titolo Sopra)
         st.markdown("""
-        <div style='display: flex; border: 2px solid #ff0000; border-radius: 4px; background-color: #000000; margin-bottom: 15px; overflow: hidden;'>
-            <div style='width: 30%; background-color: #000000; color: #ff0000; font-weight: bold; font-size: 1.1rem; padding: 15px; display: flex; align-items: center; border-right: 2px solid #0055ff;'>
+        <div style='border: 2px solid #ff0000; border-radius: 4px; background-color: #000000; margin-bottom: 20px; overflow: hidden;'>
+            <div style='background-color: #000000; color: #ff0000; font-weight: bold; font-size: 1.1rem; padding: 12px 15px; border-bottom: 2px solid #0055ff;'>
                 RUOLO CONSIGLIATO
             </div>
-            <div style='width: 70%; background-color: #001133; color: #ffffff; padding: 15px; font-size: 1rem;'>
+            <div style='background-color: #001133; color: #ffffff; padding: 15px; font-size: 1rem;'>
                 {}
             </div>
         </div>
         """.format(ruolo_consigliato if ruolo_consigliato else "Nessun ruolo specificato"), unsafe_allow_html=True)
 
-        # 2. BOX PUNTI DI FORZA
+        # 2. BOX PUNTI DI FORZA (Titolo Sopra)
         formatted_forza = format_custom_box_text(punti_di_forza_text)
         st.markdown("""
-        <div style='display: flex; border: 2px solid #ff0000; border-radius: 4px; background-color: #000000; margin-bottom: 15px; overflow: hidden;'>
-            <div style='width: 30%; background-color: #000000; color: #ff0000; font-weight: bold; font-size: 1.1rem; padding: 15px; display: flex; align-items: center; border-right: 2px solid #0055ff;'>
+        <div style='border: 2px solid #ff0000; border-radius: 4px; background-color: #000000; margin-bottom: 20px; overflow: hidden;'>
+            <div style='background-color: #000000; color: #ff0000; font-weight: bold; font-size: 1.1rem; padding: 12px 15px; border-bottom: 2px solid #0055ff;'>
                 PUNTI DI FORZA
             </div>
-            <div style='width: 70%; background-color: #001133; color: #ffffff; padding: 15px; font-size: 1rem;'>
+            <div style='background-color: #001133; color: #ffffff; padding: 15px; font-size: 1rem;'>
                 {}
             </div>
         </div>
         """.format(formatted_forza), unsafe_allow_html=True)
 
-        # 3. BOX AREE DI MIGLIORAMENTO
+        # 3. BOX AREE DI MIGLIORAMENTO (Titolo Sopra)
         formatted_miglioramento = format_custom_box_text(aree_miglioramento_text)
         st.markdown("""
-        <div style='display: flex; border: 2px solid #ff0000; border-radius: 4px; background-color: #000000; margin-bottom: 15px; overflow: hidden;'>
-            <div style='width: 30%; background-color: #000000; color: #ff0000; font-weight: bold; font-size: 1.1rem; padding: 15px; display: flex; align-items: center; border-right: 2px solid #0055ff;'>
+        <div style='border: 2px solid #ff0000; border-radius: 4px; background-color: #000000; margin-bottom: 20px; overflow: hidden;'>
+            <div style='background-color: #000000; color: #ff0000; font-weight: bold; font-size: 1.1rem; padding: 12px 15px; border-bottom: 2px solid #0055ff;'>
                 AREE DI MIGLIORAMENTO
             </div>
-            <div style='width: 70%; background-color: #001133; color: #ffffff; padding: 15px; font-size: 1rem;'>
+            <div style='background-color: #001133; color: #ffffff; padding: 15px; font-size: 1rem;'>
                 {}
             </div>
         </div>
