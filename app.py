@@ -883,7 +883,7 @@ with center_col:
 
         st.markdown("---")
 
-        if st.session_state.stat_tab == "⚙️ SETTINGS":
+        elif st.session_state.stat_tab == "⚙️ SETTINGS":
             st.subheader("⚙️ Impostazioni e Configurazione")
 
             st.markdown("""
@@ -924,14 +924,23 @@ with center_col:
 
             st.markdown("<br>", unsafe_allow_html=True)
 
-            st.markdown("### 🏠 Gestione Stanza (Salvataggio Automatico in E6)")
+            st.markdown("### 🏠 Gestione Stanza")
         
-            # Esempio di stanze rapide o inserimento pulito che aggiorna subito E6 al cambio
-            # Se preferisci una lista predefinita o un input che scrive al cambio:
-            nuova_stanza = st.text_input("Inserisci o seleziona il numero stanza", value=stanza_attuale, key="input_stanza_e6")
+            # Lista di stanze tra cui scegliere (puoi modificarla o caricarla dinamicamente se preferisci)
+            # Qui mettiamo alcune opzioni di esempio o la stanza attuale come default
+            opzioni_stanze = ["O97BBA", "STANZA_01", "STANZA_02", "STANZA_03"] 
+            if stanza_attuale and stanza_attuale not in opzioni_stanze:
+            opzioni_stanze.insert(0, stanza_attuale)
 
-            # Salvataggio automatico immediato non appena il valore cambia rispetto a quello letto dal foglio
-            if nuova_stanza and nuova_stanza != stanza_attuale:
+            index_stanza = 0
+            if stanza_attuale in opzioni_stanze:
+                index_stanza = opzioni_stanze.index(stanza_attuale)
+
+            stanza_selezionata = st.selectbox("Seleziona la stanza da impostare", options=opzioni_stanze, index=index_stanza, key="select_stanza_dropdown")
+
+            st.markdown("<br>", unsafe_allow_html=True)
+
+            if st.button("💾 SCRIVI STANZA NEL FOGLIO"):
                 try:
                     creds = ottieni_credenziali()
                     if creds:
@@ -940,12 +949,15 @@ with center_col:
                         target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == "1035088826"), None)
                     
                         if target_ws:
-                            target_ws.update("E6", [[nuova_stanza]], value_input_option='USER_ENTERED')
-                            st.toast(f"✅ Stanza '{nuova_stanza}' impostata in E6!", icon="🎉")
-                            time.sleep(0.5)
+                            target_ws.update("E6", [[stanza_selezionata]], value_input_option='USER_ENTERED')
+                        
+                            st.toast(f"✅ Stanza '{stanza_selezionata}' scritta con successo in E6!", icon="🎉")
+                            st.success(f"La stanza '{stanza_selezionata}' è stata salvata correttamente nella cella E6!")
+                        
+                            time.sleep(1)
                             st.rerun()
                 except Exception as ex:
-                    st.error(f"Errore durante l'aggiornamento automatico della stanza: {ex}")
+                    st.error(f"Errore durante la scrittura della stanza: {ex}")
 
             st.markdown("<br>", unsafe_allow_html=True)
         
