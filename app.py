@@ -832,21 +832,21 @@ with center_col:
                     for i in range(1, 6):
                         es_col = f"ESERCIZIO {i}"
                         chk_col = f"CHECK {i}"
-                    
+                        
                         val_es_attuale = str(allievo_data[es_col])
                         val_chk_attuale = bool(allievo_data[chk_col])
-
+    
                         st.markdown(f"""
                         <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px 15px; margin-bottom: 10px;'>
                             <div style='font-size: 0.8rem; text-transform: uppercase; color: #8b949e; font-weight: bold; margin-bottom: 5px;'>Esercizio {i}</div>
                         </div>
                         """, unsafe_allow_html=True)
-
+    
                         c_in1, c_in2 = st.columns([3, 1])
                         with c_in1:
                             nuovi_valori_esercizi[es_col] = st.text_input(f"Nome Esercizio {i}", value=val_es_attuale, key=f"input_es_{i}_{row_idx_df}", label_visibility="collapsed")
                         with c_in2:
-                        nuovi_valori_esercizi[chk_col] = st.checkbox("Completato", value=val_chk_attuale, key=f"chk_es_{i}_{row_idx_df}")
+                            nuovi_valori_esercizi[chk_col] = st.checkbox("Completato", value=val_chk_attuale, key=f"chk_es_{i}_{row_idx_df}")
     
                     # Pulsante Giallo in basso senza scritte descrittive o con stile personalizzato
                     st.markdown("""
