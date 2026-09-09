@@ -187,7 +187,7 @@ with center_col:
 
     current = st.session_state.current_section
 
-    if current == "🏫 ACADEMY":
+    elif current == "🏫 ACADEMY":
         st.subheader("🏫 Academy")
 
         f13_val, h13_val = "", ""
@@ -341,10 +341,10 @@ with center_col:
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-   elif current == "📋 ANAGRAFICA":
+    elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
 
-        # --> INCOLLA QUI IL CSS PER LA LEGGIBILITÀ DELLE COLONNE FISSE <--
+        # CSS per la leggibilità delle colonne fisse
         st.markdown("""
             <style>
                 [data-testid="stDataFrame"] [data-fixed-column="true"], 
@@ -364,10 +364,22 @@ with center_col:
         </div>
         """, unsafe_allow_html=True)
         
-        # ... (il resto del codice continua qui sotto)
+        # ... (il resto del codice anagrafica continua qui sotto)
 
     elif current == "📈 PROGRESSI":
         st.subheader("📈 Progressi")
+
+        # CSS per mantenere la prima colonna fissa e leggibile durante lo scorrimento
+        st.markdown("""
+            <style>
+                [data-testid="stDataFrame"] [data-fixed-column="true"], 
+                [data-testid="stDataFrame"] th[aria-pinned="true"], 
+                [data-testid="stDataFrame"] td[aria-pinned="true"] {
+                    background-color: #161b22 !important;
+                    border-right: 2px solid #30363d !important;
+                }
+            </style>
+        """, unsafe_allow_html=True)
 
         # Legenda Centrata
         st.markdown("""
@@ -440,24 +452,30 @@ with center_col:
         df_progressi = df_progressi.replace(r'^\s*$', pd.NA, regex=True)
         df_progressi = df_progressi.dropna(how='all').fillna("")
 
-        config_cols = {}
-        for i, col_name in enumerate(df_progressi.columns):
-            if i == 0:
-                config_cols[col_name] = st.column_config.TextColumn(col_name, width="medium")
-            else:
-                config_cols[col_name] = st.column_config.ProgressColumn(
-                    col_name,
-                    min_value=0,
-                    max_value=100,
-                    format="%s"
-                )
-                def parse_pct(val):
-                    try:
-                        clean = str(val).replace("%", "").replace(",", ".").strip()
-                        return float(clean)
-                    except:
-                        return 0.0
-                df_progressi[col_name] = df_progressi[col_name].apply(parse_pct)
+        # Funzione di parsing delle percentuali sicura fuori dal ciclo di configurazione
+        def parse_pct(val):
+            if val == "" or pd.isna(val):
+                return 0.0
+            try:
+                clean = str(val).replace("%", "").replace(",", ".").strip()
+                return float(clean)
+            except:
+                return 0.0
+
+        for col_name in expected_columns[1:]:
+            df_progressi[col_name] = df_progressi[col_name].apply(parse_pct)
+
+        # Configurazione colonne (con 'Allievo' fissata a sinistra)
+        config_cols = {
+            "Allievo": st.column_config.TextColumn("Allievo", width="medium", pinned=True)
+        }
+        for col_name in expected_columns[1:]:
+            config_cols[col_name] = st.column_config.ProgressColumn(
+                col_name,
+                min_value=0,
+                max_value=100,
+                format="%s"
+            )
 
         with st.container():
             st.dataframe(
