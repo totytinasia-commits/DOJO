@@ -791,31 +791,42 @@ with center_col:
                 if target_ws:
                     ruolo_consigliato = target_ws.acell("F19").value if target_ws.acell("F19") else ""
                     punti_di_forza_text = target_ws.acell("F21").value if target_ws.acell("F21") else ""
-                    aree_miglioramento_text = target_ws.acell("F23").value if target_ws.acell("F29") else ""
+                    aree_miglioramento_text = target_ws.acell("F23").value if target_ws.acell("F23") else ""
         except Exception as e:
             st.warning(f"Errore nel caricamento dati per {st.session_state.selected_player}: {e}")
 
-        # Funzione di formattazione per colorare in giallo tutto ciò che precede i due punti ":" compresa l'eventuale parola dopo il punto
+        # Funzione aggiornata per mandare a capo le frasi dopo il punto e colorare in giallo fino ai due punti
         def format_custom_box_text(raw_text):
             if not raw_text:
                 return "<span style='color: #888;'>Nessun dato inserito per questo giocatore.</span>"
             
-            lines = raw_text.split('\n')
+            # Se nel testo ci sono frasi attaccate dopo un punto (es. "...combattimento. Efficacia nei push:"), 
+            # separiamo inserendo un ritorno a capo prima della nuova voce.
+            import re
+            # Sostituisce il punto seguito da spazio e da una parola con maiuscola seguita da `:` con un ritorno a capo
+            processed_text = re.sub(r'\.\s+([A-ZÀ-Ú][a-zà-ú]+(?:\s+[a-zà-ú]+)*:)', r'.<br><br><span style="color: #FFFF00; font-weight: bold;">\1</span>', raw_text)
+            
+            lines = processed_text.split('\n')
             formatted_lines = []
             for line in lines:
                 line = line.strip()
                 if not line:
                     continue
-                if ":" in line:
+                
+                # Se la riga contiene già il tag HTML inserito sopra, la manteniamo così
+                if "<span style=" in line:
+                    formatted_lines.append(f"<div style='margin-bottom: 12px;'>{line}</div>")
+                elif ":" in line:
                     parts = line.split(":", 1)
                     title_part = parts[0].strip()
                     desc_part = parts[1].strip()
                     formatted_lines.append(f"<div style='margin-bottom: 12px;'><span style='color: #FFFF00; font-weight: bold;'>{title_part}:</span> {desc_part}</div>")
                 else:
                     formatted_lines.append(f"<div style='margin-bottom: 12px;'>{line}</div>")
+            
             return "".join(formatted_lines)
 
-        # 1. BOX RUOLO CONSIGLIATO (Titolo Sopra)
+        # 1. BOX RUOLO CONSIGLIATO
         st.markdown("""
         <div style='border: 2px solid #ff0000; border-radius: 4px; background-color: #000000; margin-bottom: 20px; overflow: hidden;'>
             <div style='background-color: #000000; color: #ff0000; font-weight: bold; font-size: 1.1rem; padding: 12px 15px; border-bottom: 2px solid #0055ff;'>
@@ -827,7 +838,7 @@ with center_col:
         </div>
         """.format(ruolo_consigliato if ruolo_consigliato else "Nessun ruolo specificato"), unsafe_allow_html=True)
 
-        # 2. BOX PUNTI DI FORZA (Titolo Sopra)
+        # 2. BOX PUNTI DI FORZA
         formatted_forza = format_custom_box_text(punti_di_forza_text)
         st.markdown("""
         <div style='border: 2px solid #ff0000; border-radius: 4px; background-color: #000000; margin-bottom: 20px; overflow: hidden;'>
@@ -840,7 +851,7 @@ with center_col:
         </div>
         """.format(formatted_forza), unsafe_allow_html=True)
 
-        # 3. BOX AREE DI MIGLIORAMENTO (Titolo Sopra)
+        # 3. BOX AREE DI MIGLIORAMENTO
         formatted_miglioramento = format_custom_box_text(aree_miglioramento_text)
         st.markdown("""
         <div style='border: 2px solid #ff0000; border-radius: 4px; background-color: #000000; margin-bottom: 20px; overflow: hidden;'>
