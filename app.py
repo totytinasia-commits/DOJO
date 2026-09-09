@@ -884,72 +884,79 @@ with center_col:
         st.markdown("---")
 
         elif current == "⚙️ SETTING":
-            st.subheader("⚙️ Impostazioni e Configurazione")
+        st.subheader("⚙️ Impostazioni e Configurazione")
 
-            st.markdown("""
-            <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-                <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
-                    LISTA EVENTI E GESTIONE STANZA
-                </div>
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
+                LISTA EVENTI E GESTIONE STANZA
             </div>
-            """, unsafe_allow_html=True)
+        </div>
+        """, unsafe_allow_html=True)
 
-            lista_eventi = []
-            stanza_attuale = ""
+        # 1. Recupero della lista eventi da C6:C36 del foglio con GID 1035088826
+        lista_eventi = []
+        stanza_attuale = ""
         
+        try:
+            creds = ottieni_credenziali()
+            if creds:
+                client = gspread.authorize(creds)
+                sheet = client.open_by_key(SHEET_ID)
+                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == "1035088826"), None)
+
+                if target_ws:
+                    # Legge la lista degli eventi da C6 a C36
+                    raw_eventi = target_ws.get("C6:C36")
+                    for r in raw_eventi:
+                        if r and len(r) > 0 and r[0] is not None and str(r[0]).strip() != "":
+                            lista_eventi.append(str(r[0]).strip())
+                    
+                    # Legge il valore attuale della stanza da E6 (se presente)
+                    val_e6 = target_ws.acell("E6").value
+                    if val_e6 is not None:
+                        stanza_attuale = str(val_e6).strip()
+        except Exception as e:
+            st.warning(f"Errore nel caricamento dei dati da Google Sheets: {e}")
+
+        # Se la lista è vuota per qualsiasi motivo, mettiamo un'opzione di fallback
+        if not lista_eventi:
+            lista_eventi = ["Nessun evento trovato"]
+
+        # 2. Mostriamo la Lista degli Eventi sopra
+        st.markdown("### 📋 Lista degli Eventi")
+        selected_evento = st.selectbox("Seleziona Evento", options=lista_eventi, key="select_evento_setting")
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # 3. Campo per inserire la stanza da esaminare (corrispondente a E6)
+        st.markdown("### 🏠 Gestione Stanza")
+        nuova_stanza = st.text_input("Inserisci la stanza che vuoi esaminare", value=stanza_attuale, key="input_stanza_e6")
+
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        # 4. Pulsante di salvataggio per aggiornare E6 su Google Sheets
+        if st.button("💾 SALVA IMPOSTAZIONI STANZA"):
             try:
                 creds = ottieni_credenziali()
                 if creds:
                     client = gspread.authorize(creds)
                     sheet = client.open_by_key(SHEET_ID)
                     target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == "1035088826"), None)
-
-                    if target_ws:
-                        raw_eventi = target_ws.get("C6:C36")
-                        for r in raw_eventi:
-                            if r and len(r) > 0 and r[0] is not None and str(r[0]).strip() != "":
-                                lista_eventi.append(str(r[0]).strip())
-                        
-                        val_e6 = target_ws.acell("E6").value
-                        if val_e6 is not None:
-                            stanza_attuale = str(val_e6).strip()
-            except Exception as e:
-                st.warning(f"Errore nel caricamento dei dati da Google Sheets: {e}")
-
-            if not lista_eventi:
-                lista_eventi = ["Nessun evento trovato"]
-
-            st.markdown("### 📋 Lista degli Eventi")
-            selected_evento = st.selectbox("Seleziona Evento", options=lista_eventi, key="select_evento_setting")
-
-            st.markdown("<br>", unsafe_allow_html=True)
-
-            st.markdown("### 🏠 Gestione Stanza")
-            nuova_stanza = st.text_input("Inserisci la stanza che vuoi esaminare", value=stanza_attuale, key="input_stanza_e6")
-
-            st.markdown("<br>", unsafe_allow_html=True)
-
-            if st.button("💾 SALVA IMPOSTAZIONI STANZA"):
-                try:
-                    creds = ottieni_credenziali()
-                    if creds:
-                        client = gspread.authorize(creds)
-                        sheet = client.open_by_key(SHEET_ID)
-                        target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == "1035088826"), None)
                     
-                        if target_ws:
-                            target_ws.update("E6", [[nuova_stanza]], value_input_option='USER_ENTERED')
+                    if target_ws:
+                        # Scrive il valore inserito direttamente nella cella E6
+                        target_ws.update("E6", [[nuova_stanza]], value_input_option='USER_ENTERED')
                         
-                            st.toast("✅ Stanza salvata con successo in E6!", icon="🎉")
-                            st.success(f"La stanza '{nuova_stanza}' è stata salvata correttamente nel foglio!")
-                            
-                            time.sleep(1)
-                            st.rerun()
-                except Exception as ex:
-                    st.error(f"Errore durante il salvataggio della stanza: {ex}")
+                        st.toast("✅ Stanza salvata con successo in E6!", icon="🎉")
+                        st.success(f"La stanza '{nuova_stanza}' è stata salvata correttamente nel foglio!")
+                        
+                        time.sleep(1)
+                        st.rerun()
+            except Exception as ex:
+                st.error(f"Errore durante il salvataggio della stanza: {ex}")
 
-            st.markdown("<br>", unsafe_allow_html=True)
-    
+        st.markdown("<br>", unsafe_allow_html=True)
         elif st.session_state.stat_tab == "🏋️ TRAINING":
             st.markdown("""
             <div style='background-color: #161b22; border: 2px dashed #ff9900; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px;'>
