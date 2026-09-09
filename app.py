@@ -414,23 +414,17 @@ with center_col:
             else:
                 lista_giocatori = df_valid[col_nickname].tolist()
                 
-                # Menu a tendina pulito
                 selected_player = st.selectbox("🔍 Seleziona un giocatore dal database:", lista_giocatori)
 
                 if selected_player:
                     giocatore_data = df_valid[df_valid[col_nickname] == selected_player].iloc[0]
                     columns_list = df_valid.columns.tolist()
 
-                    # Header del profilo selezionato
                     st.markdown(f"""
                     <div style='margin-top: 20px; margin-bottom: 15px; padding: 12px 20px; background: linear-gradient(90deg, #161b22 0%, #21262d 100%); border-left: 5px solid #58a6ff; border-radius: 4px;'>
                         <h3 style='margin: 0; color: #f0f6fc; font-size: 1.3rem;'>👤 Scheda Profilo: <span style='color: #58a6ff;'>{selected_player}</span></h3>
                     </div>
                     """, unsafe_allow_html=True)
-
-                    # Organizziamo i box in due colonne
-                    col1, col2 = st.columns(2)
-                    half = len(columns_list) // 2
 
                     def render_box(col_name, val):
                         valore_str = str(val).strip()
@@ -444,13 +438,24 @@ with center_col:
                         </div>
                         """
 
+                    # Separiamo gli ultimi campi: prendiamo tutti tranne l'ultimo per le due colonne, 
+                    # e l'ultimo lo riserviamo per la riga a tutta larghezza.
+                    campi_standard = columns_list[:-1]
+                    ultimo_campo = columns_list[-1]
+
+                    col1, col2 = st.columns(2)
+                    half = (len(campi_standard) + 1) // 2
+
                     with col1:
-                        for col in columns_list[:half]:
+                        for col in campi_standard[:half]:
                             st.markdown(render_box(col, giocatore_data[col]), unsafe_allow_html=True)
 
                     with col2:
-                        for col in columns_list[half:]:
+                        for col in campi_standard[half:]:
                             st.markdown(render_box(col, giocatore_data[col]), unsafe_allow_html=True)
+
+                    # L'ultimo campo viene renderizzato a tutta larghezza (full-width)
+                    st.markdown(render_box(ultimo_campo, giocatore_data[ultimo_campo]), unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
         
