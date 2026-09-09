@@ -552,74 +552,74 @@ with center_col:
         st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "📜 CERTIFICAZIONI":
-    st.subheader("📜 Certificazioni")
+        st.subheader("📜 Certificazioni")
 
-    st.markdown("""
-    <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-        <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
-            TABELLA CERTIFICAZIONI
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
+                TABELLA CERTIFICAZIONI
+            </div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-    cert_rows = []
-    try:
-        creds = ottieni_credenziali()
-        if creds:
-            client = gspread.authorize(creds)
-            sheet = client.open_by_key(SHEET_ID)
-            target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_CERTIFICAZIONI).strip()), None)
+        cert_rows = []
+        try:
+            creds = ottieni_credenziali()
+            if creds:
+                client = gspread.authorize(creds)
+                sheet = client.open_by_key(SHEET_ID)
+                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_CERTIFICAZIONI).strip()), None)
 
-            if target_ws:
-                raw_cert = target_ws.get("B18:O40")
-                for r in raw_cert:
-                    row_padded = []
-                    for idx in range(14):
-                        row_padded.append(r[idx] if idx < len(r) and r[idx] is not None else "")
-                    cert_rows.append(row_padded)
-    except Exception as e:
-        st.warning(f"Errore nel caricamento dati Certificazioni: {e}")
+                if target_ws:
+                    raw_cert = target_ws.get("B18:O40")
+                    for r in raw_cert:
+                        row_padded = []
+                        for idx in range(14):
+                            row_padded.append(r[idx] if idx < len(r) and r[idx] is not None else "")
+                        cert_rows.append(row_padded)
+        except Exception as e:
+            st.warning(f"Errore nel caricamento dati Certificazioni: {e}")
 
-    expected_cert_columns = [
-        "Allievo", "Bronze Aim", "Silver Aim", "Gold Aim", 
-        "SWITCH VELOCE ARMI", "BUILD DI PROTEZIONE", "BUILD PER PUSH", 
-        "USO DI BUILD COMPLESSIVO", "MIRA", "LOOT", "SNIPER", 
-        "TEORIA ARMI", "USO DELLE ARMI COMPLESSIVO", "TEAM WORK"
-    ]
+        expected_cert_columns = [
+            "Allievo", "Bronze Aim", "Silver Aim", "Gold Aim", 
+            "SWITCH VELOCE ARMI", "BUILD DI PROTEZIONE", "BUILD PER PUSH", 
+            "USO DI BUILD COMPLESSIVO", "MIRA", "LOOT", "SNIPER", 
+            "TEORIA ARMI", "USO DELLE ARMI COMPLESSIVO", "TEAM WORK"
+        ]
 
-    if not cert_rows:
-        df_certificazioni = pd.DataFrame(columns=expected_cert_columns)
-    else:
-        data_cert = cert_rows[1:] if len(cert_rows) > 1 else cert_rows
-        
-        cleaned_cert_data = []
-        for row in data_cert:
-            new_row = list(row)
-            while len(new_row) < 14:
-                new_row.append("")
-            cleaned_cert_data.append(new_row[:14])
-
-        df_certificazioni = pd.DataFrame(cleaned_cert_data, columns=expected_cert_columns)
-
-    df_certificazioni = df_certificazioni.replace(r'^\s*$', pd.NA, regex=True)
-    df_certificazioni = df_certificazioni.dropna(how='all').fillna("")
-
-    config_cert_cols = {}
-    for i, col_name in enumerate(df_certificazioni.columns):
-        if i == 0:
-            config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="medium", pinned=True)
+        if not cert_rows:
+            df_certificazioni = pd.DataFrame(columns=expected_cert_columns)
         else:
-            config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="large")
+            data_cert = cert_rows[1:] if len(cert_rows) > 1 else cert_rows
+        
+            cleaned_cert_data = []
+            for row in data_cert:
+                new_row = list(row)
+                while len(new_row) < 14:
+                    new_row.append("")
+                cleaned_cert_data.append(new_row[:14])
 
-    with st.container():
-        st.dataframe(
-            df_certificazioni,
-            use_container_width=True,
-            hide_index=True,
-            column_config=config_cert_cols
-        )
+            df_certificazioni = pd.DataFrame(cleaned_cert_data, columns=expected_cert_columns)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+        df_certificazioni = df_certificazioni.replace(r'^\s*$', pd.NA, regex=True)
+        df_certificazioni = df_certificazioni.dropna(how='all').fillna("")
+
+        config_cert_cols = {}
+        for i, col_name in enumerate(df_certificazioni.columns):
+            if i == 0:
+                config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="medium", pinned=True)
+            else:
+                config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="large")
+
+        with st.container():
+            st.dataframe(
+                df_certificazioni,
+                use_container_width=True,
+                hide_index=True,
+                column_config=config_cert_cols
+            )
+
+        st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "🏋️ ESERCIZI":
         st.subheader("🏋️ Esercizi")
