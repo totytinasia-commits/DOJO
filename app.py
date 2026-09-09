@@ -692,7 +692,7 @@ with center_col:
         })
 
         config_es_cols = {
-            "Allievo": st.column_config.TextColumn("Allievo", width="medium"),
+            "Allievo": st.column_config.TextColumn("Allievo", width="medium", pinned=True),
             "ESERCIZIO 1": st.column_config.TextColumn("ESERCIZIO", width="large"),
             "CHECK 1": st.column_config.CheckboxColumn("CHECK", default=False),
             "ESERCIZIO 2": st.column_config.TextColumn("ESERCIZIO", width="large"),
