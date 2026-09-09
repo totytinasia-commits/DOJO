@@ -188,14 +188,14 @@ with center_col:
 
     current = st.session_state.current_section
 
-    if current == "🏫 ACADEMY":
+    elif current == "🏫 ACADEMY":
         st.subheader("🏫 Academy")
 
         f13_val, h13_val = "", ""
         f14_val, h14_val = "", ""
         box_pix_rows = []
         box_nino_rows = []
-        box2_rows = []
+        target_ws_obj = None
 
         try:
             creds = ottieni_credenziali()
@@ -203,6 +203,7 @@ with center_col:
                 client = gspread.authorize(creds)
                 sheet = client.open_by_key(SHEET_ID)
                 target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ACADEMY).strip()), None)
+                target_ws_obj = target_ws
 
                 if target_ws:
                     f13_val = target_ws.acell("F13").value or ""
@@ -225,14 +226,6 @@ with center_col:
                         ["JFF_DANI", "L/M/G/D", "DOJO MAP"],
                         ["itaboyz_faire", "L/M/G/D", "DOJO MAP"]
                     ]
-
-                    raw_box2 = target_ws.get("C28:E50")
-                    for r in raw_box2:
-                        box2_rows.append([
-                            r[0] if len(r) > 0 else "",
-                            r[1] if len(r) > 1 else "",
-                            r[2] if len(r) > 2 else ""
-                        ])
         except Exception as e:
             st.warning(f"Errore nel caricamento dati Academy: {e}")
 
@@ -293,52 +286,63 @@ with center_col:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
+        # --- SEZIONE MODULO DI INSERIMENTO REGISTRO ATTIVITA' ---
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
-                REGISTRO ATTIVITA'
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
+                REGISTRO ATTIVITA' - NUOVA VOCE
             </div>
-            <div class='fixed-box-header'>
-                <span style='flex: 2;'>allievi a carico</span>
-                <span style='flex: 1; text-align: center;'>giorni</span>
-                <span style='flex: 1; text-align: right;'>mappa</span>
-            </div>
+        </div>
         """, unsafe_allow_html=True)
 
-        if not box2_rows:
-            box2_rows = [["", "", ""]] * 10
+        with st.form("form_nuovo_registro", clear_on_submit=True):
+            col_in1, col_in2, col_in3 = st.columns(3)
+            with col_in1:
+                nuovo_allievo = st.text_input("Allievi a carico")
+            with col_in2:
+                nuovo_giorni = st.text_input("Giorni")
+            with col_in3:
+                nuova_mappa = st.text_input("Mappa")
 
-        df_registro = pd.DataFrame(box2_rows, columns=["allievi a carico", "giorni", "mappa"])
+            submit_button = st.form_submit_button("➕ Aggiungi al Registro")
 
-        edited_df = st.data_editor(
-            df_registro,
-            use_container_width=True,
-            num_rows="dynamic",
-            key="editor_registro_attivita",
-            hide_index=True
-        )
+            if submit_button:
+                if not nuovo_allievo.strip() and not nuovo_giorni.strip() and not nuova_mappa.strip():
+                    st.warning("Compila almeno un campo prima di inviare.")
+                else:
+                    try:
+                        if target_ws_obj:
+                            # Leggiamo tutto il blocco da C28 a E50 includendo anche le righe vuote intermedie
+                            range_data = target_ws_obj.get("C28:E50", value_render_option='UNFORMATTED_VALUE')
+                            
+                            next_row_index = 28
+                            found_empty = False
+                            
+                            # Cerchiamo la prima riga completamente vuota o con celle tutte vuote
+                            for i, row in enumerate(range_data):
+                                # Se la riga è corta o tutti gli elementi sono vuoti
+                                if not row or all(str(cell).strip() == "" for cell in row):
+                                    next_row_index = 28 + i
+                                    found_empty = True
+                                    break
+                            
+                            # Se non ha trovato righe vuote ma c'è spazio prima della riga 50
+                            if not found_empty:
+                                next_row_index = 28 + len(range_data)
+                                if next_row_index > 50:
+                                    st.error("Il registro (C28:E50) è pieno!")
+                                    st.stop()
 
-        st.markdown("</div>", unsafe_allow_html=True)
-
-        if st.button("💾 SALVA MODIFICHE REGISTRO"):
-            try:
-                data_to_write = edited_df.values.tolist()
-                creds = ottieni_credenziali()
-                if creds:
-                    client = gspread.authorize(creds)
-                    sheet = client.open_by_key(SHEET_ID)
-                    target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ACADEMY).strip()), None)
-                    if target_ws:
-                        end_row = 28 + len(data_to_write) - 1
-                        target_ws.update(f"C28:E{end_row}", data_to_write)
-                        
-                        st.toast("✅ Modifiche effettuate con successo!", icon="🎉")
-                        st.success("Modifiche salvate con successo su Google Sheet (C28:E50)!")
-                        
-                        time.sleep(1)
-                        st.rerun()
-            except Exception as ex:
-                st.error(f"Errore durante il salvataggio: {ex}")
+                            # Scriviamo i dati nella riga esatta trovata
+                            target_ws_obj.update(f"C{next_row_index}:E{next_row_index}", [[nuovo_allievo, nuovo_giorni, nuova_mappa]])
+                            
+                            st.toast("✅ Nuova voce aggiunta con successo!", icon="🎉")
+                            st.success(f"Dati inseriti correttamente alla riga {next_row_index}!")
+                            
+                            time.sleep(1)
+                            st.rerun()
+                    except Exception as ex:
+                        st.error(f"Errore durante l'inserimento: {ex}")
 
         st.markdown("<br>", unsafe_allow_html=True)
 
