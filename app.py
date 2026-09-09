@@ -622,74 +622,115 @@ with center_col:
         st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "📜 CERTIFICAZIONI":
-        st.subheader("📜 Certificazioni")
+    st.subheader("📜 Certificazioni")
 
-        st.markdown("""
-        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
-                TABELLA CERTIFICAZIONI
-            </div>
+    st.markdown("""
+    <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+        <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
+            TABELLA CERTIFICAZIONI
         </div>
-        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
-        cert_rows = []
-        try:
-            creds = ottieni_credenziali()
-            if creds:
-                client = gspread.authorize(creds)
-                sheet = client.open_by_key(SHEET_ID)
-                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_CERTIFICAZIONI).strip()), None)
+    cert_rows = []
+    try:
+        creds = ottieni_credenziali()
+        if creds:
+            client = gspread.authorize(creds)
+            sheet = client.open_by_key(SHEET_ID)
+            target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_CERTIFICAZIONI).strip()), None)
 
-                if target_ws:
-                    raw_cert = target_ws.get("B18:O40")
-                    for r in raw_cert:
-                        row_padded = []
-                        for idx in range(14):
-                            row_padded.append(r[idx] if idx < len(r) and r[idx] is not None else "")
-                        cert_rows.append(row_padded)
-        except Exception as e:
-            st.warning(f"Errore nel caricamento dati Certificazioni: {e}")
+            if target_ws:
+                raw_cert = target_ws.get("B18:O40")
+                for r in raw_cert:
+                    row_padded = []
+                    for idx in range(14):
+                        row_padded.append(r[idx] if idx < len(r) and r[idx] is not None else "")
+                    cert_rows.append(row_padded)
+    except Exception as e:
+        st.warning(f"Errore nel caricamento dati Certificazioni: {e}")
 
-        expected_cert_columns = [
-            "Allievo", "Bronze Aim", "Silver Aim", "Gold Aim", 
-            "SWITCH VELOCE ARMI", "BUILD DI PROTEZIONE", "BUILD PER PUSH", 
-            "USO DI BUILD COMPLESSIVO", "MIRA", "LOOT", "SNIPER", 
-            "TEORIA ARMI", "USO DELLE ARMI COMPLESSIVO", "TEAM WORK"
-        ]
+    expected_cert_columns = [
+        "Allievo", "Bronze Aim", "Silver Aim", "Gold Aim", 
+        "SWITCH VELOCE ARMI", "BUILD DI PROTEZIONE", "BUILD PER PUSH", 
+        "USO DI BUILD COMPLESSIVO", "MIRA", "LOOT", "SNIPER", 
+        "TEORIA ARMI", "USO DELLE ARMI COMPLESSIVO", "TEAM WORK"
+    ]
 
-        if not cert_rows:
-            df_certificazioni = pd.DataFrame(columns=expected_cert_columns)
+    if not cert_rows:
+        df_certificazioni = pd.DataFrame(columns=expected_cert_columns)
+    else:
+        data_cert = cert_rows[1:] if len(cert_rows) > 1 else cert_rows
+    
+        cleaned_cert_data = []
+        for row in data_cert:
+            new_row = list(row)
+            while len(new_row) < 14:
+                new_row.append("")
+            cleaned_cert_data.append(new_row[:14])
+
+        df_certificazioni = pd.DataFrame(cleaned_cert_data, columns=expected_cert_columns)
+
+    df_certificazioni = df_certificazioni.replace(r'^\s*$', pd.NA, regex=True)
+    df_certificazioni = df_certificazioni.dropna(how='all').fillna("")
+
+    # --- GESTIONE VISUALIZZAZIONE A TENDINA CON BOX ---
+    if df_certificazioni.empty:
+        st.info("Nessun dato disponibile nelle certificazioni.")
+    else:
+        col_allievo = df_certificazioni.columns[0]
+        df_valid = df_certificazioni[df_certificazioni[col_allievo].astype(str).str.strip() != ""]
+
+        if df_valid.empty:
+            st.info("Nessun allievo trovato.")
         else:
-            data_cert = cert_rows[1:] if len(cert_rows) > 1 else cert_rows
-        
-            cleaned_cert_data = []
-            for row in data_cert:
-                new_row = list(row)
-                while len(new_row) < 14:
-                    new_row.append("")
-                cleaned_cert_data.append(new_row[:14])
+            lista_allievi = df_valid[col_allievo].tolist()
+            
+            selected_allievo = st.selectbox("🔍 Seleziona un allievo per le certificazioni:", lista_allievi, key="select_certificazioni")
 
-            df_certificazioni = pd.DataFrame(cleaned_cert_data, columns=expected_cert_columns)
+            if selected_allievo:
+                allievo_data = df_valid[df_valid[col_allievo] == selected_allievo].iloc[0]
+                columns_list = df_valid.columns.tolist()
 
-        df_certificazioni = df_certificazioni.replace(r'^\s*$', pd.NA, regex=True)
-        df_certificazioni = df_certificazioni.dropna(how='all').fillna("")
+                st.markdown(f"""
+                <div style='margin-top: 20px; margin-bottom: 15px; padding: 12px 20px; background: linear-gradient(90deg, #161b22 0%, #21262d 100%); border-left: 5px solid #58a6ff; border-radius: 4px;'>
+                    <h3 style='margin: 0; color: #f0f6fc; font-size: 1.3rem;'>📜 Certificazioni: <span style='color: #58a6ff;'>{selected_allievo}</span></h3>
+                </div>
+                """, unsafe_allow_html=True)
 
-        config_cert_cols = {}
-        for i, col_name in enumerate(df_certificazioni.columns):
-            if i == 0:
-                config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="medium", pinned=True)
-            else:
-                config_cert_cols[col_name] = st.column_config.TextColumn(col_name, width="small")
+                def render_cert_box(col_name, val):
+                    valore_str = str(val).strip()
+                    if not valore_str:
+                        valore_display = "<span style='color: #6e7681; font-style: italic;'>Non specificato</span>"
+                    else:
+                        valore_display = f"<span style='color: #f0f6fc; font-weight: bold;'>{valore_str}</span>"
 
-        with st.container():
-            st.dataframe(
-                df_certificazioni,
-                use_container_width=True,
-                hide_index=True,
-                column_config=config_cert_cols
-            )
+                    return f"""
+                    <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);'>
+                        <div style='font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #8b949e; margin-bottom: 6px; font-weight: 600;'>{col_name}</div>
+                        <div style='font-size: 1.05rem;'>{valore_display}</div>
+                    </div>
+                    """
 
-        st.markdown("<br>", unsafe_allow_html=True)
+                # Escludiamo la prima colonna (Nome Allievo) dai box delle metriche
+                campi_metriche = columns_list[1:]
+                
+                # Dividiamo le 13 metriche in due colonne simmetriche
+                metà = (len(campi_metriche) + 1) // 2
+                col1_items = campi_metriche[:metà]
+                col2_items = campi_metriche[metà:]
+
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    for col in col1_items:
+                        st.markdown(render_cert_box(col, allievo_data[col]), unsafe_allow_html=True)
+
+                with col2:
+                    for col in col2_items:
+                        st.markdown(render_cert_box(col, allievo_data[col]), unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True))
 
     elif current == "🏋️ ESERCIZI":
         st.subheader("🏋️ Esercizi")
