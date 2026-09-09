@@ -724,10 +724,11 @@ with center_col:
         if st.button("💾 SALVA MODIFICHE ESERCIZI"):
             try:
                 df_to_save = edited_df_es.copy()
-                # Converte le checkbox salvate direttamente nei valori testuali maiuscoli "TRUE" / "FALSE" richiesti da Google Sheets
+                
+                # Assicuriamoci che siano booleani puri Python (True/False)
                 for check_idx in [2, 4, 6, 8, 10]:
                     col_name = df_to_save.columns[check_idx]
-                    df_to_save[col_name] = df_to_save[col_name].apply(lambda x: "TRUE" if x == True or str(x).strip().upper() == "TRUE" else "FALSE")
+                    df_to_save[col_name] = df_to_save[col_name].apply(lambda x: True if x in [True, 1, "True", "TRUE", "true", "VERO", "V", "YES", "X", "ON"] else False)
 
                 data_to_write = df_to_save.values.tolist()
                 creds = ottieni_credenziali()
@@ -737,7 +738,10 @@ with center_col:
                     target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ESERCIZI).strip()), None)
                     if target_ws:
                         end_row = 17 + len(data_to_write) - 1
-                        target_ws.update(f"C17:M{end_row}", data_to_write)
+                        
+                        # AGGIUNTO value_input_option='USER_ENTERED': questo dice a Google Sheets 
+                        # di interpretare i True/False come formati nativi (quindi caselle di spunta) e non come testo.
+                        target_ws.update(f"C17:M{end_row}", data_to_write, value_input_option='USER_ENTERED')
                         
                         st.toast("✅ Modifiche Esercizi effettuate con successo!", icon="🎉")
                         st.success("Modifiche salvate con successo su Google Sheet (C17:M40)!")
