@@ -462,26 +462,6 @@ with center_col:
     elif current == "📈 PROGRESSI":
         st.subheader("📈 Progressi")
 
-        # Legenda mantenuta in alto per coerenza
-        st.markdown("""
-        <div style='display: flex; justify-content: center; margin-bottom: 20px;'>
-            <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; width: 220px;'>
-                <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1rem; padding: 6px;'>
-                    LEGGENDA
-                </div>
-                <div style='background-color: #ff0000; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
-                    0-40%
-                </div>
-                <div style='background-color: #ffaa00; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
-                    40-80%
-                </div>
-                <div style='background-color: #90ee90; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
-                    80-100%
-                </div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
@@ -586,7 +566,7 @@ with center_col:
                         # Per le metriche numeriche con percentuale
                         num_val = parse_val_to_float(valore_str)
                         
-                        # Assegnazione colore in base alla legenda
+                        # Manteniamo comunque la colorazione dinamica delle barre (Rosso, Arancione, Verde)
                         if num_val <= 40:
                             bar_color = "#ff0000"  # Rosso
                         elif num_val <= 80:
@@ -606,7 +586,6 @@ with center_col:
                         </div>
                         """
 
-                    # Dividiamo le metriche in due colonne, riservando l'ultima (es. "Media") o gestendole simmetricamente
                     campi_standard = columns_list[:-1]
                     ultimo_campo = columns_list[-1]
 
@@ -621,7 +600,7 @@ with center_col:
                         for col in campi_standard[half:]:
                             st.markdown(render_progress_box(col, allievo_data[col]), unsafe_allow_html=True)
 
-                    # L'ultimo campo (es. Media) a tutta larghezza in basso, grande come due box
+                    # L'ultimo campo (es. Media) a tutta larghezza in basso
                     st.markdown(render_progress_box(ultimo_campo, allievo_data[ultimo_campo]), unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
