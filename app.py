@@ -524,14 +524,14 @@ with center_col:
         config_cols = {}
         for i, col_name in enumerate(df_progressi.columns):
             if i == 0:
-                config_cols[col_name] = st.column_config.TextColumn(col_name, width="medium", pinned=True)
+                config_cols[col_name] = st.column_config.TextColumn(col_name, width="small", pinned=True)
             else:
                 config_cols[col_name] = st.column_config.ProgressColumn(
                     col_name,
                     min_value=0,
-                    max_value=80,
+                    max_value100,
                     format="%s",
-                    width="small"
+                    width="medium"
                 )
                 def parse_pct(val):
                     try:
