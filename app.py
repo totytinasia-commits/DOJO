@@ -344,7 +344,7 @@ with center_col:
     elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
 
-        # CSS per mantenere le prime colonne fisse e leggibili durante lo scorrimento
+        # CSS per mantenere la colonna fissa e leggibile durante lo scorrimento
         st.markdown("""
             <style>
                 [data-testid="stDataFrame"] [data-fixed-column="true"], 
@@ -373,6 +373,7 @@ with center_col:
                 target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ANAGRAFICA).strip()), None)
 
                 if target_ws:
+                    # Leggiamo da C13 a L35 (10 colonne totali)
                     raw_anagrafica = target_ws.get("C13:L35")
                     for r in raw_anagrafica:
                         anagrafica_rows.append([
@@ -391,7 +392,7 @@ with center_col:
             st.warning(f"Errore nel caricamento dati Anagrafica: {e}")
 
         if not anagrafica_rows:
-            cols_names = ["ID", "Nickname", "Nome Reale", "Paese", "Data Ingresso", "Livello Attuale", "Coach", "Ore Totali", "Obiettivo", "Certificazione"]
+            cols_names = ["Nickname", "Nome Reale", "Paese", "Data Ingresso", "Livello Attuale", "Coach", "Ore Totali", "Obiettivo", "Certificazione"]
             df_anagrafica = pd.DataFrame(columns=cols_names)
         else:
             header_anagrafica = anagrafica_rows[0] if len(anagrafica_rows) > 0 else ["ID", "Nickname", "Nome Reale", "Paese", "Data Ingresso", "Livello Attuale", "Coach", "Ore Totali", "Obiettivo", "Certificazione"]
@@ -410,10 +411,14 @@ with center_col:
 
             df_anagrafica = pd.DataFrame(cleaned_data, columns=header_anagrafica)
 
-        # Configurazione delle colonne per bloccare ID e Nickname a sinistra
+            # Rimuoviamo la colonna ID (la prima colonna del foglio) se esiste
+            if "ID" in df_anagrafica.columns:
+                df_anagrafica = df_anagrafica.drop(columns=["ID"])
+
+        # Configurazione delle colonne per bloccare "Nickname" a sinistra
         column_config = {}
         for col in df_anagrafica.columns:
-            if col in ["ID", "Nickname"]:
+            if col == "Nickname":
                 column_config[col] = st.column_config.TextColumn(col, pinned=True)
             else:
                 column_config[col] = st.column_config.TextColumn(col)
