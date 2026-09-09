@@ -753,14 +753,14 @@ with center_col:
         # Mappatura dei GID associati a ciascun giocatore
         player_gids = {
             "JFF_ANDERWAL": "341001551",
-            "ITABOYZ_VIN": "",       # Inserisci qui il GID corrispondente
-            "JFF_CLIP": "",          # Inserisci qui il GID corrispondente
-            "ITABOYZ_GALLO": "",     # Inserisci qui il GID corrispondente
-            "ITABOYZ_IMPERATUBER": "",# Inserisci qui il GID corrispondente
-            "JFF_POTA": "",          # Inserisci qui il GID corrispondente
-            "ITABOYZ_CASCO": "",     # Inserisci qui il GID corrispondente
-            "JFF_CIKKO": "",         # Inserisci qui il GID corrispondente
-            "JFF_SINNER": ""         # Inserisci qui il GID corrispondente
+            "ITABOYZ_VIN": "1483818122",       # Inserisci qui il GID corrispondente
+            "JFF_CLIP": "1771413751",          # Inserisci qui il GID corrispondente
+            "ITABOYZ_GALLO": "1353776186",     # Inserisci qui il GID corrispondente
+            "ITABOYZ_IMPERATUBER": "132907169",# Inserisci qui il GID corrispondente
+            "JFF_POTA": "596698328",          # Inserisci qui il GID corrispondente
+            "ITABOYZ_CASCO": "89864457",     # Inserisci qui il GID corrispondente
+            "JFF_CIKKO": "1697770491",         # Inserisci qui il GID corrispondente
+            "JFF_SINNER": "1148507572"         # Inserisci qui il GID corrispondente
         }
 
         # Visualizzazione dei pulsanti dei giocatori
