@@ -344,6 +344,18 @@ with center_col:
     elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
 
+        # CSS per mantenere le prime colonne fisse e leggibili durante lo scorrimento
+        st.markdown("""
+            <style>
+                [data-testid="stDataFrame"] [data-fixed-column="true"], 
+                [data-testid="stDataFrame"] th[aria-pinned="true"], 
+                [data-testid="stDataFrame"] td[aria-pinned="true"] {
+                    background-color: #161b22 !important;
+                    border-right: 2px solid #30363d !important;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
@@ -398,10 +410,19 @@ with center_col:
 
             df_anagrafica = pd.DataFrame(cleaned_data, columns=header_anagrafica)
 
+        # Configurazione delle colonne per bloccare ID e Nickname a sinistra
+        column_config = {}
+        for col in df_anagrafica.columns:
+            if col in ["ID", "Nickname"]:
+                column_config[col] = st.column_config.TextColumn(col, pinned=True)
+            else:
+                column_config[col] = st.column_config.TextColumn(col)
+
         st.dataframe(
             df_anagrafica,
             use_container_width=True,
-            hide_index=True
+            hide_index=True,
+            column_config=column_config
         )
 
         st.markdown("<br>", unsafe_allow_html=True)
