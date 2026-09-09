@@ -917,7 +917,7 @@ with center_col:
 
         elif st.session_state.stat_tab == "🏆 STATCOMP":
             st.markdown("<div style='background-color: #0e1117; border: 2px solid #262730; border-radius: 12px; padding: 15px;'>", unsafe_allow_html=True)
-            st.markdown("### 👤 Personal Stats Dashboard")
+            st.markdown("### 👤 Personal Stats")
 
             target_ws = None
             current_d13_val = ""
