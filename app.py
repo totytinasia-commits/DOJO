@@ -188,8 +188,27 @@ with center_col:
 
     current = st.session_state.current_section
 
-    if current == "🏫 ACADEMY":
+    elif current == "🏫 ACADEMY":
         st.subheader("🏫 Academy")
+
+        # CSS personalizzato per etichette bianche e pulsante giallo
+        st.markdown("""
+        <style>
+            .stTextInput label p, div[data-baseweb="input"] label, .stTextInput label {
+                color: #FFFFFF !important;
+            }
+            [data-testid="stFormSubmitButton"] button {
+                background-color: #FFFF00 !important;
+                color: #000000 !important;
+                width: 100% !important;
+                font-weight: bold !important;
+            }
+            [data-testid="stFormSubmitButton"] button:hover {
+                background-color: #cccc00 !important;
+                color: #000000 !important;
+            }
+        </style>
+        """, unsafe_allow_html=True)
 
         f13_val, h13_val = "", ""
         f14_val, h14_val = "", ""
@@ -217,7 +236,7 @@ with center_col:
                         ["itaBOYZ_VIN", "L/M/G/D", "DOJO MAP"],
                         ["itaboyz_imperat", "L/M/G/D", "DOJO MAP"],
                         ["itaboyz_gallo", "L/M/G/D", "DOJO MAP"]
-                    ]
+                    ]    
 
                     box_nino_rows = [
                         ["JFF_SINNER", "L/M/G/D", "DOJO MAP"],
@@ -300,7 +319,7 @@ with center_col:
             nuovo_giorni = st.text_input("Giorni")
             nuova_mappa = st.text_input("Mappa")
 
-            submit_button = st.form_submit_button("➕ Invia")
+            submit_button = st.form_submit_button("➕")
 
             if submit_button:
                 if not nuovo_allievo.strip() and not nuovo_giorni.strip() and not nuova_mappa.strip():
