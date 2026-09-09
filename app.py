@@ -789,26 +789,23 @@ with center_col:
                 target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(current_gid).strip()), None)
                 
                 if target_ws:
+                    # Lettura corretta basata sulla prima cella in alto a sinistra delle celle unite
                     ruolo_consigliato = target_ws.acell("F19").value if target_ws.acell("F19") else ""
                     punti_di_forza_text = target_ws.acell("F21").value if target_ws.acell("F21") else ""
-                    aree_miglioramento_text = target_ws.acell("F23").value if target_ws.acell("F23") else ""
+                    aree_miglioramento_text = target_ws.acell("F29").value if target_ws.acell("F29") else ""
         except Exception as e:
             st.warning(f"Errore nel caricamento dati per {st.session_state.selected_player}: {e}")
 
-        # Funzione aggiornata per colorare in giallo e mandare a capo tutte le sezioni (inclusa la prima)
+        # Funzione di formattazione per mandare a capo e colorare in giallo tutto ciò che precede i due punti
         def format_custom_box_text(raw_text):
             if not raw_text:
                 return "<span style='color: #888;'>Nessun dato inserito per questo giocatore.</span>"
             
             import re
-            # Pulisce eventuali spazi multipli iniziali
             clean_text = raw_text.strip()
             
-            # Trasforma le frasi con i due punti (es. "Versatilità:" o "Efficacia nei push:") in blocchi formattati e separati
-            # Gestisce sia l'inizio del testo che le frasi successive dopo il punto
-            processed_text = re.sub(r'(^|\.\s+)([A-ZÀ-Ú][a-zà-ú]+(?:\s+[a-zà-ú]+)*:)', r'\1<br><br><span style="color: #FFFF00; font-weight: bold;">\2</span>', clean_text)
-            
-            # Rimuove eventuali tag <br><br> iniziali superflui se la prima parola era all'inizio
+            # Formatta le etichette con i due punti (es. "Coesione col team:") rendendole gialle, in grassetto e andando a capo
+            processed_text = re.sub(r'(^|\.\s+)([A-ZÀ-Úa-zà-ú\s\(\)]+?:)', r'\1<br><br><span style="color: #FFFF00; font-weight: bold;">\2</span>', clean_text)
             processed_text = re.sub(r'^<br><br>', '', processed_text)
             
             lines = processed_text.split('<br><br>')
