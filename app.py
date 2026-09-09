@@ -874,12 +874,12 @@ with center_col:
                             # La tabella inizia alla riga 17 del foglio Google
                             sheet_row_index = 17 + row_idx_df
                             
-                            # Convertiamo ogni valore in un tipo nativo Python (evitando problemi con np.bool_)
+                            # Convertiamo ogni valore in tipo nativo Python
                             riga_grezza = df_esercizi.loc[row_idx_df].tolist()
                             riga_aggiornata = []
                             for val in riga_grezza:
-                                if isinstance(val, (bool, np.bool_)):
-                                    riga_aggiornata.append(bool(val))
+                                if isinstance(val, bool):
+                                    riga_aggiornata.append(val)
                                 else:
                                     riga_aggiornata.append(str(val) if pd.notna(val) else "")
     
