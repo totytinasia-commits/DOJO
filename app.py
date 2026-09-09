@@ -566,7 +566,6 @@ with center_col:
                         # Per le metriche numeriche con percentuale
                         num_val = parse_val_to_float(valore_str)
                         
-                        # Manteniamo comunque la colorazione dinamica delle barre (Rosso, Arancione, Verde)
                         if num_val <= 40:
                             bar_color = "#ff0000"  # Rosso
                         elif num_val <= 80:
@@ -586,22 +585,25 @@ with center_col:
                         </div>
                         """
 
-                    campi_standard = columns_list[:-1]
-                    ultimo_campo = columns_list[-1]
+                    # Abbiamo 8 colonne in totale: [Allievo, AIM, Building, Movimento, Teamwork, Game Sense, Leadership, Media]
+                    # Dividiamo gli elementi in modo che "Movimento" e "Media" finiscano affiancati.
+                    # Ad esempio: 
+                    # Colonna 1: Allievo, AIM, Building, Movimento
+                    # Colonna 2: Teamwork, Game Sense, Leadership, Media
+                    
+                    metà = len(columns_list) // 2  # 8 // 2 = 4 elementi per colonna
+                    col1_items = columns_list[:metà]   # ["Allievo", "AIM", "Building", "Movimento"]
+                    col2_items = columns_list[metà:]   # ["Teamwork", "Game Sense", "Leadership", "Media"]
 
                     col1, col2 = st.columns(2)
-                    half = (len(campi_standard) + 1) // 2
 
                     with col1:
-                        for col in campi_standard[:half]:
+                        for col in col1_items:
                             st.markdown(render_progress_box(col, allievo_data[col]), unsafe_allow_html=True)
 
                     with col2:
-                        for col in campi_standard[half:]:
+                        for col in col2_items:
                             st.markdown(render_progress_box(col, allievo_data[col]), unsafe_allow_html=True)
-
-                    # L'ultimo campo (es. Media) a tutta larghezza in basso
-                    st.markdown(render_progress_box(ultimo_campo, allievo_data[ultimo_campo]), unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
