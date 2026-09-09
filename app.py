@@ -1055,10 +1055,10 @@ with center_col:
         st.markdown(f"""
         <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 15px; margin-bottom: 20px;'>
             <h4 style='color: #FFFF00; margin-top: 0;'>📅 Dettagli Evento</h4>
-            <p style='margin: 5px 0;'><b>Data Evento (C2):</b> {info_evento.get('data', '-')}</p>
-            <p style='margin: 5px 0;'><b>Mappa (C3):</b> {info_evento.get('mappa', '-')}</p>
-            <p style='margin: 5px 0;'><b>Modalità (C4):</b> {info_evento.get('modalita', '-')}</p>
-            <p style='margin: 5px 0;'><b>Posti Disponibili (C5):</b> {info_evento.get('posti', '-')}</p>
+            <p style='margin: 5px 0;'><b>Data Evento :</b> {info_evento.get('data', '-')}</p>
+            <p style='margin: 5px 0;'><b>Mappa :</b> {info_evento.get('mappa', '-')}</p>
+            <p style='margin: 5px 0;'><b>Modalità :</b> {info_evento.get('modalita', '-')}</p>
+            <p style='margin: 5px 0;'><b>Posti Disponibili :</b> {info_evento.get('posti', '-')}</p>
             <p style='margin: 5px 0;'><b>Iscritti attuali:</b> {len(partecipanti)} / 25</p>
         </div>
         """, unsafe_allow_html=True)
@@ -1110,7 +1110,7 @@ with center_col:
                         st.error(f"Errore durante il salvataggio dell'iscrizione: {ex}")
     
         # Sezione Lista Partecipanti
-        st.markdown("### 📋 Lista Partecipanti Iscritti")
+        st.markdown("### 📋 Lista Partecipanti")
         if partecipanti:
             for idx, p in enumerate(partecipanti, start=1):
                 st.markdown(f"""
