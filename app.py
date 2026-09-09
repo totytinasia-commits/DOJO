@@ -964,32 +964,27 @@ with center_col:
                 (680, 707, 1, 13, "#da3633") # B681:N708 (Rosso)
             ]
 
-            # Ricerca robusta del DataFrame
+            GID_TRAINING = "1956525109"
             current_df = None
-        
-            # 1. Controlla chiavi dirette in session_state (inclusi ID numerici e stringhe)
-            for key in [1956525109, '1956525109', 'df_training', 'current_sheet']:
-                if key in st.session_state and st.session_state[key] is not None:
-                    current_df = st.session_state[key]
-                    break
-                
-            # 2. Controlla variabili locali o globali comuni
-            if current_df is None:
-                for var_name in ['df', 'df_data', 'sheet_df']:
-                    if var_name in locals() and locals()[var_name] is not None:
-                        current_df = locals()[var_name]
-                        break
-                    elif var_name in globals() and globals()[var_name] is not None:
-                        current_df = globals()[var_name]
-                        break
 
-            if current_df is not None:
+            try:
+                with st.spinner("Caricamento dati di training in corso..."):
+                    creds = ottieni_credenziali()
+                    if creds:
+                        client = gspread.authorize(creds)
+                        sheet = client.open_by_key(SHEET_ID)
+                        target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_TRAINING).strip()), None)
+                        if target_ws:
+                            raw_data = target_ws.get_all_values()
+                            current_df = pd.DataFrame(raw_data)
+            except Exception as e:
+                st.error(f"Errore nel caricamento del foglio Training da Google Sheets: {e}")
+
+            if current_df is not None and not current_df.empty:
                 for r_start, r_end, c_start, c_end, color in training_sections:
                     render_excel_table(current_df, r_start, r_end, c_start, c_end, color)
             else:
-                st.error("⚠️ DataFrame non trovato.")
-                with st.expander("🔍 Mostra chiavi disponibili in session_state (per debug)"):
-                    st.write(list(st.session_state.keys()))
+                st.error("⚠️ Impossibile caricare i dati dal foglio Training.")
 
         elif st.session_state.stat_tab == "🏆 STATCOMP":
             st.markdown("<div style='background-color: #0e1117; border: 2px solid #262730; border-radius: 12px; padding: 15px;'>", unsafe_allow_html=True)
