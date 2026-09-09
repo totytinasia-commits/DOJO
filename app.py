@@ -433,123 +433,123 @@ with center_col:
         st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "📈 PROGRESSI":
-        st.subheader("📈 Progressi")
+    st.subheader("📈 Progressi")
 
-        st.markdown("""
-            <style>
-                [data-testid="stDataFrame"] [data-fixed-column="true"], 
-                [data-testid="stDataFrame"] th[aria-pinned="true"], 
-                [data-testid="stDataFrame"] td[aria-pinned="true"] {
-                    background-color: #161b22 !important;
-                    border-right: 2px solid #30363d !important;
-                }
-                [data-testid="stDataFrame"] [data-testid="stTable"] td, 
-                [data-testid="stDataFrame"] div[data-baseweb="data-table"] th {
-                    max-width: 90px !important;
-                    min-width: 70px !important;
-                }
-            </style>
-        """, unsafe_allow_html=True)
+    st.markdown("""
+        <style>
+            [data-testid="stDataFrame"] [data-fixed-column="true"], 
+            [data-testid="stDataFrame"] th[aria-pinned="true"], 
+            [data-testid="stDataFrame"] td[aria-pinned="true"] {
+                background-color: #161b22 !important;
+                border-right: 2px solid #30363d !important;
+            }
+            [data-testid="stDataFrame"] [data-testid="stTable"] td, 
+            [data-testid="stDataFrame"] div[data-baseweb="data-table"] th {
+                max-width: 90px !important;
+                min-width: 70px !important;
+            }
+        </style>
+    """, unsafe_allow_html=True)
 
-        st.markdown("""
-        <div style='display: flex; justify-content: center; margin-bottom: 20px;'>
-            <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; width: 220px;'>
-                <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1rem; padding: 6px;'>
-                    LEGGENDA
-                </div>
-                <div style='background-color: #ff0000; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
-                    0-40%
-                </div>
-                <div style='background-color: #ffaa00; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
-                    40-80%
-                </div>
-                <div style='background-color: #90ee90; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
-                    80-100%
-                </div>
+    st.markdown("""
+    <div style='display: flex; justify-content: center; margin-bottom: 20px;'>
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; width: 220px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1rem; padding: 6px;'>
+                LEGGENDA
+            </div>
+            <div style='background-color: #ff0000; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
+                0-40%
+            </div>
+            <div style='background-color: #ffaa00; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
+                40-80%
+            </div>
+            <div style='background-color: #90ee90; color: #000000; text-align: center; font-weight: bold; padding: 6px;'>
+                80-100%
             </div>
         </div>
-        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
-        st.markdown("""
-        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
-                TABELLA PROGRESSI
-            </div>
+    st.markdown("""
+    <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+        <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
+            TABELLA PROGRESSI
         </div>
-        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
-        progressi_rows = []
-        try:
-            creds = ottieni_credenziali()
-            if creds:
-                client = gspread.authorize(creds)
-                sheet = client.open_by_key(SHEET_ID)
-                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_PROGRESSI).strip()), None)
+    progressi_rows = []
+    try:
+        creds = ottieni_credenziali()
+        if creds:
+            client = gspread.authorize(creds)
+            sheet = client.open_by_key(SHEET_ID)
+            target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_PROGRESSI).strip()), None)
 
-                if target_ws:
-                    raw_progressi = target_ws.get("B12:I35")
-                    for r in raw_progressi:
-                        progressi_rows.append([
-                            r[0] if len(r) > 0 else "",
-                            r[1] if len(r) > 1 else "",
-                            r[2] if len(r) > 2 else "",
-                            r[3] if len(r) > 3 else "",
-                            r[4] if len(r) > 4 else "",
-                            r[5] if len(r) > 5 else "",
-                            r[6] if len(r) > 6 else "",
-                            r[7] if len(r) > 7 else ""
-                        ])
-        except Exception as e:
-            st.warning(f"Errore nel caricamento dati Progressi: {e}")
+            if target_ws:
+                raw_progressi = target_ws.get("B12:I35")
+                for r in raw_progressi:
+                    progressi_rows.append([
+                        r[0] if len(r) > 0 else "",
+                        r[1] if len(r) > 1 else "",
+                        r[2] if len(r) > 2 else "",
+                        r[3] if len(r) > 3 else "",
+                        r[4] if len(r) > 4 else "",
+                        r[5] if len(r) > 5 else "",
+                        r[6] if len(r) > 6 else "",
+                        r[7] if len(r) > 7 else ""
+                    ])
+    except Exception as e:
+        st.warning(f"Errore nel caricamento dati Progressi: {e}")
 
-        expected_columns = ["Allievo", "AIM", "Building", "Movimento", "Teamwork", "Game Sense", "Leadership", "Media"]
+    expected_columns = ["Allievo", "AIM", "Building", "Movimento", "Teamwork", "Game Sense", "Leadership", "Media"]
 
-        if not progressi_rows:
-            df_progressi = pd.DataFrame(columns=expected_columns)
+    if not progressi_rows:
+        df_progressi = pd.DataFrame(columns=expected_columns)
+    else:
+        data_progressi = progressi_rows[1:] if len(progressi_rows) > 1 else progressi_rows
+        
+        cleaned_data = []
+        for row in data_progressi:
+            new_row = list(row)
+            while len(new_row) < 8:
+                new_row.append("")
+            cleaned_data.append(new_row[:8])
+
+        df_progressi = pd.DataFrame(cleaned_data, columns=expected_columns)
+
+    df_progressi = df_progressi.replace(r'^\s*$', pd.NA, regex=True)
+    df_progressi = df_progressi.dropna(how='all').fillna("")
+
+    config_cols = {}
+    for i, col_name in enumerate(df_progressi.columns):
+        if i == 0:
+            config_cols[col_name] = st.column_config.TextColumn(col_name, width="medium", pinned=True)
         else:
-            data_progressi = progressi_rows[1:] if len(progressi_rows) > 1 else progressi_rows
-            
-            cleaned_data = []
-            for row in data_progressi:
-                new_row = list(row)
-                while len(new_row) < 8:
-                    new_row.append("")
-                cleaned_data.append(new_row[:8])
-
-            df_progressi = pd.DataFrame(cleaned_data, columns=expected_columns)
-
-        df_progressi = df_progressi.replace(r'^\s*$', pd.NA, regex=True)
-        df_progressi = df_progressi.dropna(how='all').fillna("")
-
-        config_cols = {}
-        for i, col_name in enumerate(df_progressi.columns):
-            if i == 0:
-                config_cols[col_name] = st.column_config.TextColumn(col_name, width="small", pinned=True)
-            else:
-                config_cols[col_name] = st.column_config.ProgressColumn(
-                    col_name,
-                    min_value=0,
-                    max_value=100,
-                    format="%s",
-                    width="small"
-                )
-                def parse_pct(val):
-                    try:
-                        clean = str(val).replace("%", "").replace(",", ".").strip()
-                        return float(clean)
-                    except:
-                        return 0.0
-                df_progressi[col_name] = df_progressi[col_name].apply(parse_pct)
-
-        with st.container():
-            st.dataframe(
-                df_progressi,
-                use_container_width=True,
-                hide_index=True,
-                column_config=config_cols
+            config_cols[col_name] = st.column_config.ProgressColumn(
+                col_name,
+                min_value=0,
+                max_value=100,
+                format="%s",
+                width="small"
             )
+            def parse_pct(val):
+                try:
+                    clean = str(val).replace("%", "").replace(",", ".").strip()
+                    return float(clean)
+                except:
+                    return 0.0
+            df_progressi[col_name] = df_progressi[col_name].apply(parse_pct)
 
-        st.markdown("<br>", unsafe_allow_html=True)
+    with st.container():
+        st.dataframe(
+            df_progressi,
+            use_container_width=True,
+            hide_index=True,
+            column_config=config_cols
+        )
+
+    st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "📜 CERTIFICAZIONI":
         st.subheader("📜 Certificazioni")
