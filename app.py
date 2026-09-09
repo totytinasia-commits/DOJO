@@ -529,7 +529,7 @@ with center_col:
                 config_cols[col_name] = st.column_config.ProgressColumn(
                     col_name,
                     min_value=0,
-                    max_value=100,
+                    max_value=80,
                     format="%s",
                     width="small"
                 )
