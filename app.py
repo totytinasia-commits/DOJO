@@ -883,7 +883,7 @@ with center_col:
 
         st.markdown("---")
 
-        elif st.session_state.stat_tab == "⚙️ SETTINGS":
+        if st.session_state.stat_tab == "⚙️ SETTINGS":
             st.subheader("⚙️ Impostazioni e Configurazione")
 
             st.markdown("""
