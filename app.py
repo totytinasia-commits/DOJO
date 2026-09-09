@@ -730,7 +730,7 @@ with center_col:
                         for col in col2_items:
                             st.markdown(render_cert_box(col, allievo_data[col]), unsafe_allow_html=True)
 
-        st.markdown("<br>", unsafe_allow_html=True))
+        st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "🏋️ ESERCIZI":
         st.subheader("🏋️ Esercizi")
