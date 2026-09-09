@@ -662,19 +662,17 @@ with center_col:
         if not esercizi_rows:
             df_esercizi = pd.DataFrame(columns=expected_es_columns)
         else:
-            data_es = esercizi_rows[1:] if len(esercizi_rows) > 1 else esercizi_rows
-            
+            # CORRETTO: Usiamo direttamente tutte le righe lette da C17:M40 senza saltare la prima
             cleaned_es_data = []
-            for row in data_es:
+            for row in esercizi_rows:
                 new_row = list(row)
                 while len(new_row) < 11:
                     new_row.append("")
                 
-                # Conversione rigorosa dei valori TRUE / FALSE di Google Sheets in booleani Python per le checkbox
                 for check_idx in [2, 4, 6, 8, 10]:
                     val = new_row[check_idx]
                     if isinstance(val, bool):
-                        new_row[check_idx] = val
+                        new_row[check_idx] val
                     else:
                         val_str = str(val).strip().upper()
                         if val_str in ["TRUE", "VERO", "1", "V", "YES", "X", "ON"]:
@@ -725,7 +723,6 @@ with center_col:
             try:
                 df_to_save = edited_df_es.copy()
                 
-                # Assicuriamoci che siano booleani puri Python (True/False)
                 for check_idx in [2, 4, 6, 8, 10]:
                     col_name = df_to_save.columns[check_idx]
                     df_to_save[col_name] = df_to_save[col_name].apply(lambda x: True if x in [True, 1, "True", "TRUE", "true", "VERO", "V", "YES", "X", "ON"] else False)
@@ -739,8 +736,6 @@ with center_col:
                     if target_ws:
                         end_row = 17 + len(data_to_write) - 1
                         
-                        # AGGIUNTO value_input_option='USER_ENTERED': questo dice a Google Sheets 
-                        # di interpretare i True/False come formati nativi (quindi caselle di spunta) e non come testo.
                         target_ws.update(f"C17:M{end_row}", data_to_write, value_input_option='USER_ENTERED')
                         
                         st.toast("✅ Modifiche Esercizi effettuate con successo!", icon="🎉")
