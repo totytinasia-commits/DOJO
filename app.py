@@ -346,17 +346,6 @@ with center_col:
         st.subheader("📋 Anagrafica")
 
         st.markdown("""
-            <style>
-                [data-testid="stDataFrame"] [data-fixed-column="true"], 
-                [data-testid="stDataFrame"] th[aria-pinned="true"], 
-                [data-testid="stDataFrame"] td[aria-pinned="true"] {
-                    background-color: #161b22 !important;
-                    border-right: 2px solid #30363d !important;
-                }
-            </style>
-        """, unsafe_allow_html=True)
-
-        st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
                 ANAGRAFICA ALLIEVI
@@ -413,22 +402,46 @@ with center_col:
             if "ID" in df_anagrafica.columns:
                 df_anagrafica = df_anagrafica.drop(columns=["ID"])
 
-        column_config = {}
-        for col in df_anagrafica.columns:
-            if col == "Nickname":
-                column_config[col] = st.column_config.TextColumn(col, pinned=True)
-            else:
-                column_config[col] = st.column_config.TextColumn(col)
+        # --- GESTIONE VISUALIZZAZIONE A TENDINA (GIOCATORE PER GIOCATORE) ---
+        if df_anagrafica.empty:
+            st.info("Nessun dato disponibile nell'anagrafica.")
+        else:
+            # Filtriamo eventuali righe vuote basandoci sulla colonna del Nickname (o la prima colonna disponibile)
+            col_nickname = df_anagrafica.columns[0]
+            df_valid = df_anagrafica[df_anagrafica[col_nickname].astype(str).str.strip() != ""]
 
-        st.dataframe(
-            df_anagrafica,
-            use_container_width=True,
-            hide_index=True,
-            column_config=column_config
-        )
+            if df_valid.empty:
+                st.info("Nessun allievo trovato.")
+            else:
+                # Creiamo una lista di opzioni per la selectbox (es. basata sul Nickname)
+                lista_giocatori = df_valid[col_nickname].tolist()
+                
+                selected_player = st.selectbox("🔍 Seleziona un giocatore:", lista_giocatori)
+
+                if selected_player:
+                    # Estraiamo la riga corrispondente al giocatore selezionato
+                    giocatore_data = df_valid[df_valid[col_nickname] == selected_player].iloc[0]
+
+                    st.markdown("---")
+                    st.markdown(f"### 👤 Scheda di: {selected_player}")
+
+                    # Visualizziamo i dati in colonne o in modo strutturato
+                    col1, col2 = st.columns(2)
+                    
+                    columns_list = df_valid.columns.tolist()
+                    half = len(columns_list) // 2
+
+                    with col1:
+                        for col in columns_list[:half]:
+                            valore = giocatore_data[col]
+                            st.metric(label=col, value=valore if str(valore).strip() != "" else "-")
+
+                    with col2:
+                        for col in columns_list[half:]:
+                            valore = giocatore_data[col]
+                            st.metric(label=col, value=valore if str(valore).strip() != "" else "-")
 
         st.markdown("<br>", unsafe_allow_html=True)
-
     elif current == "📈 PROGRESSI":
         st.subheader("📈 Progressi")
 
