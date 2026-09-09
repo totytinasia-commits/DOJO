@@ -344,7 +344,6 @@ with center_col:
     elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
 
-        # CSS per la leggibilità delle colonne fisse
         st.markdown("""
             <style>
                 [data-testid="stDataFrame"] [data-fixed-column="true"], 
@@ -363,13 +362,10 @@ with center_col:
             </div>
         </div>
         """, unsafe_allow_html=True)
-        
-        # ... (il resto del codice anagrafica continua qui sotto)
 
     elif current == "📈 PROGRESSI":
         st.subheader("📈 Progressi")
 
-        # CSS per mantenere la prima colonna fissa e leggibile durante lo scorrimento
         st.markdown("""
             <style>
                 [data-testid="stDataFrame"] [data-fixed-column="true"], 
@@ -381,7 +377,6 @@ with center_col:
             </style>
         """, unsafe_allow_html=True)
 
-        # Legenda Centrata
         st.markdown("""
         <div style='display: flex; justify-content: center; margin-bottom: 20px;'>
             <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; width: 220px;'>
@@ -452,7 +447,6 @@ with center_col:
         df_progressi = df_progressi.replace(r'^\s*$', pd.NA, regex=True)
         df_progressi = df_progressi.dropna(how='all').fillna("")
 
-        # Funzione di parsing delle percentuali sicura fuori dal ciclo di configurazione
         def parse_pct(val):
             if val == "" or pd.isna(val):
                 return 0.0
@@ -465,7 +459,6 @@ with center_col:
         for col_name in expected_columns[1:]:
             df_progressi[col_name] = df_progressi[col_name].apply(parse_pct)
 
-        # Configurazione colonne (con 'Allievo' fissata a sinistra)
         config_cols = {
             "Allievo": st.column_config.TextColumn("Allievo", width="medium", pinned=True)
         }
@@ -486,7 +479,6 @@ with center_col:
             )
 
         st.markdown("<br>", unsafe_allow_html=True)
-
     elif current == "📜 CERTIFICAZIONI":
         st.subheader("📜 Certificazioni")
 
