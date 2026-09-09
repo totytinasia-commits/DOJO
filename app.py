@@ -795,25 +795,29 @@ with center_col:
         except Exception as e:
             st.warning(f"Errore nel caricamento dati per {st.session_state.selected_player}: {e}")
 
-        # Funzione aggiornata per mandare a capo le frasi dopo il punto e colorare in giallo fino ai due punti
+        # Funzione aggiornata per colorare in giallo e mandare a capo tutte le sezioni (inclusa la prima)
         def format_custom_box_text(raw_text):
             if not raw_text:
                 return "<span style='color: #888;'>Nessun dato inserito per questo giocatore.</span>"
             
-            # Se nel testo ci sono frasi attaccate dopo un punto (es. "...combattimento. Efficacia nei push:"), 
-            # separiamo inserendo un ritorno a capo prima della nuova voce.
             import re
-            # Sostituisce il punto seguito da spazio e da una parola con maiuscola seguita da `:` con un ritorno a capo
-            processed_text = re.sub(r'\.\s+([A-ZÀ-Ú][a-zà-ú]+(?:\s+[a-zà-ú]+)*:)', r'.<br><br><span style="color: #FFFF00; font-weight: bold;">\1</span>', raw_text)
+            # Pulisce eventuali spazi multipli iniziali
+            clean_text = raw_text.strip()
             
-            lines = processed_text.split('\n')
+            # Trasforma le frasi con i due punti (es. "Versatilità:" o "Efficacia nei push:") in blocchi formattati e separati
+            # Gestisce sia l'inizio del testo che le frasi successive dopo il punto
+            processed_text = re.sub(r'(^|\.\s+)([A-ZÀ-Ú][a-zà-ú]+(?:\s+[a-zà-ú]+)*:)', r'\1<br><br><span style="color: #FFFF00; font-weight: bold;">\2</span>', clean_text)
+            
+            # Rimuove eventuali tag <br><br> iniziali superflui se la prima parola era all'inizio
+            processed_text = re.sub(r'^<br><br>', '', processed_text)
+            
+            lines = processed_text.split('<br><br>')
             formatted_lines = []
             for line in lines:
                 line = line.strip()
                 if not line:
                     continue
                 
-                # Se la riga contiene già il tag HTML inserito sopra, la manteniamo così
                 if "<span style=" in line:
                     formatted_lines.append(f"<div style='margin-bottom: 12px;'>{line}</div>")
                 elif ":" in line:
