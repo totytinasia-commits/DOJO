@@ -938,7 +938,6 @@ with center_col:
                 except Exception as e:
                     st.error(f"Errore nel rendering della tabella [{start_row}:{end_row}]: {e}")
 
-            # Mappatura completa degli intervalli (convertiti in indici 0-based: Colonna B=1, M=12, N=13)
             training_sections = [
                 (20, 47, 1, 12, "#2ea043"),  # B21:M48 (Armi 1)
                 (51, 78, 1, 12, "#2ea043"),  # B52:M79 (Armi 2)
@@ -963,26 +962,34 @@ with center_col:
                 (620, 647, 1, 13, "#8957e5"),# B621:N648 (Viola)
                 (650, 677, 1, 13, "#da3633"),# B651:N678 (Rosso)
                 (680, 707, 1, 13, "#da3633") # B681:N708 (Rosso)
-            ]    
+            ]
 
-            # Cerca il DataFrame usando l'ID del foglio o le variabili comuni
+            # Ricerca robusta del DataFrame
             current_df = None
-            if 1956525109 in st.session_state:
-                current_df = st.session_state[1956525109]
-            elif '1956525109' in st.session_state:
-                current_df = st.session_state['1956525109']
-            elif 'df' in locals() and df is not None:
-                current_df = df
-            elif 'excel_data' in st.session_state:
-                current_df = st.session_state.excel_data
-            else:
-                current_df = globals().get('df_data', None)
+        
+            # 1. Controlla chiavi dirette in session_state (inclusi ID numerici e stringhe)
+            for key in [1956525109, '1956525109', 'df_training', 'current_sheet']:
+                if key in st.session_state and st.session_state[key] is not None:
+                    current_df = st.session_state[key]
+                    break
+                
+            # 2. Controlla variabili locali o globali comuni
+            if current_df is None:
+                for var_name in ['df', 'df_data', 'sheet_df']:
+                    if var_name in locals() and locals()[var_name] is not None:
+                        current_df = locals()[var_name]
+                        break
+                    elif var_name in globals() and globals()[var_name] is not None:
+                        current_df = globals()[var_name]
+                        break
 
             if current_df is not None:
                 for r_start, r_end, c_start, c_end, color in training_sections:
                     render_excel_table(current_df, r_start, r_end, c_start, c_end, color)
             else:
-                st.warning("⚠️ Impossibile trovare il DataFrame per il foglio 1956525109. Controlla come è salvato in session_state.")
+                st.error("⚠️ DataFrame non trovato.")
+                with st.expander("🔍 Mostra chiavi disponibili in session_state (per debug)"):
+                    st.write(list(st.session_state.keys()))
 
         elif st.session_state.stat_tab == "🏆 STATCOMP":
             st.markdown("<div style='background-color: #0e1117; border: 2px solid #262730; border-radius: 12px; padding: 15px;'>", unsafe_allow_html=True)
