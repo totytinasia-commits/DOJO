@@ -829,7 +829,7 @@ with center_col:
                     nuovi_valori_esercizi = {}
                 
                     # Creiamo 5 box con esercizio (testo) e checkbox associata
-                    for i in range(1, 6]:
+                    ffor i in range(1, 6):
                         es_col = f"ESERCIZIO {i}"
                         chk_col = f"CHECK {i}"
                     
