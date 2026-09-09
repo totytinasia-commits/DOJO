@@ -402,46 +402,58 @@ with center_col:
             if "ID" in df_anagrafica.columns:
                 df_anagrafica = df_anagrafica.drop(columns=["ID"])
 
-        # --- GESTIONE VISUALIZZAZIONE A TENDINA (GIOCATORE PER GIOCATORE) ---
+        # --- GESTIONE VISUALIZZAZIONE A TENDINA CON BOX PROFESSIONALI ---
         if df_anagrafica.empty:
             st.info("Nessun dato disponibile nell'anagrafica.")
         else:
-            # Filtriamo eventuali righe vuote basandoci sulla colonna del Nickname (o la prima colonna disponibile)
             col_nickname = df_anagrafica.columns[0]
             df_valid = df_anagrafica[df_anagrafica[col_nickname].astype(str).str.strip() != ""]
 
             if df_valid.empty:
                 st.info("Nessun allievo trovato.")
             else:
-                # Creiamo una lista di opzioni per la selectbox (es. basata sul Nickname)
                 lista_giocatori = df_valid[col_nickname].tolist()
                 
-                selected_player = st.selectbox("🔍 Seleziona un giocatore:", lista_giocatori)
+                # Menu a tendina pulito
+                selected_player = st.selectbox("🔍 Seleziona un giocatore dal database:", lista_giocatori)
 
                 if selected_player:
-                    # Estraiamo la riga corrispondente al giocatore selezionato
                     giocatore_data = df_valid[df_valid[col_nickname] == selected_player].iloc[0]
-
-                    st.markdown("---")
-                    st.markdown(f"### 👤 Scheda di: {selected_player}")
-
-                    # Visualizziamo i dati in colonne o in modo strutturato
-                    col1, col2 = st.columns(2)
-                    
                     columns_list = df_valid.columns.tolist()
+
+                    # Header del profilo selezionato
+                    st.markdown(f"""
+                    <div style='margin-top: 20px; margin-bottom: 15px; padding: 12px 20px; background: linear-gradient(90deg, #161b22 0%, #21262d 100%); border-left: 5px solid #58a6ff; border-radius: 4px;'>
+                        <h3 style='margin: 0; color: #f0f6fc; font-size: 1.3rem;'>👤 Scheda Profilo: <span style='color: #58a6ff;'>{selected_player}</span></h3>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    # Organizziamo i box in due colonne
+                    col1, col2 = st.columns(2)
                     half = len(columns_list) // 2
+
+                    def render_box(col_name, val):
+                        valore_str = str(val).strip()
+                        if not valore_str:
+                            valore_str = "<span style='color: #6e7681; font-style: italic;'>Non specificato</span>"
+                        
+                        return f"""
+                        <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);'>
+                            <div style='font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #8b949e; margin-bottom: 6px; font-weight: 600;'>{col_name}</div>
+                            <div style='font-size: 1.05rem; color: #c9d1d9; font-weight: 500;'>{valore_str}</div>
+                        </div>
+                        """
 
                     with col1:
                         for col in columns_list[:half]:
-                            valore = giocatore_data[col]
-                            st.metric(label=col, value=valore if str(valore).strip() != "" else "-")
+                            st.markdown(render_box(col, giocatore_data[col]), unsafe_allow_html=True)
 
                     with col2:
                         for col in columns_list[half:]:
-                            valore = giocatore_data[col]
-                            st.metric(label=col, value=valore if str(valore).strip() != "" else "-")
+                            st.markdown(render_box(col, giocatore_data[col]), unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
+        
     elif current == "📈 PROGRESSI":
         st.subheader("📈 Progressi")
 
