@@ -670,12 +670,17 @@ with center_col:
                 while len(new_row) < 11:
                     new_row.append("")
                 
+                # Conversione rigorosa dei valori TRUE / FALSE di Google Sheets in booleani Python per le checkbox
                 for check_idx in [2, 4, 6, 8, 10]:
-                    val = str(new_row[check_idx]).strip().upper()
-                    if val in ["TRUE", "VERO", "1", "V", "YES", "X", "ON"]:
-                        new_row[check_idx] = True
+                    val = new_row[check_idx]
+                    if isinstance(val, bool):
+                        new_row[check_idx] = val
                     else:
-                        new_row[check_idx] = False
+                        val_str = str(val).strip().upper()
+                        if val_str in ["TRUE", "VERO", "1", "V", "YES", "X", "ON"]:
+                            new_row[check_idx] = True
+                        else:
+                            new_row[check_idx] = False
                         
                 cleaned_es_data.append(new_row[:11])
 
@@ -719,9 +724,10 @@ with center_col:
         if st.button("💾 SALVA MODIFICHE ESERCIZI"):
             try:
                 df_to_save = edited_df_es.copy()
+                # Converte le checkbox salvate direttamente nei valori testuali maiuscoli "TRUE" / "FALSE" richiesti da Google Sheets
                 for check_idx in [2, 4, 6, 8, 10]:
                     col_name = df_to_save.columns[check_idx]
-                    df_to_save[col_name] = df_to_save[col_name].apply(lambda x: "TRUE" if x else "FALSE")
+                    df_to_save[col_name] = df_to_save[col_name].apply(lambda x: "TRUE" if x == True or str(x).strip().upper() == "TRUE" else "FALSE")
 
                 data_to_write = df_to_save.values.tolist()
                 creds = ottieni_credenziali()
