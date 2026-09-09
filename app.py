@@ -662,7 +662,6 @@ with center_col:
         if not esercizi_rows:
             df_esercizi = pd.DataFrame(columns=expected_es_columns)
         else:
-            # CORRETTO: Usiamo direttamente tutte le righe lette da C17:M40 senza saltare la prima
             cleaned_es_data = []
             for row in esercizi_rows:
                 new_row = list(row)
@@ -672,7 +671,7 @@ with center_col:
                 for check_idx in [2, 4, 6, 8, 10]:
                     val = new_row[check_idx]
                     if isinstance(val, bool):
-                        new_row[check_idx] val
+                        new_row[check_idx] = val
                     else:
                         val_str = str(val).strip().upper()
                         if val_str in ["TRUE", "VERO", "1", "V", "YES", "X", "ON"]:
@@ -739,7 +738,7 @@ with center_col:
                         target_ws.update(f"C17:M{end_row}", data_to_write, value_input_option='USER_ENTERED')
                         
                         st.toast("✅ Modifiche Esercizi effettuate con successo!", icon="🎉")
-                        st.success("Modifiche salvate con successo su Google Sheet (C17:M40)!")
+                        st.success("Modifiche salvate con successo sur Google Sheet (C17:M40)!")
                         
                         time.sleep(1)
                         st.rerun()
