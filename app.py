@@ -734,7 +734,7 @@ with center_col:
 
     elif current == "🏋️ ESERCIZI":
         st.subheader("🏋️ Esercizi")
-
+    
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
@@ -742,7 +742,7 @@ with center_col:
             </div>
         </div>
         """, unsafe_allow_html=True)
-
+    
         esercizi_rows = []
         target_ws_obj = None
         try:
@@ -752,7 +752,7 @@ with center_col:
                 sheet = client.open_by_key(SHEET_ID)
                 target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ESERCIZI).strip()), None)
                 target_ws_obj = target_ws
-
+    
                 if target_ws:
                     raw_es = target_ws.get("C17:M40")
                     for r in raw_es:
@@ -762,7 +762,7 @@ with center_col:
                         esercizi_rows.append(row_padded)
         except Exception as e:
             st.warning(f"Errore nel caricamento dati Esercizi: {e}")
-
+    
         expected_es_columns = [
             "Allievo", 
             "ESERCIZIO 1", "CHECK 1", 
@@ -771,7 +771,7 @@ with center_col:
             "ESERCIZIO 4", "CHECK 4", 
             "ESERCIZIO 5", "CHECK 5"
         ]
-
+    
         if not esercizi_rows:
             df_esercizi = pd.DataFrame(columns=expected_es_columns)
         else:
@@ -780,7 +780,8 @@ with center_col:
                 new_row = list(row)
                 while len(new_row) < 11:
                     new_row.append("")
-            
+                
+                # Conversione dei check in booleani per gestire le checkbox correttamente
                 for check_idx in [2, 4, 6, 8, 10]:
                     val = new_row[check_idx]
                     if isinstance(val, bool):
@@ -792,9 +793,9 @@ with center_col:
                         else:
                             new_row[check_idx] = False
                 cleaned_es_data.append(new_row[:11])
-
+    
             df_esercizi = pd.DataFrame(cleaned_es_data, columns=expected_es_columns)
-
+    
         df_esercizi = df_esercizi.replace(r'^\s*$', pd.NA, regex=True)
         df_esercizi = df_esercizi.dropna(subset=["Allievo"], how='all').fillna({
             "Allievo": "",
@@ -804,31 +805,30 @@ with center_col:
             "ESERCIZIO 4": "", "CHECK 4": False,
             "ESERCIZIO 5": "", "CHECK 5": False
         })
-
+    
         # --- SELEZIONE TRAMITE MENU A TENDINA E BOX ---
         df_valid_es = df_esercizi[df_esercizi["Allievo"].astype(str).str.strip() != ""]
-
+    
         if df_valid_es.empty:
             st.info("Nessun allievo trovato nella tabella esercizi.")
         else:
             lista_allievi_es = df_valid_es["Allievo"].tolist()
             selected_allievo_es = st.selectbox("🔍 Seleziona un allievo per gli esercizi:", lista_allievi_es, key="select_esercizi_menu")
-
+    
             if selected_allievo_es:
-                # Troviamo la riga corrispondente nel dataframe
+                # Troviamo l'indice di riga reale nel DataFrame
                 row_idx_df = df_valid_es[df_valid_es["Allievo"] == selected_allievo_es].index[0]
                 allievo_data = df_esercizi.loc[row_idx_df]
-
+    
                 st.markdown(f"""
                 <div style='margin-top: 20px; margin-bottom: 15px; padding: 12px 20px; background: linear-gradient(90deg, #161b22 0%, #21262d 100%); border-left: 5px solid #FF0000; border-radius: 4px;'>
                     <h3 style='margin: 0; color: #f0f6fc; font-size: 1.3rem;'>🏋️ Esercizi di: <span style='color: #FFFF00;'>{selected_allievo_es}</span></h3>
                 </div>
                 """, unsafe_allow_html=True)
-
+    
                 with st.form(f"form_esercizi_{row_idx_df}"):
                     nuovi_valori_esercizi = {}
-                
-                    # Creiamo 5 box con esercizio (testo) e checkbox associata
+                    
                     for i in range(1, 6):
                         es_col = f"ESERCIZIO {i}"
                         chk_col = f"CHECK {i}"
@@ -837,7 +837,7 @@ with center_col:
                         val_chk_attuale = bool(allievo_data[chk_col])
     
                         st.markdown(f"""
-                        <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px 15px; margin-bottom: 10px;'>
+                        <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px 15px; margin-bottom: 8px;'>
                             <div style='font-size: 0.8rem; text-transform: uppercase; color: #8b949e; font-weight: bold; margin-bottom: 5px;'>Esercizio {i}</div>
                         </div>
                         """, unsafe_allow_html=True)
@@ -848,7 +848,6 @@ with center_col:
                         with c_in2:
                             nuovi_valori_esercizi[chk_col] = st.checkbox("Completato", value=val_chk_attuale, key=f"chk_es_{i}_{row_idx_df}")
     
-                    # Pulsante Giallo in basso senza scritte descrittive o con stile personalizzato
                     st.markdown("""
                     <style>
                         [data-testid="stFormSubmitButton"] button {
@@ -863,29 +862,31 @@ with center_col:
                         }
                     </style>
                     """, unsafe_allow_html=True)
-
+    
                     submit_es = st.form_submit_button("➕")
-
+    
                     if submit_es:
                         try:
-                            # Aggiorniamo il dataframe generale con i nuovi valori inseriti nel form
+                            # Aggiorniamo il DataFrame locale con i dati inseriti nel form
                             for col_k, val_k in nuovi_valori_esercizi.items():
                                 df_esercizi.loc[row_idx_df, col_k] = val_k
-
-                            # Prepariamo la lista da salvare su Google Sheets
-                            data_to_write = df_esercizi.values.tolist()
+    
+                            # La tabella inizia alla riga 17 del foglio Google
+                            sheet_row_index = 17 + row_idx_df
+                            riga_aggiornata = df_esercizi.loc[row_idx_df].tolist()
+    
                             if target_ws_obj:
-                                end_row = 17 + len(data_to_write) - 1
-                                target_ws_obj.update(f"C17:M{end_row}", data_to_write, value_input_option='USER_ENTERED')
-                            
-                                st.toast("✅ Modifiche Esercizi salvate con successo!", icon="🎉")
-                                st.success("Dati aggiornati correttamente su Google Sheet!")
-                            
+                                # Scrive esattamente dalla colonna C alla colonna M per quella specifica riga
+                                target_ws_obj.update(f"C{sheet_row_index}:M{sheet_row_index}", [riga_aggiornata], value_input_option='USER_ENTERED')
+                                
+                                st.toast("✅ Esercizi aggiornati con successo!", icon="🎉")
+                                st.success(f"Dati salvati correttamente alla riga {sheet_row_index} del foglio!")
+                                
                                 time.sleep(1)
                                 st.rerun()
                         except Exception as ex:
                             st.error(f"Errore durante il salvataggio: {ex}")
-
+    
         st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "👤 SCHEDE GIOCATORE":
