@@ -641,7 +641,6 @@ with center_col:
                 target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ESERCIZI).strip()), None)
 
                 if target_ws:
-                    # Da C17 a M40 (11 colonne: C, D, E, F, G, H, I, J, K, L, M)
                     raw_es = target_ws.get("C17:M40")
                     for r in raw_es:
                         row_padded = []
@@ -651,7 +650,6 @@ with center_col:
         except Exception as e:
             st.warning(f"Errore nel caricamento dati Esercizi: {e}")
 
-        # Intestazioni come da foto: Allievo, Esercizio, Check, Esercizio, Check, Esercizio, Check, Esercizio, Check, Esercizio, Check
         expected_es_columns = [
             "Allievo", 
             "ESERCIZIO 1", "CHECK 1", 
@@ -672,7 +670,6 @@ with center_col:
                 while len(new_row) < 11:
                     new_row.append("")
                 
-                # Convertiamo le colonne di check (indici 2, 4, 6, 8, 10) in booleani reali per le checkbox
                 for check_idx in [2, 4, 6, 8, 10]:
                     val = str(new_row[check_idx]).strip().upper()
                     if val in ["TRUE", "VERO", "1", "V", "YES", "X", "ON"]:
@@ -685,7 +682,6 @@ with center_col:
             df_esercizi = pd.DataFrame(cleaned_es_data, columns=expected_es_columns)
 
         df_esercizi = df_esercizi.replace(r'^\s*$', pd.NA, regex=True)
-        # Rimuove righe interamente vuote tenendo conto dei valori booleani
         df_esercizi = df_esercizi.dropna(subset=["Allievo"], how='all').fillna({
             "Allievo": "",
             "ESERCIZIO 1": "", "CHECK 1": False,
@@ -722,7 +718,6 @@ with center_col:
 
         if st.button("💾 SALVA MODIFICHE ESERCIZI"):
             try:
-                # Prepariamo i dati convertendo i booleani in stringhe "TRUE"/"FALSE" per Google Sheets
                 df_to_save = edited_df_es.copy()
                 for check_idx in [2, 4, 6, 8, 10]:
                     col_name = df_to_save.columns[check_idx]
