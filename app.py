@@ -873,7 +873,15 @@ with center_col:
     
                             # La tabella inizia alla riga 17 del foglio Google
                             sheet_row_index = 17 + row_idx_df
-                            riga_aggiornata = df_esercizi.loc[row_idx_df].tolist()
+                            
+                            # Convertiamo ogni valore in un tipo nativo Python (evitando problemi con np.bool_)
+                            riga_grezza = df_esercizi.loc[row_idx_df].tolist()
+                            riga_aggiornata = []
+                            for val in riga_grezza:
+                                if isinstance(val, (bool, np.bool_)):
+                                    riga_aggiornata.append(bool(val))
+                                else:
+                                    riga_aggiornata.append(str(val) if pd.notna(val) else "")
     
                             if target_ws_obj:
                                 # Scrive esattamente dalla colonna C alla colonna M per quella specifica riga
