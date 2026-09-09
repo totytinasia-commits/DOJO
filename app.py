@@ -911,65 +911,79 @@ with center_col:
             st.markdown("""
                 <div style='text-align: center; margin-bottom: 25px;'>
                     <h2 style='color: #FFD700; text-transform: uppercase;'>🏋️ Training Data</h2>
-                    <p style='color: #8b949e;'>Panoramica delle statistiche di allenamento e armi</p>
+                    <p style='color: #8b949e;'>Statistiche dettagliate di addestramento e armi</p>
                 </div>
             """, unsafe_allow_html=True)
 
-            # Funzione di supporto per renderizzare le tabelle con colori personalizzati
-            def render_training_table(title, df_slice, header_color):
-                st.markdown(f"""
-                    <div style='background-color: {header_color}; padding: 10px; border-radius: 8px 8px 0 0; text-align: center; font-weight: bold; color: #000; text-transform: uppercase; margin-top: 20px;'>
-                        {title}
-                    </div>
-                """, unsafe_allow_html=True)
-                st.dataframe(df_slice, use_container_width=True, hide_index=True)
+            def render_excel_table(df_source, start_row, end_row, start_col, end_col, border_color):
+                try:
+                    # Estrae la porzione di dataframe basata sulle coordinate
+                    subset = df_source.iloc[start_row:end_row+1, start_col:end_col+1].copy()
+                
+                    if subset.empty:
+                        return
 
-            # Esempio di mappatura e caricamento delle tabelle basate sulle coordinate Excel fornite:
-            # Assicurati di avere il DataFrame principale (es. df_excel) caricato dal file Excel.
-        
-            try:
-                # 1. Tabelle Armi
-                # B21:M48 (Armi 1) e B52:M79 (Armi 2) -> Le prime due righe contengono titolo e spiegazione colonne
-                # st.markdown("### 🔫 Sezione Armi")
-                # render_training_table("Armi - Tabella 1", df.iloc[19:48, 1:13], "#2ea043")
-                # render_training_table("Armi - Tabella 2", df.iloc[51:79, 1:13], "#2ea043")
+                    # Le prime due righe contengono titolo e intestazione delle colonne
+                    title = str(subset.iloc[0, 0]).strip()
+                    if title == "nan" or not title:
+                        title = frighe = f"Tabella ({start_row+1}:{end_row+1})"
+                
+                    # Imposta la seconda riga come intestazione delle colonne se coerente
+                    subset.columns = subset.iloc[1].fillna("").astype(str)
+                    table_data = subset.iloc[2:].reset_index(drop=True)
 
-                # 2. Tabelle successive con i rispettivi colori
-                color_mapping = [
-                    ("B83:N110", "#FFD700"),   # Gialla
-                    ("B112:N139", "#FFD700"),  # Gialla
-                    ("B142:N169", "#FFD700"),  # Gialla
-                    ("B172:N199", "#FFD700"),  # Gialla
-                    ("B202:N229", "#FFD700"),  # Gialla
-                    ("B231:N258", "#FFD700"),  # Gialla
-                    ("B261:N288", "#1f6feb"),  # Blu
-                    ("B291:N318", "#1f6feb"),  # Blu
-                    ("B321:N348", "#1f6feb"),  # Blu
-                    ("B351:N378", "#1f6feb"),  # Blu
-                    ("B381:N408", "#238636"),  # Verde
-                    ("B411:N438", "#ffa657"),  # Arancione
-                    ("B441:N468", "#ffa657"),  # Arancione
-                    ("B471:N498", "#ffa657"),  # Arancione
-                    ("B501:N528", "#ffa657"),  # Arancione
-                    ("B531:N558", "#ffa657"),  # Arancione
-                    ("B561:N588", "#8957e5"),  # Viola
-                    ("B591:N618", "#8957e5"),  # Viola
-                    ("B621:N648", "#8957e5"),  # Viola
-                    ("B651:N678", "#da3633"),  # Rosso
-                    ("B681:N708", "#da3633")   # Rosso
-                ]
-
-                # Loop dimostrativo per la generazione dinamica o inserimento puntuale
-                for idx, (range_str, color) in enumerate(color_mapping, start=1):
+                    # Renderizza il titolo con il colore assegnato
                     st.markdown(f"""
-                        <div style='background-color: #161b22; border: 1px solid {color}; border-radius: 8px; padding: 15px; margin-bottom: 15px;'>
-                            <h4 style='color: {color}; margin: 0;'>Tabella Training {idx} ({range_str})</h4>
-                            <p style='color: #8b949e; font-size: 0.9rem; margin: 5px 0 0 0;'>Dati estratti dalle coordinate specificate.</p>
+                        <div style='border-left: 5px solid {border_color}; background-color: #161b22; padding: 8px 12px; margin-top: 25px; border-radius: 4px;'>
+                            <h4 style='color: {border_color}; margin: 0; text-transform: uppercase; font-size: 1.1rem;'>{title}</h4>
                         </div>
                     """, unsafe_allow_html=True)
                 
-            except Exception as e:
-                st.error(f"Errore nel caricamento delle tabelle di training: {e}")
+                    st.dataframe(table_data, use_container_width=True, hide_index=True)
+                except Exception as e:
+                    st.error(f"Errore nel rendering della tabella [{start_row}:{end_row}]: {e}")
+
+            # Mappatura completa degli intervalli (convertiti in indici 0-based per Python/pandas)
+            # Colonna B = indice 1, M = indice 12, N = indice 13
+            training_sections = [
+                # Armi
+                (20, 47, 1, 12, "#2ea043"),  # B21:M48
+                (51, 78, 1, 12, "#2ea043"),  # B52:M79
+                # Gialle
+                (82, 109, 1, 13, "#FFD700"), # B83:N110
+                (111, 138, 1, 13, "#FFD700"),# B112:N139
+                (141, 168, 1, 13, "#FFD700"),# B142:N169
+                (171, 198, 1, 13, "#FFD700"),# B172:N199
+                (201, 228, 1, 13, "#FFD700"),# B202:N229
+                (230, 257, 1, 13, "#FFD700"),# B231:N258
+               # Blu
+                (260, 287, 1, 13, "#1f6feb"),# B261:N288
+                (290, 317, 1, 13, "#1f6feb"),# B291:N318
+                (320, 347, 1, 13, "#1f6feb"),# B321:N348
+                (350, 377, 1, 13, "#1f6feb"),# B351:N378
+                # Verde
+                (380, 407, 1, 13, "#238636"),# B381:N408
+                # Arancione
+                (410, 437, 1, 13, "#ffa657"),# B411:N438
+                (440, 467, 1, 13, "#ffa657"),# B441:N468
+                (470, 497, 1, 13, "#ffa657"),# B471:N498
+                (500, 527, 1, 13, "#ffa657"),# B501:N528
+                (530, 557, 1, 13, "#ffa657"),# B531:N558
+                # Viola
+                (560, 587, 1, 13, "#8957e5"),# B561:N588
+                (590, 617, 1, 13, "#8957e5"),# B591:N618
+                (620, 647, 1, 13, "#8957e5"),# B621:N648
+                # Rosso
+                (650, 677, 1, 13, "#da3633"),# B651:N678
+                (680, 707, 1, 13, "#da3633") # B681:N708
+            ]
+
+            # Assicurati che il DataFrame principale sia caricato (es. df)
+            if 'df' in locals() or 'df' in globals():
+                for r_start, r_end, c_start, c_end, color in training_sections:
+                    render_excel_table(df, r_start, r_end, c_start, c_end, color)
+            else:
+                st.warning("Il DataFrame di origine non è disponibile in questa sessione.")
 
         elif st.session_state.stat_tab == "🏆 STATCOMP":
             st.markdown("<div style='background-color: #0e1117; border: 2px solid #262730; border-radius: 12px; padding: 15px;'>", unsafe_allow_html=True)
