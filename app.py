@@ -924,8 +924,21 @@ with center_col:
                     title = str(subset.iloc[0, 0]).strip()
                     if title == "nan" or not title:
                         title = f"Tabella ({start_row+1}:{end_row+1})"
+            
+                    # Gestione dei nomi di colonna duplicati per evitare errori in pandas
+                    raw_cols = subset.iloc[1].fillna("").astype(str).tolist()
+                    seen = {}
+                    unique_cols = []
+                    for c in raw_cols:
+                        col_name = c.strip() if c.strip() else "Unnamed"
+                        if col_name in seen:
+                            seen[col_name] += 1
+                            unique_cols.append(f"{col_name}_{seen[col_name]}")
+                        else:
+                            seen[col_name] = 0
+                            unique_cols.append(col_name)
                 
-                    subset.columns = subset.iloc[1].fillna("").astype(str)
+                    subset.columns = unique_cols
                     table_data = subset.iloc[2:].reset_index(drop=True)
 
                     st.markdown(f"""
@@ -933,7 +946,7 @@ with center_col:
                             <h4 style='color: {border_color}; margin: 0; text-transform: uppercase; font-size: 1.1rem;'>{title}</h4>
                         </div>
                     """, unsafe_allow_html=True)
-                
+            
                     st.dataframe(table_data, use_container_width=True, hide_index=True)
                 except Exception as e:
                     st.error(f"Errore nel rendering della tabella [{start_row}:{end_row}]: {e}")
