@@ -693,15 +693,15 @@ with center_col:
 
         config_es_cols = {
             "Allievo": st.column_config.TextColumn("Allievo", width="small", pinned=True),
-            "ESERCIZIO 1": st.column_config.TextColumn("ESERCIZIO", width="large"),
+            "ESERCIZIO 1": st.column_config.TextColumn("ESERCIZIO", width="medium"),
             "CHECK 1": st.column_config.CheckboxColumn("CHECK", default=False),
-            "ESERCIZIO 2": st.column_config.TextColumn("ESERCIZIO", width="large"),
+            "ESERCIZIO 2": st.column_config.TextColumn("ESERCIZIO", width="medium"),
             "CHECK 2": st.column_config.CheckboxColumn("CHECK", default=False),
-            "ESERCIZIO 3": st.column_config.TextColumn("ESERCIZIO", width="large"),
+            "ESERCIZIO 3": st.column_config.TextColumn("ESERCIZIO", width="medium"),
             "CHECK 3": st.column_config.CheckboxColumn("CHECK", default=False),
-            "ESERCIZIO 4": st.column_config.TextColumn("ESERCIZIO", width="large"),
+            "ESERCIZIO 4": st.column_config.TextColumn("ESERCIZIO", width="medium"),
             "CHECK 4": st.column_config.CheckboxColumn("CHECK", default=False),
-            "ESERCIZIO 5": st.column_config.TextColumn("ESERCIZIO", width="large"),
+            "ESERCIZIO 5": st.column_config.TextColumn("ESERCIZIO", width="medium"),
             "CHECK 5": st.column_config.CheckboxColumn("CHECK", default=False),
         }
 
