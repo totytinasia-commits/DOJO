@@ -188,7 +188,7 @@ with center_col:
 
     current = st.session_state.current_section
 
-    elif current == "🏫 ACADEMY":
+    if current == "🏫 ACADEMY":
         st.subheader("🏫 Academy")
 
         # CSS personalizzato per etichette bianche e pulsante giallo
