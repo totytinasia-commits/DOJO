@@ -1008,7 +1008,120 @@ with center_col:
             </div>
         </div>
         """.format(formatted_miglioramento), unsafe_allow_html=True)
-
+    elif current == "🎯 ISCRIVITI ALL'EVENTO":
+        st.subheader("🎯 Iscriviti all'Evento")
+    
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
+                REGISTRAZIONE EVENTO
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+        # Configuriamo il GID o leggiamo il foglio dell'evento dal link fornito (ID: 1ul4pI3QDqGYz7kjj6p-QLgLXMkMMR3anv4JdEP0lI48, GID: 2080846180)
+        EVENTO_SHEET_ID = "1ul4pI3QDqGYz7kjj6p-QLgLXMkMMR3anv4JdEP0lI48"
+        EVENTO_GID = "2080846180"
+    
+        info_evento = {}
+        partecipanti = []
+        target_ws_evento = None
+    
+        try:
+            creds = ottieni_credenziali()
+            if creds:
+                client = gspread.authorize(creds)
+                sheet = client.open_by_key(EVENTO_SHEET_ID)
+                target_ws_evento = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(EVENTO_GID).strip()), None)
+    
+                if target_ws_evento:
+                    # Leggiamo le informazioni fisse (C2: Data, C3: Mappa, C4/C5: Modalità e Posti)
+                    # Leggiamo un range sicuro da C1 a C5
+                    dati_c = target_ws_evento.get("C1:C5")
+                    info_evento["data"] = dati_c[1][0] if len(dati_c) > 1 and len(dati_c[1]) > 0 else "-"
+                    info_evento["mappa"] = dati_c[2][0] if len(dati_c) > 2 and len(dati_c[2]) > 0 else "-"
+                    info_evento["modalita"] = dati_c[3][0] if len(dati_c) > 3 and len(dati_c[3]) > 0 else "-"
+                    info_evento["posti"] = dati_c[4][0] if len(dati_c) > 4 and len(dati_c[4]) > 0 else "-"
+    
+                    # Leggiamo i partecipanti da B8 a B32
+                    raw_partecipanti = target_ws_evento.get("B8:B32")
+                    for r in raw_partecipanti:
+                        if r and r[0] and str(r[0]).strip() != "":
+                            partecipanti.append(str(r[0]).strip())
+        except Exception as e:
+            st.warning(f"Errore nel caricamento dei dati dell'evento: {e}")
+    
+        # Visualizzazione delle informazioni dell'evento
+        st.markdown(f"""
+        <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 15px; margin-bottom: 20px;'>
+            <h4 style='color: #FFFF00; margin-top: 0;'>📅 Dettagli Evento</h4>
+            <p style='margin: 5px 0;'><b>Data Evento (C2):</b> {info_evento.get('data', '-')}</p>
+            <p style='margin: 5px 0;'><b>Mappa (C3):</b> {info_evento.get('mappa', '-')}</p>
+            <p style='margin: 5px 0;'><b>Modalità (C4):</b> {info_evento.get('modalita', '-')}</p>
+            <p style='margin: 5px 0;'><b>Posti Disponibili (C5):</b> {info_evento.get('posti', '-')}</p>
+            <p style='margin: 5px 0;'><b>Iscritti attuali:</b> {len(partecipanti)} / 25</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+        # Form di iscrizione con il solo campo Nome
+        with st.form("form_iscrizione_evento", clear_on_submit=True):
+            nome_partecipante = st.text_input("Inserisci il tuo Nome per iscriverti:")
+    
+            st.markdown("""
+            <style>
+                [data-testid="stFormSubmitButton"] button {
+                    background-color: #FFFF00 !important;
+                    color: #000000 !important;
+                    width: 100% !important;
+                    font-weight: bold !important;
+                }
+                [data-testid="stFormSubmitButton"] button:hover {
+                    background-color: #cccc00 !important;
+                    color: #000000 !important;
+                }
+            </style>
+            """, unsafe_allow_html=True)
+    
+            submit_evento = st.form_submit_button("➕ ISCRIVITI")
+    
+            if submit_evento:
+                if not nome_partecipante.strip():
+                    st.warning("Inserisci un nome valido per procedere.")
+                elif len(partecipanti) >= 25:
+                    st.error("Mi dispiace, i posti disponibili sono esauriti (raggiunto il limite massimo in B32).")
+                elif nome_partecipante.strip() in partecipanti:
+                    st.warning("Questo nome risulta già iscritto all'evento!")
+                else:
+                    try:
+                        if target_ws_evento:
+                            # Troviamo la prima riga libera tra 8 e 32
+                            nuova_riga_idx = 8 + len(partecipanti)
+                            if nuova_riga_idx <= 32:
+                                target_ws_evento.update(f"B{nuova_riga_idx}", [[nome_partecipante.strip()]], value_input_option='USER_ENTERED')
+                                
+                                st.toast("✅ Iscrizione registrata con successo!", icon="🎉")
+                                st.success(f"Benvenuto/a {nome_partecipante.strip()}! Iscrizione salvata alla riga B{nuova_riga_idx}.")
+                                
+                                time.sleep(1)
+                                st.rerun()
+                            else:
+                                st.error("Limite massimo di partecipanti raggiunto.")
+                    except Exception as ex:
+                        st.error(f"Errore durante il salvataggio dell'iscrizione: {ex}")
+    
+        # Sezione Lista Partecipanti
+        st.markdown("### 📋 Lista Partecipanti Iscritti")
+        if partecipanti:
+            for idx, p in enumerate(partecipanti, start=1):
+                st.markdown(f"""
+                <div style='background-color: #21262d; border-left: 3px solid #FFFF00; padding: 8px 12px; margin-bottom: 5px; border-radius: 4px;'>
+                    <b>{idx}.</b> {p}
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.info("Nessun partecipante iscritto al momento. Sii il primo!")
+    
+        st.markdown("<br>", unsafe_allow_html=True)
     elif current == "📊 STATISTICHE":
         st.subheader("📊 Statistiche")
 
