@@ -21,6 +21,7 @@ GID_ANAGRAFICA = "1502613256"
 GID_PROGRESSI = "797090179"
 GID_CERTIFICAZIONI = "886238750"
 GID_ESERCIZI = "1935989008"
+GID_SETTINGS = "1035088826"
 
 # ==========================================
 # 2. FUNZIONI HELPER GOOGLE SHEETS
@@ -344,7 +345,6 @@ with center_col:
     elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
 
-        # CSS per mantenere la colonna fissa e leggibile durante lo scorrimento
         st.markdown("""
             <style>
                 [data-testid="stDataFrame"] [data-fixed-column="true"], 
@@ -373,7 +373,6 @@ with center_col:
                 target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ANAGRAFICA).strip()), None)
 
                 if target_ws:
-                    # Leggiamo da C13 a L35 (10 colonne totali)
                     raw_anagrafica = target_ws.get("C13:L35")
                     for r in raw_anagrafica:
                         anagrafica_rows.append([
@@ -411,11 +410,9 @@ with center_col:
 
             df_anagrafica = pd.DataFrame(cleaned_data, columns=header_anagrafica)
 
-            # Rimuoviamo la colonna ID (la prima colonna del foglio) se esiste
             if "ID" in df_anagrafica.columns:
                 df_anagrafica = df_anagrafica.drop(columns=["ID"])
 
-        # Configurazione delle colonne per bloccare "Nickname" a sinistra
         column_config = {}
         for col in df_anagrafica.columns:
             if col == "Nickname":
@@ -750,24 +747,21 @@ with center_col:
     elif current == "👤 SCHEDE GIOCATORE":
         st.subheader("👤 Schede Giocatore")
 
-        # Inizializzazione della selezione del giocatore
         if "selected_player" not in st.session_state:
             st.session_state.selected_player = PLAYERS[0]
 
-        # Mappatura dei GID associati a ciascun giocatore
         player_gids = {
             "JFF_ANDERWAL": "341001551",
-            "ITABOYZ_VIN": "1483818122",       # Inserisci qui il GID corrispondente
-            "JFF_CLIP": "1771413751",          # Inserisci qui il GID corrispondente
-            "ITABOYZ_GALLO": "1353776186",     # Inserisci qui il GID corrispondente
-            "ITABOYZ_IMPERATUBER": "132907169",# Inserisci qui il GID corrispondente
-            "JFF_POTA": "596698328",          # Inserisci qui il GID corrispondente
-            "ITABOYZ_CASCO": "89864457",     # Inserisci qui il GID corrispondente
-            "JFF_CIKKO": "1697770491",         # Inserisci qui il GID corrispondente
-            "JFF_SINNER": "1148507572"         # Inserisci qui il GID corrispondente
+            "ITABOYZ_VIN": "1483818122",
+            "JFF_CLIP": "1771413751",
+            "ITABOYZ_GALLO": "1353776186",
+            "ITABOYZ_IMPERATUBER": "132907169",
+            "JFF_POTA": "596698328",
+            "ITABOYZ_CASCO": "89864457",
+            "JFF_CIKKO": "1697770491",
+            "JFF_SINNER": "1148507572"
         }
 
-        # Visualizzazione dei pulsanti dei giocatori
         for player_name in PLAYERS:
             btn_type = "primary" if st.session_state.selected_player == player_name else "secondary"
             if st.button(player_name, key=f"btn_p_{player_name}", type=btn_type):
@@ -776,7 +770,6 @@ with center_col:
 
         st.markdown("---")
         
-        # Recupero del GID del giocatore attualmente selezionato
         current_gid = player_gids.get(st.session_state.selected_player, "")
 
         ruolo_consigliato = ""
@@ -789,18 +782,15 @@ with center_col:
                 client = gspread.authorize(creds)
                 sheet = client.open_by_key(SHEET_ID)
                 
-                # Trova il foglio specifico tramite il GID associato al giocatore
                 target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(current_gid).strip()), None)
                 
                 if target_ws:
-                    # Lettura corretta basata sulla prima cella in alto a sinistra delle celle unite
                     ruolo_consigliato = target_ws.acell("F19").value if target_ws.acell("F19") else ""
                     punti_di_forza_text = target_ws.acell("F21").value if target_ws.acell("F21") else ""
                     aree_miglioramento_text = target_ws.acell("F29").value if target_ws.acell("F29") else ""
         except Exception as e:
             st.warning(f"Errore nel caricamento dati per {st.session_state.selected_player}: {e}")
 
-        # Funzione di formattazione per mandare a capo e colorare in giallo tutto ciò che precede i due punti
         def format_custom_box_text(raw_text):
             if not raw_text:
                 return "<span style='color: #888;'>Nessun dato inserito per questo giocatore.</span>"
@@ -808,7 +798,6 @@ with center_col:
             import re
             clean_text = raw_text.strip()
             
-            # Formatta le etichette con i due punti (es. "Coesione col team:") rendendole gialle, in grassetto e andando a capo
             processed_text = re.sub(r'(^|\.\s+)([A-ZÀ-Úa-zà-ú\s\(\)]+?:)', r'\1<br><br><span style="color: #FFFF00; font-weight: bold;">\2</span>', clean_text)
             processed_text = re.sub(r'^<br><br>', '', processed_text)
             
@@ -831,7 +820,6 @@ with center_col:
             
             return "".join(formatted_lines)
 
-        # 1. BOX RUOLO CONSIGLIATO
         st.markdown("""
         <div style='border: 2px solid #ff0000; border-radius: 4px; background-color: #000000; margin-bottom: 20px; overflow: hidden;'>
             <div style='background-color: #000000; color: #ff0000; font-weight: bold; font-size: 1.1rem; padding: 12px 15px; border-bottom: 2px solid #0055ff;'>
@@ -843,7 +831,6 @@ with center_col:
         </div>
         """.format(ruolo_consigliato if ruolo_consigliato else "Nessun ruolo specificato"), unsafe_allow_html=True)
 
-        # 2. BOX PUNTI DI FORZA
         formatted_forza = format_custom_box_text(punti_di_forza_text)
         st.markdown("""
         <div style='border: 2px solid #ff0000; border-radius: 4px; background-color: #000000; margin-bottom: 20px; overflow: hidden;'>
@@ -856,7 +843,6 @@ with center_col:
         </div>
         """.format(formatted_forza), unsafe_allow_html=True)
 
-        # 3. BOX AREE DI MIGLIORAMENTO
         formatted_miglioramento = format_custom_box_text(aree_miglioramento_text)
         st.markdown("""
         <div style='border: 2px solid #ff0000; border-radius: 4px; background-color: #000000; margin-bottom: 20px; overflow: hidden;'>
@@ -883,90 +869,44 @@ with center_col:
 
         st.markdown("---")
 
-    elif st.session_state.stat_tab == "⚙️ SETTINGS":
-        st.subheader("⚙️ Impostazioni e Configurazione")
+        if st.session_state.stat_tab == "⚙️ SETTINGS":
+            st.markdown("<div style='background-color: #0e1117; border: 2px solid #262730; border-radius: 12px; padding: 15px;'>", unsafe_allow_html=True)
+            st.markdown("### ⚙️ Settings")
 
-        st.markdown("""
-        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
-                LISTA EVENTI E GESTIONE STANZA
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        lista_eventi = []
-        stanza_attuale = ""
-        
-        try:
-            creds = ottieni_credenziali()
-            if creds:
-                client = gspread.authorize(creds)
-                sheet = client.open_by_key(SHEET_ID)
-                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == "1035088826"), None)
-
-                if target_ws:
-                    raw_eventi = target_ws.get("C6:C36")
-                    for r in raw_eventi:
-                        if r and len(r) > 0 and r[0] is not None and str(r[0]).strip() != "":
-                            lista_eventi.append(str(r[0]).strip())
-                    
-                    val_e6 = target_ws.acell("E6").value
-                    if val_e6 is not None:
-                        stanza_attuale = str(val_e6).strip()
-        except Exception as e:
-            st.warning(f"Errore nel caricamento dei dati da Google Sheets: {e}")
-
-        if not lista_eventi:
-            lista_eventi = ["Nessun evento trovato"]
-
-        st.markdown("### 📋 Lista degli Eventi")
-        selected_evento = st.selectbox("Seleziona Evento", options=lista_eventi, key="select_evento_setting")
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        st.markdown("### 🏠 Gestione Stanza")
-        
-        opzioni_stanze = ["O97BBA", "STANZA_01", "STANZA_02", "STANZA_03"] 
-        if stanza_attuale and stanza_attuale not in opzioni_stanze:
-            opzioni_stanze.insert(0, stanza_attuale)
-
-        index_stanza = 0
-        if stanza_attuale in opzioni_stanze:
-            index_stanza = opzioni_stanze.index(stanza_attuale)
-
-        stanza_selezionata = st.selectbox("Seleziona la stanza da impostare", options=opzioni_stanze, index=index_stanza, key="select_stanza_dropdown")
-
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        if st.button("💾 SCRIVI STANZA NEL FOGLIO"):
+            settings_options = []
             try:
                 creds = ottieni_credenziali()
                 if creds:
                     client = gspread.authorize(creds)
                     sheet = client.open_by_key(SHEET_ID)
-                    target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == "1035088826"), None)
-                    
+                    target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_SETTINGS).strip()), None)
                     if target_ws:
-                        target_ws.update("E6", [[stanza_selezionata]], value_input_option='USER_ENTERED')
-                        
-                        st.toast(f"✅ Stanza '{stanza_selezionata}' scritta con successo in E6!", icon="🎉")
-                        st.success(f"La stanza '{stanza_selezionata}' è stata salvata correttamente nella cella E6!")
-                        
-                        time.sleep(1)
-                        st.rerun()
-            except Exception as ex:
-                st.error(f"Errore durante la scrittura della stanza: {ex}")
+                        raw_c6_c30 = target_ws.get("C6:C30")
+                        for row in raw_c6_c30:
+                            if row and len(row) > 0:
+                                val = str(row[0]).strip()
+                                if val and val.lower() not in ["nan", "none", ""]:
+                                    settings_options.append(val)
+            except Exception as e:
+                st.warning(f"Errore nel caricamento delle opzioni da Settings: {e}")
 
-        st.markdown("<br>", unsafe_allow_html=True)
+            if not settings_options:
+                settings_options = ["Nessun valore disponibile"]
 
-    elif st.session_state.stat_tab == "🏋️ TRAINING":
-        st.markdown("""
-        <div style='background-color: #161b22; border: 2px dashed #ff9900; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px;'>
-            <h3 style='color: #FFD700; margin: 0; text-transform: uppercase;'>🏋️ Training</h3>
-            <p style='color: #8b949e; font-size: 1.1rem; margin-top: 10px; font-weight: bold;'>PRESTO IN ARRIVO</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
+            selected_setting = st.selectbox("Seleziona valore da C6:C30", settings_options, key="sb_settings_c6_c30")
+
+            if st.button("SCEGLI", key="btn_scegli_settings"):
+                try:
+                    scrivi_cella_per_gid(GID_SETTINGS, "E6", selected_setting)
+                    st.toast("✅ Valore impostato con successo in E6!", icon="🎉")
+                    st.success(f"Valore '{selected_setting}' impostato con successo nella cella E6!")
+                    time.sleep(1)
+                    st.rerun()
+                except Exception as ex:
+                    st.error(f"Errore durante l'impostazione del valore: {ex}")
+
+            st.markdown("</div>", unsafe_allow_html=True)
+
         elif st.session_state.stat_tab == "🏋️ TRAINING":
             st.markdown("""
             <div style='background-color: #161b22; border: 2px dashed #ff9900; border-radius: 12px; padding: 30px; text-align: center; margin-top: 20px;'>
