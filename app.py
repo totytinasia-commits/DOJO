@@ -746,9 +746,24 @@ with center_col:
     elif current == "👤 SCHEDE GIOCATORE":
         st.subheader("👤 Schede Giocatore")
 
+        # Inizializzazione della selezione del giocatore
         if "selected_player" not in st.session_state:
             st.session_state.selected_player = PLAYERS[0]
 
+        # Mappatura dei GID associati a ciascun giocatore (puoi aggiornare gli altri GID quando pronti)
+        player_gids = {
+            "JFF_ANDERWAL": "341001551",
+            "ITABOYZ_VIN": "",       # Inserisci qui il GID corrispondente
+            "JFF_CLIP": "",          # Inserisci qui il GID corrispondente
+            "ITABOYZ_GALLO": "",     # Inserisci qui il GID corrispondente
+            "ITABOYZ_IMPERATUBER": "",# Inserisci qui il GID corrispondente
+            "JFF_POTA": "",          # Inserisci qui il GID corrispondente
+            "ITABOYZ_CASCO": "",     # Inserisci qui il GID corrispondente
+            "JFF_CIKKO": "",         # Inserisci qui il GID corrispondente
+            "JFF_SINNER": ""         # Inserisci qui il GID corrispondente
+        }
+
+        # Visualizzazione dei pulsanti dei giocatori come da tua interfaccia
         for player_name in PLAYERS:
             btn_type = "primary" if st.session_state.selected_player == player_name else "secondary"
             if st.button(player_name, key=f"btn_p_{player_name}", type=btn_type):
@@ -756,7 +771,89 @@ with center_col:
                 st.rerun()
 
         st.markdown("---")
-        st.write(f"Giocatore selezionato: **{st.session_state.selected_player}**")
+        
+        # Recupero del GID del giocatore attualmente selezionato
+        current_gid = player_gids.get(st.session_state.selected_player, "")
+
+        ruolo_consigliato = ""
+        punti_di_forza_text = ""
+        aree_miglioramento_text = ""
+
+        try:
+            creds = ottieni_credenziali()
+            if creds and current_gid:
+                client = gspread.authorize(creds)
+                sheet = client.open_by_key(SHEET_ID)
+                
+                # Trova il foglio specifico tramite il GID associato al giocatore
+                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(current_gid).strip()), None)
+                
+                if target_ws:
+                    # Legge i campi richiesti dalla pagina del giocatore
+                    # (Regola le celle F9/F19 o analoghe in base alla struttura del tuo foglio)
+                    ruolo_consigliato = target_ws.acell("F19").value if target_ws.acell("F19") else ""
+                    punti_di_forza_text = target_ws.acell("F21").value if target_ws.acell("F21") else ""
+                    aree_miglioramento_text = target_ws.acell("F23").value if target_ws.acell("F23") else "" # Modifica la cella se necessario
+        except Exception as e:
+            st.warning(f"Errore nel caricamento dati per {st.session_state.selected_player}: {e}")
+
+        # Funzione di formattazione per colorare in giallo la parte prima dei due punti ":"
+        def format_custom_box_text(raw_text):
+            if not raw_text:
+                return "<span style='color: #888;'>Nessun dato inserito per questo giocatore.</span>"
+            
+            lines = raw_text.split('\n')
+            formatted_lines = []
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    continue
+                if ":" in line:
+                    parts = line.split(":", 1)
+                    title_part = parts[0].strip()
+                    desc_part = parts[1].strip()
+                    formatted_lines.append(f"<div style='margin-bottom: 12px;'><span style='color: #FFFF00; font-weight: bold;'>{title_part}:</span> {desc_part}</div>")
+                else:
+                    formatted_lines.append(f"<div style='margin-bottom: 12px;'>{line}</div>")
+            return "".join(formatted_lines)
+
+        # 1. BOX RUOLO CONSIGLIATO
+        st.markdown("""
+        <div style='display: flex; border: 2px solid #ff0000; border-radius: 4px; background-color: #000000; margin-bottom: 15px; overflow: hidden;'>
+            <div style='width: 30%; background-color: #000000; color: #ff0000; font-weight: bold; font-size: 1.1rem; padding: 15px; display: flex; align-items: center; border-right: 2px solid #0055ff;'>
+                RUOLO CONSIGLIATO
+            </div>
+            <div style='width: 70%; background-color: #001133; color: #ffffff; padding: 15px; font-size: 1rem;'>
+                {}
+            </div>
+        </div>
+        """.format(ruolo_consigliato if ruolo_consigliato else "Nessun ruolo specificato"), unsafe_allow_html=True)
+
+        # 2. BOX PUNTI DI FORZA
+        formatted_forza = format_custom_box_text(punti_di_forza_text)
+        st.markdown("""
+        <div style='display: flex; border: 2px solid #ff0000; border-radius: 4px; background-color: #000000; margin-bottom: 15px; overflow: hidden;'>
+            <div style='width: 30%; background-color: #000000; color: #ff0000; font-weight: bold; font-size: 1.1rem; padding: 15px; display: flex; align-items: center; border-right: 2px solid #0055ff;'>
+                PUNTI DI FORZA
+            </div>
+            <div style='width: 70%; background-color: #001133; color: #ffffff; padding: 15px; font-size: 1rem;'>
+                {}
+            </div>
+        </div>
+        """.format(formatted_forza), unsafe_allow_html=True)
+
+        # 3. BOX AREE DI MIGLIORAMENTO
+        formatted_miglioramento = format_custom_box_text(aree_miglioramento_text)
+        st.markdown("""
+        <div style='display: flex; border: 2px solid #ff0000; border-radius: 4px; background-color: #000000; margin-bottom: 15px; overflow: hidden;'>
+            <div style='width: 30%; background-color: #000000; color: #ff0000; font-weight: bold; font-size: 1.1rem; padding: 15px; display: flex; align-items: center; border-right: 2px solid #0055ff;'>
+                AREE DI MIGLIORAMENTO
+            </div>
+            <div style='width: 70%; background-color: #001133; color: #ffffff; padding: 15px; font-size: 1rem;'>
+                {}
+            </div>
+        </div>
+        """.format(formatted_miglioramento), unsafe_allow_html=True)
 
     elif current == "📊 STATISTICHE":
         st.subheader("📊 Statistiche")
