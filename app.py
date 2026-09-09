@@ -151,7 +151,8 @@ SECTIONS = [
     "📜 CERTIFICAZIONI",
     "🏋️ ESERCIZI",
     "👤 SCHEDE GIOCATORE",
-    "📊 STATISTICHE"
+    "📊 STATISTICHE",
+    "🎯 ISCRIVITI ALL'EVENTO"  # <-- Nuova sezione aggiunta qui
 ]
 
 PLAYERS = [
