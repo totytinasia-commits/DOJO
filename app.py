@@ -738,18 +738,20 @@ with center_col:
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
-                TABELLA ESERCIZI
+                GESTIONE ESERCIZI ALLIEVI
             </div>
         </div>
         """, unsafe_allow_html=True)
 
         esercizi_rows = []
+        target_ws_obj = None
         try:
             creds = ottieni_credenziali()
             if creds:
                 client = gspread.authorize(creds)
                 sheet = client.open_by_key(SHEET_ID)
                 target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ESERCIZI).strip()), None)
+                target_ws_obj = target_ws
 
                 if target_ws:
                     raw_es = target_ws.get("C17:M40")
@@ -778,7 +780,7 @@ with center_col:
                 new_row = list(row)
                 while len(new_row) < 11:
                     new_row.append("")
-                
+            
                 for check_idx in [2, 4, 6, 8, 10]:
                     val = new_row[check_idx]
                     if isinstance(val, bool):
@@ -789,7 +791,6 @@ with center_col:
                             new_row[check_idx] = True
                         else:
                             new_row[check_idx] = False
-                        
                 cleaned_es_data.append(new_row[:11])
 
             df_esercizi = pd.DataFrame(cleaned_es_data, columns=expected_es_columns)
@@ -804,57 +805,86 @@ with center_col:
             "ESERCIZIO 5": "", "CHECK 5": False
         })
 
-        config_es_cols = {
-            "Allievo": st.column_config.TextColumn("Allievo", width="medium", pinned=True),
-            "ESERCIZIO 1": st.column_config.TextColumn("ESERCIZIO", width="medium"),
-            "CHECK 1": st.column_config.CheckboxColumn("CHECK", default=False),
-            "ESERCIZIO 2": st.column_config.TextColumn("ESERCIZIO", width="medium"),
-            "CHECK 2": st.column_config.CheckboxColumn("CHECK", default=False),
-            "ESERCIZIO 3": st.column_config.TextColumn("ESERCIZIO", width="medium"),
-            "CHECK 3": st.column_config.CheckboxColumn("CHECK", default=False),
-            "ESERCIZIO 4": st.column_config.TextColumn("ESERCIZIO", width="medium"),
-            "CHECK 4": st.column_config.CheckboxColumn("CHECK", default=False),
-            "ESERCIZIO 5": st.column_config.TextColumn("ESERCIZIO", width="medium"),
-            "CHECK 5": st.column_config.CheckboxColumn("CHECK", default=False),
-        }
+        # --- SELEZIONE TRAMITE MENU A TENDINA E BOX ---
+        df_valid_es = df_esercizi[df_esercizi["Allievo"].astype(str).str.strip() != ""]
 
-        with st.container():
-            edited_df_es = st.data_editor(
-                df_esercizi,
-                use_container_width=True,
-                hide_index=True,
-                column_config=config_es_cols,
-                key="editor_esercizi"
-            )
+        if df_valid_es.empty:
+            st.info("Nessun allievo trovato nella tabella esercizi.")
+        else:
+            lista_allievi_es = df_valid_es["Allievo"].tolist()
+            selected_allievo_es = st.selectbox("🔍 Seleziona un allievo per gli esercizi:", lista_allievi_es, key="select_esercizi_menu")
 
-        st.markdown("<br>", unsafe_allow_html=True)
+            if selected_allievo_es:
+                # Troviamo la riga corrispondente nel dataframe
+                row_idx_df = df_valid_es[df_valid_es["Allievo"] == selected_allievo_es].index[0]
+                allievo_data = df_esercizi.loc[row_idx_df]
 
-        if st.button("💾 SALVA MODIFICHE ESERCIZI"):
-            try:
-                df_to_save = edited_df_es.copy()
+                st.markdown(f"""
+                <div style='margin-top: 20px; margin-bottom: 15px; padding: 12px 20px; background: linear-gradient(90deg, #161b22 0%, #21262d 100%); border-left: 5px solid #FF0000; border-radius: 4px;'>
+                    <h3 style='margin: 0; color: #f0f6fc; font-size: 1.3rem;'>🏋️ Esercizi di: <span style='color: #FFFF00;'>{selected_allievo_es}</span></h3>
+                </div>
+                """, unsafe_allow_html=True)
+
+                with st.form(f"form_esercizi_{row_idx_df}"):
+                    nuovi_valori_esercizi = {}
                 
-                for check_idx in [2, 4, 6, 8, 10]:
-                    col_name = df_to_save.columns[check_idx]
-                    df_to_save[col_name] = df_to_save[col_name].apply(lambda x: True if x in [True, 1, "True", "TRUE", "true", "VERO", "V", "YES", "X", "ON"] else False)
+                    # Creiamo 5 box con esercizio (testo) e checkbox associata
+                    for i in range(1, 6]:
+                        es_col = f"ESERCIZIO {i}"
+                        chk_col = f"CHECK {i}"
+                    
+                        val_es_attuale = str(allievo_data[es_col])
+                        val_chk_attuale = bool(allievo_data[chk_col])
 
-                data_to_write = df_to_save.values.tolist()
-                creds = ottieni_credenziali()
-                if creds:
-                    client = gspread.authorize(creds)
-                    sheet = client.open_by_key(SHEET_ID)
-                    target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ESERCIZI).strip()), None)
-                    if target_ws:
-                        end_row = 17 + len(data_to_write) - 1
-                        
-                        target_ws.update(f"C17:M{end_row}", data_to_write, value_input_option='USER_ENTERED')
-                        
-                        st.toast("✅ Modifiche Esercizi effettuate con successo!", icon="🎉")
-                        st.success("Modifiche salvate con successo sur Google Sheet (C17:M40)!")
-                        
-                        time.sleep(1)
-                        st.rerun()
-            except Exception as ex:
-                st.error(f"Errore durante il salvataggio degli esercizi: {ex}")
+                        st.markdown(f"""
+                        <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px 15px; margin-bottom: 10px;'>
+                            <div style='font-size: 0.8rem; text-transform: uppercase; color: #8b949e; font-weight: bold; margin-bottom: 5px;'>Esercizio {i}</div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                        c_in1, c_in2 = st.columns([3, 1])
+                        with c_in1:
+                            nuovi_valori_esercizi[es_col] = st.text_input(f"Nome Esercizio {i}", value=val_es_attuale, key=f"input_es_{i}_{row_idx_df}", label_visibility="collapsed")
+                        with c_in2:
+                        nuovi_valori_esercizi[chk_col] = st.checkbox("Completato", value=val_chk_attuale, key=f"chk_es_{i}_{row_idx_df}")
+    
+                    # Pulsante Giallo in basso senza scritte descrittive o con stile personalizzato
+                    st.markdown("""
+                    <style>
+                        [data-testid="stFormSubmitButton"] button {
+                            background-color: #FFFF00 !important;
+                            color: #000000 !important;
+                            width: 100% !important;
+                            font-weight: bold !important;
+                        }
+                        [data-testid="stFormSubmitButton"] button:hover {
+                            background-color: #cccc00 !important;
+                            color: #000000 !important;
+                        }
+                    </style>
+                    """, unsafe_allow_html=True)
+
+                    submit_es = st.form_submit_button("➕")
+
+                    if submit_es:
+                        try:
+                            # Aggiorniamo il dataframe generale con i nuovi valori inseriti nel form
+                            for col_k, val_k in nuovi_valori_esercizi.items():
+                                df_esercizi.loc[row_idx_df, col_k] = val_k
+
+                            # Prepariamo la lista da salvare su Google Sheets
+                            data_to_write = df_esercizi.values.tolist()
+                            if target_ws_obj:
+                                end_row = 17 + len(data_to_write) - 1
+                                target_ws_obj.update(f"C17:M{end_row}", data_to_write, value_input_option='USER_ENTERED')
+                            
+                                st.toast("✅ Modifiche Esercizi salvate con successo!", icon="🎉")
+                                st.success("Dati aggiornati correttamente su Google Sheet!")
+                            
+                                time.sleep(1)
+                                st.rerun()
+                        except Exception as ex:
+                            st.error(f"Errore durante il salvataggio: {ex}")
 
         st.markdown("<br>", unsafe_allow_html=True)
 
