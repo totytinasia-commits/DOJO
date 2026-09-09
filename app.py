@@ -462,22 +462,7 @@ with center_col:
     elif current == "📈 PROGRESSI":
         st.subheader("📈 Progressi")
 
-        st.markdown("""
-            <style>
-                [data-testid="stDataFrame"] [data-fixed-column="true"], 
-                [data-testid="stDataFrame"] th[aria-pinned="true"], 
-                [data-testid="stDataFrame"] td[aria-pinned="true"] {
-                    background-color: #161b22 !important;
-                    border-right: 2px solid #30363d !important;
-                }
-                [data-testid="stDataFrame"] [data-testid="stTable"] td, 
-                [data-testid="stDataFrame"] div[data-baseweb="data-table"] th {
-                    max-width: 90px !important;
-                    min-width: 70px !important;
-                }
-            </style>
-        """, unsafe_allow_html=True)
-
+        # Legenda mantenuta in alto per coerenza
         st.markdown("""
         <div style='display: flex; justify-content: center; margin-bottom: 20px;'>
             <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; width: 220px;'>
@@ -548,33 +533,96 @@ with center_col:
         df_progressi = df_progressi.replace(r'^\s*$', pd.NA, regex=True)
         df_progressi = df_progressi.dropna(how='all').fillna("")
 
-        config_cols = {}
-        for i, col_name in enumerate(df_progressi.columns):
-            if i == 0:
-                config_cols[col_name] = st.column_config.TextColumn(col_name, width="medium", pinned=True)
-            else:
-                config_cols[col_name] = st.column_config.ProgressColumn(
-                    col_name,
-                    min_value=0,
-                    max_value=100,
-                    format="%s",
-                    width="medium"
-                )
-                def parse_pct(val):
-                    try:
-                        clean = str(val).replace("%", "").replace(",", ".").strip()
-                        return float(clean)
-                    except:
-                        return 0.0
-                df_progressi[col_name] = df_progressi[col_name].apply(parse_pct)
+        # --- GESTIONE VISUALIZZAZIONE A TENDINA CON BOX E BARRE DI PROGRESSO ---
+        if df_progressi.empty:
+            st.info("Nessun dato disponibile nei progressi.")
+        else:
+            col_allievo = df_progressi.columns[0]
+            df_valid = df_progressi[df_progressi[col_allievo].astype(str).str.strip() != ""]
 
-        with st.container():
-            st.dataframe(
-                df_progressi,
-                use_container_width=True,
-                hide_index=True,
-                column_config=config_cols
-            )
+            if df_valid.empty:
+                st.info("Nessun allievo trovato.")
+            else:
+                lista_allievi = df_valid[col_allievo].tolist()
+                
+                selected_allievo = st.selectbox("🔍 Seleziona un allievo per i progressi:", lista_allievi, key="select_progressi")
+
+                if selected_allievo:
+                    allievo_data = df_valid[df_valid[col_allievo] == selected_allievo].iloc[0]
+                    columns_list = df_valid.columns.tolist()
+
+                    st.markdown(f"""
+                    <div style='margin-top: 20px; margin-bottom: 15px; padding: 12px 20px; background: linear-gradient(90deg, #161b22 0%, #21262d 100%); border-left: 5px solid #58a6ff; border-radius: 4px;'>
+                        <h3 style='margin: 0; color: #f0f6fc; font-size: 1.3rem;'>📈 Statistiche Progressi: <span style='color: #58a6ff;'>{selected_allievo}</span></h3>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    def parse_val_to_float(val):
+                        try:
+                            clean = str(val).replace("%", "").replace(",", ".").strip()
+                            return float(clean)
+                        except:
+                            return 0.0
+
+                    def render_progress_box(col_name, val):
+                        valore_str = str(val).strip()
+                        if not valore_str:
+                            return f"""
+                            <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);'>
+                                <div style='font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #8b949e; margin-bottom: 6px; font-weight: 600;'>{col_name}</div>
+                                <div style='font-size: 1.05rem; color: #6e7681; font-style: italic;'>Non specificato</div>
+                            </div>
+                            """
+
+                        # Se è la prima colonna (Nome Allievo)
+                        if col_name == columns_list[0]:
+                            return f"""
+                            <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);'>
+                                <div style='font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #8b949e; margin-bottom: 6px; font-weight: 600;'>{col_name}</div>
+                                <div style='font-size: 1.05rem; color: #c9d1d9; font-weight: 500;'>{valore_str}</div>
+                            </div>
+                            """
+
+                        # Per le metriche numeriche con percentuale
+                        num_val = parse_val_to_float(valore_str)
+                        
+                        # Assegnazione colore in base alla legenda
+                        if num_val <= 40:
+                            bar_color = "#ff0000"  # Rosso
+                        elif num_val <= 80:
+                            bar_color = "#ffaa00"  # Arancione
+                        else:
+                            bar_color = "#90ee90"  # Verde
+
+                        return f"""
+                        <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);'>
+                            <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;'>
+                                <span style='font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #8b949e; font-weight: 600;'>{col_name}</span>
+                                <span style='font-size: 0.95rem; color: #f0f6fc; font-weight: bold;'>{num_val}%</span>
+                            </div>
+                            <div style='background-color: #30363d; border-radius: 4px; overflow: hidden; height: 10px; width: 100%;'>
+                                <div style='background-color: {bar_color}; width: {min(max(num_val, 0), 100)}%; height: 100%; border-radius: 4px;'></div>
+                            </div>
+                        </div>
+                        """
+
+                    # Dividiamo le metriche in due colonne, riservando l'ultima (es. "Media") o gestendole simmetricamente
+                    campi_standard = columns_list[:-1]
+                    ultimo_campo = columns_list[-1]
+
+                    col1, col2 = st.columns(2)
+                    half = (len(campi_standard) + 1) // 2
+
+                    with col1:
+                        for col in campi_standard[:half]:
+                            st.markdown(render_progress_box(col, allievo_data[col]), unsafe_allow_html=True)
+
+                    with col2:
+                        for col in campi_standard[half:]:
+                            st.markdown(render_progress_box(col, allievo_data[col]), unsafe_allow_html=True)
+
+                    # L'ultimo campo (es. Media) a tutta larghezza in basso, grande come due box
+                    st.markdown(render_progress_box(ultimo_campo, allievo_data[ultimo_campo]), unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
