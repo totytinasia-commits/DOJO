@@ -341,7 +341,7 @@ with center_col:
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-    elif current == "📋 ANAGRAFICA":
+elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
 
         st.markdown("""
@@ -378,11 +378,12 @@ with center_col:
         except Exception as e:
             st.warning(f"Errore nel caricamento dati Anagrafica: {e}")
 
+        cols_names = ["ID", "Nickname", "Nome Reale", "Paese", "Data Ingresso", "Livello Attuale", "Coach", "Ore Totali", "Obiettivo", "Certificazione"]
+
         if not anagrafica_rows:
-            cols_names = ["ID", "Nickname", "Nome Reale", "Paese", "Data Ingresso", "Livello Attuale", "Coach", "Ore Totali", "Obiettivo", "Certificazione"]
             df_anagrafica = pd.DataFrame(columns=cols_names)
         else:
-            header_anagrafica = anagrafica_rows[0] if len(anagrafica_rows) > 0 else ["ID", "Nickname", "Nome Reale", "Paese", "Data Ingresso", "Livello Attuale", "Coach", "Ore Totali", "Obiettivo", "Certificazione"]
+            header_anagrafica = anagrafica_rows[0] if len(anagrafica_rows) > 0 else cols_names
             data_anagrafica = anagrafica_rows[1:] if len(anagrafica_rows) > 1 else [[""] * 10]
             
             cleaned_data = []
@@ -398,10 +399,17 @@ with center_col:
 
             df_anagrafica = pd.DataFrame(cleaned_data, columns=header_anagrafica)
 
+        # Configurazione delle colonne per bloccare ID e Nickname a sinistra
+        config_anagrafica_cols = {
+            "ID": st.column_config.TextColumn("ID", width="small", pinned=True),
+            "Nickname": st.column_config.TextColumn("Nickname", width="medium", pinned=True),
+        }
+
         st.dataframe(
             df_anagrafica,
             use_container_width=True,
-            hide_index=True
+            hide_index=True,
+            column_config=config_anagrafica_cols
         )
 
         st.markdown("<br>", unsafe_allow_html=True)
