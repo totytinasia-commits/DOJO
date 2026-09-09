@@ -882,7 +882,6 @@ with center_col:
                     sheet = client.open_by_key(SHEET_ID)
                     target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_SETTINGS).strip()), None)
                     if target_ws:
-                        # Legge l'intervallo B6:C40 (Colonna B = Data, Colonna C = Opzione)
                         raw_data = target_ws.get("B6:C40")
                         for row in raw_data:
                             if len(row) >= 2:
@@ -899,12 +898,11 @@ with center_col:
 
             selected_setting = st.selectbox("Seleziona valore da C6:C30", settings_options, key="sb_settings_c6_c30")
 
-            # Visualizza la data dell'evento corrispondente alla scelta
             event_date = option_to_date.get(selected_setting, "N/A")
             st.markdown(f"""
                 <div style='background-color: #161b22; padding: 10px 14px; border-radius: 6px; margin: 10px 0 15px 0; border: 1px solid #30363d;'>
                     <span style='color: #8b949e;'>📅 Data dell'evento:</span> <strong style='color: #58a6ff;'>{event_date}</strong>
-                </div>
+                 </div>
             """, unsafe_allow_html=True)
 
             if st.button("SCEGLI", key="btn_scegli_settings"):
@@ -917,7 +915,7 @@ with center_col:
                 except Exception as ex:
                     st.error(f"Errore durante l'impostazione del valore: {ex}")
 
-            st.markdown("</div>", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True) 
 
         elif st.session_state.stat_tab == "🏋️ TRAINING":
             st.markdown("""
