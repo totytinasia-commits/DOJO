@@ -665,21 +665,21 @@ with center_col:
             df_esercizi = pd.DataFrame(columns=expected_es_columns)
         else:
             data_es = esercizi_rows[1:] if len(esercizi_rows) > 1 else esercizi_rows
-            
+        
             cleaned_es_data = []
             for row in data_es:
                 new_row = list(row)
                 while len(new_row) < 11:
                     new_row.append("")
-                
+            
                 # Convertiamo le colonne di check (indici 2, 4, 6, 8, 10) in booleani reali per le checkbox
-                for check_idx in [2, 4, 6, 8, 10]:
+                    for check_idx in [2, 4, 6, 8, 10]:
                     val = str(new_row[check_idx]).strip().upper()
                     if val in ["TRUE", "VERO", "1", "V", "YES", "X", "ON"]:
                         new_row[check_idx] = True
                     else:
                         new_row[check_idx] = False
-                        
+                    
                 cleaned_es_data.append(new_row[:11])
 
             df_esercizi = pd.DataFrame(cleaned_es_data, columns=expected_es_columns)
@@ -696,7 +696,7 @@ with center_col:
         })
 
         config_es_cols = {
-            "Allievo": st.column_config.TextColumn("Allievo", width="medium"),
+            "Allievo": st.column_config.TextColumn("Allievo", width="medium", pinned=True), # <-- Aggiunto pinned=True
             "ESERCIZIO 1": st.column_config.TextColumn("ESERCIZIO", width="large"),
             "CHECK 1": st.column_config.CheckboxColumn("CHECK", default=False),
             "ESERCIZIO 2": st.column_config.TextColumn("ESERCIZIO", width="large"),
@@ -720,33 +720,33 @@ with center_col:
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        if st.button("💾 SALVA MODIFICHE ESERCIZI"):
-            try:
-                # Prepariamo i dati convertendo i booleani in stringhe "TRUE"/"FALSE" per Google Sheets
-                df_to_save = edited_df_es.copy()
-                for check_idx in [2, 4, 6, 8, 10]:
-                    col_name = df_to_save.columns[check_idx]
-                    df_to_save[col_name] = df_to_save[col_name].apply(lambda x: "TRUE" if x else "FALSE")
+    if st.button("💾 SALVA MODIFICHE ESERCIZI"):
+        try:
+            # Prepariamo i dati convertendo i booleani in stringhe "TRUE"/"FALSE" per Google Sheets
+            df_to_save = edited_df_es.copy()
+            for check_idx in [2, 4, 6, 8, 10]:
+                col_name = df_to_save.columns[check_idx]
+                df_to_save[col_name] = df_to_save[col_name].apply(lambda x: "TRUE" if x else "FALSE")
 
-                data_to_write = df_to_save.values.tolist()
-                creds = ottieni_credenziali()
-                if creds:
-                    client = gspread.authorize(creds)
-                    sheet = client.open_by_key(SHEET_ID)
-                    target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ESERCIZI).strip()), None)
-                    if target_ws:
-                        end_row = 17 + len(data_to_write) - 1
-                        target_ws.update(f"C17:M{end_row}", data_to_write)
-                        
-                        st.toast("✅ Modifiche Esercizi effettuate con successo!", icon="🎉")
-                        st.success("Modifiche salvate con successo su Google Sheet (C17:M40)!")
-                        
-                        time.sleep(1)
-                        st.rerun()
-            except Exception as ex:
-                st.error(f"Errore durante il salvataggio degli esercizi: {ex}")
+            data_to_write = df_to_save.values.tolist()
+            creds = ottieni_credenziali()
+            if creds:
+                client = gspread.authorize(creds)
+                sheet = client.open_by_key(SHEET_ID)
+                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ESERCIZI).strip()), None)
+                if target_ws:
+                    end_row = 17 + len(data_to_write) - 1
+                    target_ws.update(f"C17:M{end_row}", data_to_write)
+                    
+                    st.toast("✅ Modifiche Esercizi effettuate con successo!", icon="🎉")
+                    st.success("Modifiche salvate con successo su Google Sheet (C17:M40)!")
+                    
+                    time.sleep(1)
+                    st.rerun()
+        except Exception as ex:
+            st.error(f"Errore durante il salvataggio degli esercizi: {ex}")
 
-        st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "👤 SCHEDE GIOCATORE":
         st.subheader("👤 Schede Giocatore")
