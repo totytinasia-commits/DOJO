@@ -352,10 +352,10 @@ with center_col:
         st.markdown(f"""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 12px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
-                ALLENAMENTO NINO
+                ALLENAMENTO ARES NINO
             </div>
             <div style='padding: 12px; text-align: center; background-color: #0f141c; color: #FFFFFF; font-size: 1.2rem;'>
-                <strong style='color: #58a6ff;'>{r14_val}</strong>
+                <strong style='color: #58a6ff;'>{K14_val}</strong>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -364,7 +364,7 @@ with center_col:
         st.markdown(f"""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
-                ALLENAMENTO PIX
+                ALLENAMENTO ARES PIX
             </div>
             <div style='padding: 12px; text-align: center; background-color: #0f141c; color: #FFFFFF; font-size: 1.2rem;'>
                 <strong style='color: #58a6ff;'>{d14_val}</strong>
