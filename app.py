@@ -153,7 +153,7 @@ SECTIONS = [
     "👤 SCHEDE GIOCATORE",
     "📊 STATISTICHE",
     "🎮 RISULTATI SCRIMS",  # <-- Nuova sezione aggiunta
-    "🎯 ISCRIVITI ALL'EVENTO"
+    "🎯 ISCRIVITI ALL'EVENTO",
     "🎯 ISCRIVITI AGLI SCRIMS"
 ]
 
