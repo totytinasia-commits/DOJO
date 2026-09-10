@@ -180,17 +180,17 @@ with center_col:
     st.markdown("<br>", unsafe_allow_html=True)
 
     if "current_section" not in st.session_state:
-    st.session_state.current_section = "🏫 ACADEMY"
+        st.session_state.current_section = "🏫 ACADEMY"
 
-for sec in SECTIONS:
-    btn_type = "primary" if st.session_state.current_section == sec else "secondary"
-    if st.button(sec, key=f"nav_{sec}", type=btn_type):
-        st.session_state.current_section = sec
-        st.rerun()
+    for sec in SECTIONS:
+        btn_type = "primary" if st.session_state.current_section == sec else "secondary"
+        if st.button(sec, key=f"nav_{sec}", type=btn_type):
+            st.session_state.current_section = sec
+            st.rerun()
 
-st.markdown("---")
+    st.markdown("---")
 
-current = st.session_state.current_section
+    current = st.session_state.current_section
 
     if current == "🏫 ACADEMY":
         st.subheader("🏫 Academy")
@@ -369,7 +369,6 @@ current = st.session_state.current_section
                 else:
                     try:
                         if target_ws_obj:
-                            # Lettura da C28 a F50 per trovare la prima riga vuota
                             range_data = target_ws_obj.get("C28:F50", value_render_option='UNFORMATTED_VALUE')
                             
                             next_row_index = 28
@@ -387,7 +386,7 @@ current = st.session_state.current_section
                                     st.error("Il registro (C28:F50) è pieno!")
                                     st.stop()
     
-                            # Scrittura dei 4 campi nelle colonne C, D, E, F
+                            # Inserimento dati su colonne C, D, E e F
                             target_ws_obj.update(f"C{next_row_index}:F{next_row_index}", [[nuovo_allievo, nuovo_giorni, nuova_mappa, nuovo_insegnante]])
                             
                             st.toast("✅ Nuova voce aggiunta con successo!", icon="🎉")
@@ -399,7 +398,8 @@ current = st.session_state.current_section
                         st.error(f"Errore durante l'inserimento: {ex}")
     
         st.markdown("<br>", unsafe_allow_html=True)
-        elif current == "📋 ANAGRAFICA":
+
+    elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
 
         st.markdown("""
