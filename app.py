@@ -1141,11 +1141,12 @@ with center_col:
         base_dir = Path(__file__).parent / "assets"
 
         scrims_data = [
-            {"nome": "Euro Quads", "link": "https://tuo-link-1.com", "icona": "euroquad.png"},
-            {"nome": "EU Scrim Club", "link": "https://tuo-link-2.com", "icona": "euscrims.png"},
+            {"nome": "Euro Quads", "link": "https://euroquad-rm6yh6gb7taq5rmjn9sweg.streamlit.app/", "icona": "euroquad.png"},
+            {"nome": "EU Scrim Club", "link": "https://euscrims-jym7ekup39k57h66e4ljyz.streamlit.app/", "icona": "euscrims.png"},
             {"nome": "FFC EU", "link": "https://tuo-link-3.com", "icona": "ffc.png"},
-            {"nome": "Italian Community", "link": "https://tuo-link-4.com", "icona": "population_ita.png"},
-            {"nome": "CL", "link": "https://tuo-link-5.com", "icona": "cl.png"},
+            {"nome": "Euro Cup squad", "link": "https://eurocup-dashboard-h76lwgruyz9ejupyjdsttv.streamlit.app/", "icona": "population_ita.png"},
+            {"nome": "CLans League tuesday", "link": "https://clans-legues-tuesday-scrims-tlpehvubdrncbfo6pm7g5x.streamlit.app/", "icona": "cl.png"},
+            {"nome": "CLans League friday", "link": "https://clans-leadue-friday-scrims-nwgscanechct7pmvlusfkl.streamlit.app/", "icona": "cl.png"},
         ]
 
         for scrim in scrims_data:
