@@ -192,214 +192,214 @@ st.markdown("---")
 
 current = st.session_state.current_section
 
-if current == "🏫 ACADEMY":
-    st.subheader("🏫 Academy")
-
-    # CSS personalizzato per etichette bianche e pulsante giallo
-    st.markdown("""
-    <style>
-        .stTextInput label p, div[data-baseweb="input"] label, .stTextInput label {
-            color: #FFFFFF !important;
-        }
-        [data-testid="stFormSubmitButton"] button {
-            background-color: #FFFF00 !important;
-            color: #000000 !important;
-            width: 100% !important;
-            font-weight: bold !important;
-        }
-        [data-testid="stFormSubmitButton"] button:hover {
-            background-color: #cccc00 !important;
-            color: #000000 !important;
-        }
-        .fixed-box-header {
-            background-color: #1a202c; 
-            color: #a0aec0; 
-            padding: 8px 12px; 
-            display: flex; 
-            justify-content: space-between; 
-            font-weight: bold; 
-            font-size: 0.85rem; 
-            border-top: 1px solid #ff0000;
-        }
-        .fixed-box-row {
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 8px 12px; 
-            border-bottom: 1px solid #1e2638;
-            background-color: #0f141c;
-        }
-    </style>
-    """, unsafe_allow_html=True)
-
-    f13_val, h13_val = "", ""
-    f14_val, h14_val = "", ""
-    box_pix_rows = []
-    box_nino_rows = []
-    target_ws_obj = None
-
-    try:
-        creds = ottieni_credenziali()
-        if creds:
-            client = gspread.authorize(creds)
-            sheet = client.open_by_key(SHEET_ID)
-            target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ACADEMY).strip()), None)
-            target_ws_obj = target_ws
-
-            if target_ws:
-                f13_val = target_ws.acell("F13").value or ""
-                h13_val = target_ws.acell("H13").value or ""
-                f14_val = target_ws.acell("F14").value or ""
-                h14_val = target_ws.acell("H14").value or ""
-
-                # Lettura dinamica C18:E25 per ARES PIX
-                raw_pix = target_ws.get("C18:E25")
-                box_pix_rows = [
-                    [
-                        r[0] if len(r) > 0 else "",
-                        r[1] if len(r) > 1 else "",
-                        r[2] if len(r) > 2 else ""
+    if current == "🏫 ACADEMY":
+        st.subheader("🏫 Academy")
+    
+        # CSS personalizzato per etichette bianche e pulsante giallo
+        st.markdown("""
+        <style>
+            .stTextInput label p, div[data-baseweb="input"] label, .stTextInput label {
+                color: #FFFFFF !important;
+            }
+            [data-testid="stFormSubmitButton"] button {
+                background-color: #FFFF00 !important;
+                color: #000000 !important;
+                width: 100% !important;
+                font-weight: bold !important;
+            }
+            [data-testid="stFormSubmitButton"] button:hover {
+                background-color: #cccc00 !important;
+                color: #000000 !important;
+            }
+            .fixed-box-header {
+                background-color: #1a202c; 
+                color: #a0aec0; 
+                padding: 8px 12px; 
+                display: flex; 
+                justify-content: space-between; 
+                font-weight: bold; 
+                font-size: 0.85rem; 
+                border-top: 1px solid #ff0000;
+            }
+            .fixed-box-row {
+                display: flex; 
+                justify-content: space-between; 
+                align-items: center; 
+                padding: 8px 12px; 
+                border-bottom: 1px solid #1e2638;
+                background-color: #0f141c;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+    
+        f13_val, h13_val = "", ""
+        f14_val, h14_val = "", ""
+        box_pix_rows = []
+        box_nino_rows = []
+        target_ws_obj = None
+    
+        try:
+            creds = ottieni_credenziali()
+            if creds:
+                client = gspread.authorize(creds)
+                sheet = client.open_by_key(SHEET_ID)
+                target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ACADEMY).strip()), None)
+                target_ws_obj = target_ws
+    
+                if target_ws:
+                    f13_val = target_ws.acell("F13").value or ""
+                    h13_val = target_ws.acell("H13").value or ""
+                    f14_val = target_ws.acell("F14").value or ""
+                    h14_val = target_ws.acell("H14").value or ""
+    
+                    # Lettura dinamica C18:E25 per ARES PIX
+                    raw_pix = target_ws.get("C18:E25")
+                    box_pix_rows = [
+                        [
+                            r[0] if len(r) > 0 else "",
+                            r[1] if len(r) > 1 else "",
+                            r[2] if len(r) > 2 else ""
+                        ]
+                        for r in raw_pix if any(str(cell).strip() for cell in r)
                     ]
-                    for r in raw_pix if any(str(cell).strip() for cell in r)
-                ]
-
-                # Lettura dinamica I18:K25 per ARES NINO
-                raw_nino = target_ws.get("I18:K25")
-                box_nino_rows = [
-                    [
-                        r[0] if len(r) > 0 else "",
-                        r[1] if len(r) > 1 else "",
-                        r[2] if len(r) > 2 else ""
+    
+                    # Lettura dinamica I18:K25 per ARES NINO
+                    raw_nino = target_ws.get("I18:K25")
+                    box_nino_rows = [
+                        [
+                            r[0] if len(r) > 0 else "",
+                            r[1] if len(r) > 1 else "",
+                            r[2] if len(r) > 2 else ""
+                        ]
+                        for r in raw_nino if any(str(cell).strip() for cell in r)
                     ]
-                    for r in raw_nino if any(str(cell).strip() for cell in r)
-                ]
-
-    except Exception as e:
-        st.warning(f"Errore nel caricamento dati Academy: {e}")
-
-    # Banner Titolo
-    st.markdown(f"""
-    <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-        <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.2rem; padding: 10px;'>
-            {f13_val} {h13_val}
-        </div>
-        <div style='color: #FFFFFF; text-align: center; font-size: 0.95rem; padding: 8px;'>
-            {f14_val} &nbsp;&nbsp; {h14_val}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # --- TABELLA ARES PIX ---
-    st.markdown("""
-    <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-        <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
-            ARES PIX
-        </div>
-        <div class='fixed-box-header'>
-            <span style='flex: 2;'>Allievi a carico</span>
-            <span style='flex: 1; text-align: center;'>giorni</span>
-            <span style='flex: 1; text-align: right;'>Mappa</span>
-        </div>
-    """, unsafe_allow_html=True)
-
-    if not box_pix_rows:
-        st.markdown("<div class='fixed-box-row'><span style='color: #8b949e;'>Nessun dato presente.</span></div>", unsafe_allow_html=True)
-    else:
-        for row in box_pix_rows:
-            st.markdown(f"""
-            <div class='fixed-box-row'>
-                <span style='flex: 2; color: #FFFFFF;'>{row[0]}</span>
-                <span style='flex: 1; text-align: center; color: #8b949e;'>{row[1]}</span>
-                <span style='flex: 1; text-align: right; color: #58a6ff;'>{row[2]}</span>
+    
+        except Exception as e:
+            st.warning(f"Errore nel caricamento dati Academy: {e}")
+    
+        # Banner Titolo
+        st.markdown(f"""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.2rem; padding: 10px;'>
+                {f13_val} {h13_val}
             </div>
-            """, unsafe_allow_html=True)
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # --- TABELLA ARES NINO ---
-    st.markdown("""
-    <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-        <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
-            ARES NINO
-        </div>
-        <div class='fixed-box-header'>
-            <span style='flex: 2;'>Allievi a carico</span>
-            <span style='flex: 1; text-align: center;'>giorni</span>
-            <span style='flex: 1; text-align: right;'>Mappa</span>
-        </div>
-    """, unsafe_allow_html=True)
-
-    if not box_nino_rows:
-        st.markdown("<div class='fixed-box-row'><span style='color: #8b949e;'>Nessun dato presente.</span></div>", unsafe_allow_html=True)
-    else:
-        for row in box_nino_rows:
-            st.markdown(f"""
-            <div class='fixed-box-row'>
-                <span style='flex: 2; color: #FFFFFF;'>{row[0]}</span>
-                <span style='flex: 1; text-align: center; color: #8b949e;'>{row[1]}</span>
-                <span style='flex: 1; text-align: right; color: #58a6ff;'>{row[2]}</span>
+            <div style='color: #FFFFFF; text-align: center; font-size: 0.95rem; padding: 8px;'>
+                {f14_val} &nbsp;&nbsp; {h14_val}
             </div>
-            """, unsafe_allow_html=True)
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # --- SEZIONE MODULO DI INSERIMENTO REGISTRO ATTIVITA' ---
-    st.markdown("""
-    <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-        <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
-            REGISTRO ATTIVITA' - NUOVA VOCE
         </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    with st.form("form_nuovo_registro", clear_on_submit=True):
-        col_f1, col_f2 = st.columns(2)
-        with col_f1:
-            nuovo_allievo = st.text_input("Allievo")
-            nuovo_giorni = st.text_input("Data e ora allenamento")
-        with col_f2:
-            nuova_mappa = st.text_input("Mappa preferita")
-            nuovo_insegnante = st.text_input("Insegnante")
-
-        submit_button = st.form_submit_button("➕")
-
-        if submit_button:
-            if not nuovo_allievo.strip() and not nuovo_giorni.strip() and not nuova_mappa.strip() and not nuovo_insegnante.strip():
-                st.warning("Compila almeno un campo prima di inviare.")
-            else:
-                try:
-                    if target_ws_obj:
-                        # Lettura da C28 a F50 per trovare la prima riga vuota
-                        range_data = target_ws_obj.get("C28:F50", value_render_option='UNFORMATTED_VALUE')
-                        
-                        next_row_index = 28
-                        found_empty = False
-                        
-                        for i, row in enumerate(range_data):
-                            if not row or all(str(cell).strip() == "" for cell in row):
-                                next_row_index = 28 + i
-                                found_empty = True
-                                break
-                        
-                        if not found_empty:
-                            next_row_index = 28 + len(range_data)
-                            if next_row_index > 50:
-                                st.error("Il registro (C28:F50) è pieno!")
-                                st.stop()
-
-                        # Scrittura dei 4 campi nelle colonne C, D, E, F
-                        target_ws_obj.update(f"C{next_row_index}:F{next_row_index}", [[nuovo_allievo, nuovo_giorni, nuova_mappa, nuovo_insegnante]])
-                        
-                        st.toast("✅ Nuova voce aggiunta con successo!", icon="🎉")
-                        st.success(f"Dati inseriti correttamente alla riga {next_row_index}!")
-                        
-                        time.sleep(1)
-                        st.rerun()
-                except Exception as ex:
-                    st.error(f"Errore durante l'inserimento: {ex}")
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    elif current == "📋 ANAGRAFICA":
+        """, unsafe_allow_html=True)
+    
+        # --- TABELLA ARES PIX ---
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
+                ARES PIX
+            </div>
+            <div class='fixed-box-header'>
+                <span style='flex: 2;'>Allievi a carico</span>
+                <span style='flex: 1; text-align: center;'>giorni</span>
+                <span style='flex: 1; text-align: right;'>Mappa</span>
+            </div>
+        """, unsafe_allow_html=True)
+    
+        if not box_pix_rows:
+            st.markdown("<div class='fixed-box-row'><span style='color: #8b949e;'>Nessun dato presente.</span></div>", unsafe_allow_html=True)
+        else:
+            for row in box_pix_rows:
+                st.markdown(f"""
+                <div class='fixed-box-row'>
+                    <span style='flex: 2; color: #FFFFFF;'>{row[0]}</span>
+                    <span style='flex: 1; text-align: center; color: #8b949e;'>{row[1]}</span>
+                    <span style='flex: 1; text-align: right; color: #58a6ff;'>{row[2]}</span>
+                </div>
+                """, unsafe_allow_html=True)
+    
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+        # --- TABELLA ARES NINO ---
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
+                ARES NINO
+            </div>
+            <div class='fixed-box-header'>
+                <span style='flex: 2;'>Allievi a carico</span>
+                <span style='flex: 1; text-align: center;'>giorni</span>
+                <span style='flex: 1; text-align: right;'>Mappa</span>
+            </div>
+        """, unsafe_allow_html=True)
+    
+        if not box_nino_rows:
+            st.markdown("<div class='fixed-box-row'><span style='color: #8b949e;'>Nessun dato presente.</span></div>", unsafe_allow_html=True)
+        else:
+            for row in box_nino_rows:
+                st.markdown(f"""
+                <div class='fixed-box-row'>
+                    <span style='flex: 2; color: #FFFFFF;'>{row[0]}</span>
+                    <span style='flex: 1; text-align: center; color: #8b949e;'>{row[1]}</span>
+                    <span style='flex: 1; text-align: right; color: #58a6ff;'>{row[2]}</span>
+                </div>
+                """, unsafe_allow_html=True)
+    
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+        # --- SEZIONE MODULO DI INSERIMENTO REGISTRO ATTIVITA' ---
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
+                REGISTRO ATTIVITA' - NUOVA VOCE
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+        with st.form("form_nuovo_registro", clear_on_submit=True):
+            col_f1, col_f2 = st.columns(2)
+            with col_f1:
+                nuovo_allievo = st.text_input("Allievo")
+                nuovo_giorni = st.text_input("Data e ora allenamento")
+            with col_f2:
+                nuova_mappa = st.text_input("Mappa preferita")
+                nuovo_insegnante = st.text_input("Insegnante")
+    
+            submit_button = st.form_submit_button("➕")
+    
+            if submit_button:
+                if not nuovo_allievo.strip() and not nuovo_giorni.strip() and not nuova_mappa.strip() and not nuovo_insegnante.strip():
+                    st.warning("Compila almeno un campo prima di inviare.")
+                else:
+                    try:
+                        if target_ws_obj:
+                            # Lettura da C28 a F50 per trovare la prima riga vuota
+                            range_data = target_ws_obj.get("C28:F50", value_render_option='UNFORMATTED_VALUE')
+                            
+                            next_row_index = 28
+                            found_empty = False
+                            
+                            for i, row in enumerate(range_data):
+                                if not row or all(str(cell).strip() == "" for cell in row):
+                                    next_row_index = 28 + i
+                                    found_empty = True
+                                    break
+                            
+                            if not found_empty:
+                                next_row_index = 28 + len(range_data)
+                                if next_row_index > 50:
+                                    st.error("Il registro (C28:F50) è pieno!")
+                                    st.stop()
+    
+                            # Scrittura dei 4 campi nelle colonne C, D, E, F
+                            target_ws_obj.update(f"C{next_row_index}:F{next_row_index}", [[nuovo_allievo, nuovo_giorni, nuova_mappa, nuovo_insegnante]])
+                            
+                            st.toast("✅ Nuova voce aggiunta con successo!", icon="🎉")
+                            st.success(f"Dati inseriti correttamente alla riga {next_row_index}!")
+                            
+                            time.sleep(1)
+                            st.rerun()
+                    except Exception as ex:
+                        st.error(f"Errore durante l'inserimento: {ex}")
+    
+        st.markdown("<br>", unsafe_allow_html=True)
+        elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
 
         st.markdown("""
