@@ -1138,30 +1138,28 @@ with center_col:
         </div>
         """, unsafe_allow_html=True)
 
-        base_dir = Path(__file__).parent
-
-        def img_to_base64(path_img):
-            path = base_dir / path_img
-            if path.exists():
-                encoded = base64.b64encode(path.read_bytes()).decode()
-                return f"data:image/png;base64,{encoded}"
-            return ""
+        base_dir = Path(__file__).parent / "assets"
 
         scrims_data = [
-            {"nome": "Euro Quads", "link": "https://tuo-link-1.com", "icona": "assets/euroquad_2.png"},
-            {"nome": "EU Scrim Club", "link": "https://tuo-link-2.com", "icona": "assets/euscrims_2.png"},
-            {"nome": "FFC EU", "link": "https://tuo-link-3.com", "icona": "assets/ffc_2.png"},
-            {"nome": "Italian Community", "link": "https://tuo-link-4.com", "icona": "assets/population_ita_2.png"},
-            {"nome": "CL", "link": "https://tuo-link-5.com", "icona": "assets/cl_2.png"},
+            {"nome": "Euro Quads", "link": "https://tuo-link-1.com", "icona": "euroquad_2.png"},
+            {"nome": "EU Scrim Club", "link": "https://tuo-link-2.com", "icona": "euscrims_2.png"},
+            {"nome": "FFC EU", "link": "https://tuo-link-3.com", "icona": "ffc_2.png"},
+            {"nome": "Italian Community", "link": "https://tuo-link-4.com", "icona": "population_ita_2.png"},
+            {"nome": "CL", "link": "https://tuo-link-5.com", "icona": "cl_2.png"},
         ]
 
         for scrim in scrims_data:
-            img_src = img_to_base64(scrim["icona"])
+            img_path = base_dir / scrim["icona"]
+            img_html = ""
+            if img_path.exists():
+                encoded = base64.b64encode(img_path.read_bytes()).decode()
+                img_html = f"data:image/png;base64,{encoded}"
+
             st.markdown(f"""
             <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;'>
                 <span style='color: #f0f6fc; font-weight: bold; font-size: 1.05rem;'>{scrim['nome']}</span>
                 <a href="{scrim['link']}" target="_blank" style='text-decoration: none;'>
-                    <img src="{img_src}" width="40" height="40" style="border-radius: 6px; object-fit: cover; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1.0)'">
+                    <img src="{img_html}" width="45" height="45" style="border-radius: 6px; object-fit: cover; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1.0)'">
                 </a>
             </div>
             """, unsafe_allow_html=True)
