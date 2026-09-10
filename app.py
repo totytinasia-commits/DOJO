@@ -476,22 +476,22 @@ with center_col:
                     st.markdown(render_box(ultimo_campo, giocatore_data[ultimo_campo]), unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
+        
     elif current == "⚔️ ISCRIVITI AGLI SCRIMS":
         st.subheader("⚔️ Iscriviti agli Scrims")
 
-        # Mostra l'immagine statbor.png dalla cartella assets
-        # Sostituisci "assets/statbor.png" con il percorso corretto se necessario
-        st.image("assets/statbor.png", use_container_width=True)
+        # Mostra l'immagine logo1.png dalla cartella assets
+        st.image("assets/logo1.png", use_container_width=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # Pulsante che reindirizza al link esterno
-        # Sostituisci "https://tuo-link-esterno.com" con l'URL di destinazione reale
+        # Pulsante che reindirizza a Statbot App
         st.link_button(
             label="ISCRIVITI", 
-            url="https://tuo-link-esterno.com", 
+            url="https://statbotapp.uk/", 
             use_container_width=True
-        )     
+        )    
+        
     elif current == "📈 PROGRESSI":
         st.subheader("📈 Progressi")
 
