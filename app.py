@@ -151,10 +151,11 @@ SECTIONS = [
     "📜 CERTIFICAZIONI",
     "🏋️ ESERCIZI",
     "👤 SCHEDE GIOCATORE",
-    "📊 STATISTICHE",
-    "🎮 RISULTATI SCRIMS",  # <-- Nuova sezione aggiunta
     "🎯 ISCRIVITI ALL'EVENTO",
-    "⚔️ ISCRIVITI AGLI SCRIMS"
+    "📊 STATISTICHE EVENTI",
+    "⚔️ ISCRIVITI AGLI SCRIMS",
+    
+    "🎮 RISULTATI SCRIMS",  # <-- Nuova sezione aggiunta
 ]
 
 PLAYERS = [
