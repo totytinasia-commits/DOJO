@@ -1123,6 +1123,37 @@ with center_col:
             st.info("Nessun partecipante iscritto al momento. Sii il primo!")
     
         st.markdown("<br>", unsafe_allow_html=True)
+
+    elif current == "🎮 RISULTATI SCRIMS":
+        st.subheader("🎮 Risultati Scrims")
+
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
+                ARCHIVIO RISULTATI SCRIMS
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        scrims_data = [
+            {"nome": "Euro Quads", "link": "https://tuo-link-1.com", "icona": "assets/euroquad_2.png"},
+            {"nome": "EU Scrim Club", "link": "https://tuo-link-2.com", "icona": "assets/euscrims_2.png"},
+            {"nome": "FFC EU", "link": "https://tuo-link-3.com", "icona": "assets/ffc_2.png"},
+            {"nome": "Italian Community", "link": "https://tuo-link-4.com", "icona": "assets/population_ita_2.png"},
+            {"nome": "CL", "link": "https://tuo-link-5.com", "icona": "assets/cl_2.png"},
+        ]
+
+        for scrim in scrims_data:
+            st.markdown(f"""
+            <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;'>
+                <span style='color: #f0f6fc; font-weight: bold; font-size: 1.05rem;'>{scrim['nome']}</span>
+                <a href="{scrim['link']}" target="_blank" style='text-decoration: none;'>
+                    <img src="app/static/{scrim['icona'].replace('assets/', '')}" width="40" height="40" style="border-radius: 6px; object-fit: cover; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1.0)'">
+                </a>
+            </div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
     elif current == "📊 STATISTICHE":
         st.subheader("📊 Statistiche")
 
