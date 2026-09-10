@@ -1125,6 +1125,9 @@ with center_col:
         st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "🎮 RISULTATI SCRIMS":
+        import base64
+        from pathlib import Path
+
         st.subheader("🎮 Risultati Scrims")
 
         st.markdown("""
@@ -1135,6 +1138,13 @@ with center_col:
         </div>
         """, unsafe_allow_html=True)
 
+        def img_to_base64(path_img):
+            path = Path(path_img)
+            if path.exists():
+                encoded = base64.b64encode(path.read_bytes()).decode()
+                return f"data:image/png;base64,{encoded}"
+            return ""
+
         scrims_data = [
             {"nome": "Euro Quads", "link": "https://tuo-link-1.com", "icona": "assets/euroquad_2.png"},
             {"nome": "EU Scrim Club", "link": "https://tuo-link-2.com", "icona": "assets/euscrims_2.png"},
@@ -1144,16 +1154,18 @@ with center_col:
         ]
 
         for scrim in scrims_data:
+            img_src = img_to_base64(scrim["icona"])
             st.markdown(f"""
             <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;'>
                 <span style='color: #f0f6fc; font-weight: bold; font-size: 1.05rem;'>{scrim['nome']}</span>
                 <a href="{scrim['link']}" target="_blank" style='text-decoration: none;'>
-                    <img src="app/static/{scrim['icona'].replace('assets/', '')}" width="40" height="40" style="border-radius: 6px; object-fit: cover; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1.0)'">
+                    <img src="{img_src}" width="40" height="40" style="border-radius: 6px; object-fit: cover; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1.0)'">
                 </a>
             </div>
             """, unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
+        
     elif current == "📊 STATISTICHE":
         st.subheader("📊 Statistiche")
 
