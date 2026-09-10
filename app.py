@@ -1125,7 +1125,6 @@ with center_col:
         st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "🎮 RISULTATI SCRIMS":
-        import base64
         from pathlib import Path
 
         st.subheader("🎮 Risultati Scrims")
@@ -1150,19 +1149,23 @@ with center_col:
 
         for scrim in scrims_data:
             img_path = base_dir / scrim["icona"]
-            img_html = ""
-            if img_path.exists():
-                encoded = base64.b64encode(img_path.read_bytes()).decode()
-                img_html = f"data:image/png;base64,{encoded}"
-
-            st.markdown(f"""
-            <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;'>
-                <span style='color: #f0f6fc; font-weight: bold; font-size: 1.05rem;'>{scrim['nome']}</span>
-                <a href="{scrim['link']}" target="_blank" style='text-decoration: none;'>
-                    <img src="{img_html}" width="45" height="45" style="border-radius: 6px; object-fit: cover; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1.0)'">
-                </a>
-            </div>
-            """, unsafe_allow_html=True)
+            
+            # Contenitore stile card
+            with st.container():
+                col1, col2 = st.columns([5, 1])
+                with col1:
+                    st.markdown(f"<p style='color: #f0f6fc; font-weight: bold; font-size: 1.1rem; margin-top: 12px;'>{scrim['nome']}</p>", unsafe_allow_html=True)
+                with col2:
+                    if img_path.exists():
+                        # Mostriamo l'immagine nativa
+                        st.image(str(img_path), width=45)
+                    else:
+                        st.write("🖼️")
+                
+                # Link testuale pulito subito sotto o a fianco per reindirizzare
+                st.markdown(f"<a href='{scrim['link']}' target='_blank' style='color: #58a6ff; text-decoration: none; font-size: 0.9rem;'>🔗 Apri Risultati</a>", unsafe_allow_html=True)
+            
+            st.markdown("<hr style='border-color: #30363d; margin: 15px 0;'>", unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
         
