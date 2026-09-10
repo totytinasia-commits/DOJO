@@ -194,7 +194,7 @@ with center_col:
 
     if current == "🏫 ACADEMY":
         st.subheader("🏫 Academy")
-    
+        
         # CSS personalizzato per etichette bianche e pulsante giallo
         st.markdown("""
         <style>
@@ -231,13 +231,14 @@ with center_col:
             }
         </style>
         """, unsafe_allow_html=True)
-    
+        
         f13_val, h13_val = "", ""
         f14_val, h14_val = "", ""
+        d14_val, r14_val = "", ""
         box_pix_rows = []
         box_nino_rows = []
         target_ws_obj = None
-    
+        
         try:
             creds = ottieni_credenziali()
             if creds:
@@ -245,13 +246,17 @@ with center_col:
                 sheet = client.open_by_key(SHEET_ID)
                 target_ws = next((ws for ws in sheet.worksheets() if str(ws.id).strip() == str(GID_ACADEMY).strip()), None)
                 target_ws_obj = target_ws
-    
+                
                 if target_ws:
                     f13_val = target_ws.acell("F13").value or ""
                     h13_val = target_ws.acell("H13").value or ""
                     f14_val = target_ws.acell("F14").value or ""
                     h14_val = target_ws.acell("H14").value or ""
-    
+                    
+                    # Lettura D14 (PIX) e R14 (NINO)
+                    d14_val = target_ws.acell("D14").value or ""
+                    r14_val = target_ws.acell("R14").value or ""
+                    
                     # Lettura dinamica C18:E25 per ARES PIX
                     raw_pix = target_ws.get("C18:E22")
                     box_pix_rows = [
@@ -262,7 +267,7 @@ with center_col:
                         ]
                         for r in raw_pix if any(str(cell).strip() for cell in r)
                     ]
-    
+                    
                     # Lettura dinamica I18:K25 per ARES NINO
                     raw_nino = target_ws.get("I18:K22")
                     box_nino_rows = [
@@ -273,10 +278,10 @@ with center_col:
                         ]
                         for r in raw_nino if any(str(cell).strip() for cell in r)
                     ]
-    
+                    
         except Exception as e:
             st.warning(f"Errore nel caricamento dati Academy: {e}")
-    
+        
         # Banner Titolo
         st.markdown(f"""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
@@ -289,6 +294,19 @@ with center_col:
         </div>
         """, unsafe_allow_html=True)
     
+        # --- BOX ALLENAMENTO (D14 per PIX, R14 per NINO) ---
+        st.markdown(f"""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
+                ALLENAMENTO
+            </div>
+            <div class='fixed-box-header'>
+                <span style='flex: 1; text-align: center; color: #FFFFFF;'>PIX: <strong style='color: #58a6ff;'>{d14_val}</strong></span>
+                <span style='flex: 1; text-align: center; color: #FFFFFF;'>NINO: <strong style='color: #58a6ff;'>{r14_val}</strong></span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
         # --- TABELLA ARES PIX ---
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
@@ -301,7 +319,7 @@ with center_col:
                 <span style='flex: 1; text-align: right;'>Mappa</span>
             </div>
         """, unsafe_allow_html=True)
-    
+        
         if not box_pix_rows:
             st.markdown("<div class='fixed-box-row'><span style='color: #8b949e;'>Nessun dato presente.</span></div>", unsafe_allow_html=True)
         else:
@@ -313,9 +331,9 @@ with center_col:
                     <span style='flex: 1; text-align: right; color: #58a6ff;'>{row[2]}</span>
                 </div>
                 """, unsafe_allow_html=True)
-    
+        
         st.markdown("</div>", unsafe_allow_html=True)
-    
+        
         # --- TABELLA ARES NINO ---
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
@@ -328,7 +346,7 @@ with center_col:
                 <span style='flex: 1; text-align: right;'>Mappa</span>
             </div>
         """, unsafe_allow_html=True)
-    
+        
         if not box_nino_rows:
             st.markdown("<div class='fixed-box-row'><span style='color: #8b949e;'>Nessun dato presente.</span></div>", unsafe_allow_html=True)
         else:
@@ -340,9 +358,9 @@ with center_col:
                     <span style='flex: 1; text-align: right; color: #58a6ff;'>{row[2]}</span>
                 </div>
                 """, unsafe_allow_html=True)
-    
+        
         st.markdown("</div>", unsafe_allow_html=True)
-    
+        
         # --- SEZIONE MODULO DI INSERIMENTO REGISTRO ATTIVITA' ---
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
@@ -351,7 +369,7 @@ with center_col:
             </div>
         </div>
         """, unsafe_allow_html=True)
-    
+        
         with st.form("form_nuovo_registro", clear_on_submit=True):
             col_f1, col_f2 = st.columns(2)
             with col_f1:
@@ -360,9 +378,9 @@ with center_col:
             with col_f2:
                 nuova_mappa = st.text_input("Mappa preferita")
                 nuovo_insegnante = st.text_input("Insegnante")
-    
+        
             submit_button = st.form_submit_button("➕")
-    
+        
             if submit_button:
                 if not nuovo_allievo.strip() and not nuovo_giorni.strip() and not nuova_mappa.strip() and not nuovo_insegnante.strip():
                     st.warning("Compila almeno un campo prima di inviare.")
@@ -385,7 +403,7 @@ with center_col:
                                 if next_row_index > 50:
                                     st.error("Il registro (C28:F50) è pieno!")
                                     st.stop()
-    
+                            
                             # Inserimento dati su colonne C, D, E e F
                             target_ws_obj.update(f"C{next_row_index}:F{next_row_index}", [[nuovo_allievo, nuovo_giorni, nuova_mappa, nuovo_insegnante]])
                             
@@ -396,7 +414,7 @@ with center_col:
                             st.rerun()
                     except Exception as ex:
                         st.error(f"Errore durante l'inserimento: {ex}")
-    
+        
         st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "📋 ANAGRAFICA":
