@@ -1125,6 +1125,7 @@ with center_col:
         st.markdown("<br>", unsafe_allow_html=True)
 
     elif current == "🎮 RISULTATI SCRIMS":
+        import base64
         from pathlib import Path
 
         st.subheader("🎮 Risultati Scrims")
@@ -1140,32 +1141,33 @@ with center_col:
         base_dir = Path(__file__).parent / "assets"
 
         scrims_data = [
-            {"nome": "Euro Quads", "link": "https://tuo-link-1.com", "icona": "euroquad_2.png"},
-            {"nome": "EU Scrim Club", "link": "https://tuo-link-2.com", "icona": "euscrims_2.png"},
-            {"nome": "FFC EU", "link": "https://tuo-link-3.com", "icona": "ffc_2.png"},
-            {"nome": "Italian Community", "link": "https://tuo-link-4.com", "icona": "population_ita_2.png"},
-            {"nome": "CL", "link": "https://tuo-link-5.com", "icona": "cl_2.png"},
+            {"nome": "Euro Quads", "link": "https://tuo-link-1.com", "icona": "euroquad.png"},
+            {"nome": "EU Scrim Club", "link": "https://tuo-link-2.com", "icona": "euscrims.png"},
+            {"nome": "FFC EU", "link": "https://tuo-link-3.com", "icona": "ffc.png"},
+            {"nome": "Italian Community", "link": "https://tuo-link-4.com", "icona": "population_ita.png"},
+            {"nome": "CL", "link": "https://tuo-link-5.com", "icona": "cl.png"},
         ]
 
         for scrim in scrims_data:
             img_path = base_dir / scrim["icona"]
-            
-            # Contenitore stile card
-            with st.container():
-                col1, col2 = st.columns([5, 1])
-                with col1:
-                    st.markdown(f"<p style='color: #f0f6fc; font-weight: bold; font-size: 1.1rem; margin-top: 12px;'>{scrim['nome']}</p>", unsafe_allow_html=True)
-                with col2:
-                    if img_path.exists():
-                        # Mostriamo l'immagine nativa
-                        st.image(str(img_path), width=45)
-                    else:
-                        st.write("🖼️")
-                
-                # Link testuale pulito subito sotto o a fianco per reindirizzare
-                st.markdown(f"<a href='{scrim['link']}' target='_blank' style='color: #58a6ff; text-decoration: none; font-size: 0.9rem;'>🔗 Apri Risultati</a>", unsafe_allow_html=True)
-            
-            st.markdown("<hr style='border-color: #30363d; margin: 15px 0;'>", unsafe_allow_html=True)
+            img_b64 = ""
+            if img_path.exists():
+                encoded = base64.b64encode(img_path.read_bytes()).decode()
+                img_b64 = f"data:image/png;base64,{encoded}"
+
+            st.markdown(f"""
+            <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;'>
+                <div>
+                    <div style='color: #f0f6fc; font-weight: bold; font-size: 1.1rem; margin-bottom: 6px;'>{scrim['nome']}</div>
+                    <a href='{scrim['link']}' target='_blank' style='color: #58a6ff; text-decoration: none; font-size: 0.95rem;'>🔗 Apri Risultati</a>
+                </div>
+                <div>
+                    <a href='{scrim['link']}' target='_blank'>
+                        <img src='{img_b64}' width='50' height='50' style='border-radius: 6px; object-fit: cover;'>
+                    </a>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
         
