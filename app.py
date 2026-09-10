@@ -485,12 +485,14 @@ with center_col:
 
         st.markdown("<br>", unsafe_allow_html=True)
 
-        # Pulsante che reindirizza a Statbot App
-        st.link_button(
-            label="ISCRIVITI", 
-            url="https://statbotapp.uk/", 
-            use_container_width=True
-        )    
+        # Pulsante personalizzato con stile giallo e nero
+        st.markdown("""
+        <div style='text-align: center;'>
+            <a href='https://statbotapp.uk/' target='_blank' style='display: block; background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.2rem; padding: 12px 20px; border-radius: 6px; text-decoration: none; border: 2px solid #ff0000;'>
+                ISCRIVITI
+            </a>
+        </div>
+        """, unsafe_allow_html=True)    
         
     elif current == "📈 PROGRESSI":
         st.subheader("📈 Progressi")
