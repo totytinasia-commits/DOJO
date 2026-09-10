@@ -1138,8 +1138,10 @@ with center_col:
         </div>
         """, unsafe_allow_html=True)
 
+        base_dir = Path(__file__).parent
+
         def img_to_base64(path_img):
-            path = Path(path_img)
+            path = base_dir / path_img
             if path.exists():
                 encoded = base64.b64encode(path.read_bytes()).decode()
                 return f"data:image/png;base64,{encoded}"
