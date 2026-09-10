@@ -253,7 +253,7 @@ with center_col:
                     h14_val = target_ws.acell("H14").value or ""
     
                     # Lettura dinamica C18:E25 per ARES PIX
-                    raw_pix = target_ws.get("C18:E25")
+                    raw_pix = target_ws.get("C18:E23")
                     box_pix_rows = [
                         [
                             r[0] if len(r) > 0 else "",
@@ -264,7 +264,7 @@ with center_col:
                     ]
     
                     # Lettura dinamica I18:K25 per ARES NINO
-                    raw_nino = target_ws.get("I18:K25")
+                    raw_nino = target_ws.get("I18:K23")
                     box_nino_rows = [
                         [
                             r[0] if len(r) > 0 else "",
