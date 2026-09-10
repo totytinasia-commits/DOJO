@@ -293,19 +293,6 @@ with center_col:
             </div>
         </div>
         """, unsafe_allow_html=True)
-    
-        # --- BOX ALLENAMENTO (D14 per PIX, R14 per NINO) ---
-        st.markdown(f"""
-        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
-                ALLENAMENTO
-            </div>
-            <div class='fixed-box-header'>
-                <span style='flex: 1; text-align: center; color: #FFFFFF;'>PIX: <strong style='color: #58a6ff;'>{d14_val}</strong></span>
-                <span style='flex: 1; text-align: center; color: #FFFFFF;'>NINO: <strong style='color: #58a6ff;'>{r14_val}</strong></span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
         
         # --- TABELLA ARES PIX ---
         st.markdown("""
@@ -360,6 +347,30 @@ with center_col:
                 """, unsafe_allow_html=True)
         
         st.markdown("</div>", unsafe_allow_html=True)
+    
+        # --- BOX ALLENAMENTO NINO (R14) ---
+        st.markdown(f"""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 12px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
+                ALLENAMENTO NINO
+            </div>
+            <div style='padding: 12px; text-align: center; background-color: #0f141c; color: #FFFFFF; font-size: 1.2rem;'>
+                <strong style='color: #58a6ff;'>{r14_val}</strong>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+        # --- BOX ALLENAMENTO PIX (D14) ---
+        st.markdown(f"""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
+                ALLENAMENTO PIX
+            </div>
+            <div style='padding: 12px; text-align: center; background-color: #0f141c; color: #FFFFFF; font-size: 1.2rem;'>
+                <strong style='color: #58a6ff;'>{d14_val}</strong>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
         
         # --- SEZIONE MODULO DI INSERIMENTO REGISTRO ATTIVITA' ---
         st.markdown("""
