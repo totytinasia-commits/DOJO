@@ -255,7 +255,7 @@ with center_col:
                     
                     # Lettura D14 (PIX) e R14 (NINO)
                     d14_val = target_ws.acell("D14").value or ""
-                    r14_val = target_ws.acell("R14").value or ""
+                    k14_val = target_ws.acell("K14").value or ""
                     
                     # Lettura dinamica C18:E25 per ARES PIX
                     raw_pix = target_ws.get("C18:E22")
@@ -355,7 +355,7 @@ with center_col:
                 ALLENAMENTO ARES NINO
             </div>
             <div style='padding: 12px; text-align: center; background-color: #0f141c; color: #FFFFFF; font-size: 1.2rem;'>
-                <strong style='color: #58a6ff;'>{K14_val}</strong>
+                <strong style='color: #58a6ff;'>{k14_val}</strong>
             </div>
         </div>
         """, unsafe_allow_html=True)
