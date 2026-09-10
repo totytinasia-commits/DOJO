@@ -1125,28 +1125,7 @@ with center_col:
             st.info("Nessun partecipante iscritto al momento. Sii il primo!")
     
         st.markdown("<br>", unsafe_allow_html=True)
-    elif selected_section == "🎯 COMPETIZIONI":
-        st.header("🎯 Competizioni")
-        st.write("Consulta l'immagine di Statbot e clicca sul pulsante sottostante per procedere con la registrazione.")
-        
-        # Mostra l'immagine statbot.png presente nella cartella assets
-        st.image("assets/statbot.png", use_container_width=True)
-        
-        # Link di reindirizzamento per la registrazione
-        target_url = "https://statbotapp.uk/"  # Sostituisci con il link effettivo
-        
-        # Pulsante per aprire il link di registrazione in una nuova scheda
-        st.markdown(
-            f"""
-            <div style="text-align: center; margin-top: 20px;">
-                <a href="{target_url}" target="_blank">
-                    <button style="background-color: #ff4b4b; color: white; padding: 12px 24px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer;">
-                        🔗 REGISTRATI
-                    </button>
-                </a>
-            </div>
-            """,
-            unsafe_allow_html=True)
+    
             
         elif current == "🎮 RISULTATI SCRIMS":
             import base64
