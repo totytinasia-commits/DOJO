@@ -154,8 +154,6 @@ SECTIONS = [
     "📊 STATISTICHE",
     "🎮 RISULTATI SCRIMS",  # <-- Nuova sezione aggiunta
     "🎯 ISCRIVITI ALL'EVENTO"
-    "🎯 COMPETIZIONI"
-    
 ]
 
 PLAYERS = [
@@ -1125,55 +1123,54 @@ with center_col:
             st.info("Nessun partecipante iscritto al momento. Sii il primo!")
     
         st.markdown("<br>", unsafe_allow_html=True)
-    
-            
-        elif current == "🎮 RISULTATI SCRIMS":
-            import base64
-            from pathlib import Path
-    
-            st.subheader("🎮 Risultati Scrims")
-    
-            st.markdown("""
-            <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
-                <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
-                    ARCHIVIO RISULTATI SCRIMS
+
+    elif current == "🎮 RISULTATI SCRIMS":
+        import base64
+        from pathlib import Path
+
+        st.subheader("🎮 Risultati Scrims")
+
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 10px;'>
+                ARCHIVIO RISULTATI SCRIMS
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        base_dir = Path(__file__).parent / "assets"
+
+        scrims_data = [
+            {"nome": "Euro Quads", "link": "https://euroquad-rm6yh6gb7taq5rmjn9sweg.streamlit.app/", "icona": "euroquad.png"},
+            {"nome": "EU Scrim Club", "link": "https://euscrims-jym7ekup39k57h66e4ljyz.streamlit.app/", "icona": "euscrims.png"},
+            {"nome": "FFC EU", "link": "https://tuo-link-3.com", "icona": "ffc.png"},
+            {"nome": "Euro Cup squad", "link": "https://eurocup-dashboard-h76lwgruyz9ejupyjdsttv.streamlit.app/", "icona": "population_ita.png"},
+            {"nome": "CLans League tuesday", "link": "https://clans-legues-tuesday-scrims-tlpehvubdrncbfo6pm7g5x.streamlit.app/", "icona": "cl.png"},
+            {"nome": "CLans League friday", "link": "https://clans-leadue-friday-scrims-nwgscanechct7pmvlusfkl.streamlit.app/", "icona": "cl.png"},
+        ]
+
+        for scrim in scrims_data:
+            img_path = base_dir / scrim["icona"]
+            img_b64 = ""
+            if img_path.exists():
+                encoded = base64.b64encode(img_path.read_bytes()).decode()
+                img_b64 = f"data:image/png;base64,{encoded}"
+
+            st.markdown(f"""
+            <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;'>
+                <div>
+                    <div style='color: #f0f6fc; font-weight: bold; font-size: 1.1rem; margin-bottom: 6px;'>{scrim['nome']}</div>
+                    <a href='{scrim['link']}' target='_blank' style='color: #58a6ff; text-decoration: none; font-size: 0.95rem;'>🔗 Apri Risultati</a>
+                </div>
+                <div>
+                    <a href='{scrim['link']}' target='_blank'>
+                        <img src='{img_b64}' width='50' height='50' style='border-radius: 6px; object-fit: cover;'>
+                    </a>
                 </div>
             </div>
             """, unsafe_allow_html=True)
-    
-            base_dir = Path(__file__).parent / "assets"
-    
-            scrims_data = [
-                {"nome": "Euro Quads", "link": "https://euroquad-rm6yh6gb7taq5rmjn9sweg.streamlit.app/", "icona": "euroquad.png"},
-                {"nome": "EU Scrim Club", "link": "https://euscrims-jym7ekup39k57h66e4ljyz.streamlit.app/", "icona": "euscrims.png"},
-                {"nome": "FFC EU", "link": "https://tuo-link-3.com", "icona": "ffc.png"},
-                {"nome": "Euro Cup squad", "link": "https://eurocup-dashboard-h76lwgruyz9ejupyjdsttv.streamlit.app/", "icona": "population_ita.png"},
-                {"nome": "CLans League tuesday", "link": "https://clans-legues-tuesday-scrims-tlpehvubdrncbfo6pm7g5x.streamlit.app/", "icona": "cl.png"},
-                {"nome": "CLans League friday", "link": "https://clans-leadue-friday-scrims-nwgscanechct7pmvlusfkl.streamlit.app/", "icona": "cl.png"},
-            ]
-    
-            for scrim in scrims_data:
-                img_path = base_dir / scrim["icona"]
-                img_b64 = ""
-                if img_path.exists():
-                    encoded = base64.b64encode(img_path.read_bytes()).decode()
-                    img_b64 = f"data:image/png;base64,{encoded}"
-    
-                st.markdown(f"""
-                <div style='background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;'>
-                    <div>
-                        <div style='color: #f0f6fc; font-weight: bold; font-size: 1.1rem; margin-bottom: 6px;'>{scrim['nome']}</div>
-                        <a href='{scrim['link']}' target='_blank' style='color: #58a6ff; text-decoration: none; font-size: 0.95rem;'>🔗 Apri Risultati</a>
-                    </div>
-                    <div>
-                        <a href='{scrim['link']}' target='_blank'>
-                            <img src='{img_b64}' width='50' height='50' style='border-radius: 6px; object-fit: cover;'>
-                        </a>
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-    
-            st.markdown("<br>", unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
         
     elif current == "📊 STATISTICHE":
         st.subheader("📊 Statistiche")
