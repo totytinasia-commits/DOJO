@@ -280,11 +280,12 @@ with center_col:
                         for r in raw_nino if any(str(cell).strip() for cell in r)
                     ]
     
-                    # Lettura C28:F50 per Allievo (Colonna C -> indice 0) e Insegnante (Colonna F -> indice 3)
+                    # Lettura C28:F50 per Allievo (Col C), Data (Col D) e Insegnante (Col F)
                     raw_iscritti = target_ws.get("C28:F50")
                     iscritti_rows = [
                         [
                             r[0].strip() if len(r) > 0 else "",  # Colonna C (Allievo)
+                            r[1].strip() if len(r) > 1 else "",  # Colonna D (Data e ora)
                             r[3].strip() if len(r) > 3 else ""   # Colonna F (Insegnante)
                         ]
                         for r in raw_iscritti if any(str(cell).strip() for cell in r)
@@ -437,15 +438,16 @@ with center_col:
                     except Exception as ex:
                         st.error(f"Errore durante l'inserimento: {ex}")
     
-        # --- TABELLA REGISTRATI / ISCRITTI (COLONNA C E F) ---
+        # --- TABELLA REGISTRATI / ISCRITTI (ALLIEVO - DATA - INSEGNANTE) ---
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-top: 20px; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
                 ISCRITTI ACADEMY
             </div>
             <div class='fixed-box-header'>
-                <span style='flex: 1; text-align: left;'>ALLIEVO (COL C)</span>
-                <span style='flex: 1; text-align: right;'>INSEGNANTE (COL F)</span>
+                <span style='flex: 2; text-align: left;'>ALLIEVO</span>
+                <span style='flex: 1.5; text-align: center;'>DATA / ORA</span>
+                <span style='flex: 2; text-align: right;'>INSEGNANTE</span>
             </div>
         """, unsafe_allow_html=True)
     
@@ -454,11 +456,13 @@ with center_col:
         else:
             for row in iscritti_rows:
                 allievo_txt = row[0] if row[0] else "-"
-                insegnante_txt = row[1] if row[1] else "-"
+                data_txt = row[1] if row[1] else "-"
+                insegnante_txt = row[2] if row[2] else "-"
                 st.markdown(f"""
                 <div class='fixed-box-row'>
-                    <span style='flex: 1; text-align: left; color: #FFFFFF;'>{allievo_txt}</span>
-                    <span style='flex: 1; text-align: right; color: #58a6ff;'>{insegnante_txt}</span>
+                    <span style='flex: 2; text-align: left; color: #FFFFFF;'>{allievo_txt}</span>
+                    <span style='flex: 1.5; text-align: center; color: #8b949e;'>{data_txt}</span>
+                    <span style='flex: 2; text-align: right; color: #58a6ff;'>{insegnante_txt}</span>
                 </div>
                 """, unsafe_allow_html=True)
     
