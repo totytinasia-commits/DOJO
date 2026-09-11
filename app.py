@@ -442,7 +442,7 @@ with center_col:
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-top: 20px; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
-                ISCRITTI ACADEMY
+                ALLENAMENTI PRENOTATI
             </div>
             <div class='fixed-box-header'>
                 <span style='flex: 2; text-align: left;'>ALLIEVO</span>
