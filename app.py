@@ -234,9 +234,10 @@ with center_col:
         
         f13_val, h13_val = "", ""
         f14_val, h14_val = "", ""
-        d14_val, r14_val = "", ""
+        d14_val, k14_val = "", ""
         box_pix_rows = []
         box_nino_rows = []
+        iscritti_rows = []
         target_ws_obj = None
         
         try:
@@ -253,11 +254,11 @@ with center_col:
                     f14_val = target_ws.acell("F14").value or ""
                     h14_val = target_ws.acell("H14").value or ""
                     
-                    # Lettura D14 (PIX) e R14 (NINO)
+                    # Lettura D14 (PIX) e K14 (NINO)
                     d14_val = target_ws.acell("D14").value or ""
                     k14_val = target_ws.acell("K14").value or ""
                     
-                    # Lettura dinamica C18:E25 per ARES PIX
+                    # Lettura dinamica C18:E22 per ARES PIX
                     raw_pix = target_ws.get("C18:E22")
                     box_pix_rows = [
                         [
@@ -268,7 +269,7 @@ with center_col:
                         for r in raw_pix if any(str(cell).strip() for cell in r)
                     ]
                     
-                    # Lettura dinamica I18:K25 per ARES NINO
+                    # Lettura dinamica I18:K22 per ARES NINO
                     raw_nino = target_ws.get("I18:K22")
                     box_nino_rows = [
                         [
@@ -277,6 +278,16 @@ with center_col:
                             r[2] if len(r) > 2 else ""
                         ]
                         for r in raw_nino if any(str(cell).strip() for cell in r)
+                    ]
+    
+                    # Lettura F28:G50 per Insegnante (Colonna F) e Allievo (Colonna G)
+                    raw_iscritti = target_ws.get("F28:G50")
+                    iscritti_rows = [
+                        [
+                            r[0].strip() if len(r) > 0 else "",  # Colonna F (Insegnante)
+                            r[1].strip() if len(r) > 1 else ""   # Colonna G (Allievo)
+                        ]
+                        for r in raw_iscritti if any(str(cell).strip() for cell in r)
                     ]
                     
         except Exception as e:
@@ -347,8 +358,8 @@ with center_col:
                 """, unsafe_allow_html=True)
         
         st.markdown("</div>", unsafe_allow_html=True)
-    
-        # --- BOX ALLENAMENTO NINO (R14) ---
+        
+        # --- BOX ALLENAMENTO NINO (K14) ---
         st.markdown(f"""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 12px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
@@ -359,7 +370,7 @@ with center_col:
             </div>
         </div>
         """, unsafe_allow_html=True)
-    
+        
         # --- BOX ALLENAMENTO PIX (D14) ---
         st.markdown(f"""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
@@ -389,9 +400,9 @@ with center_col:
             with col_f2:
                 nuova_mappa = st.text_input("Mappa preferita")
                 nuovo_insegnante = st.text_input("Insegnante")
-        
+            
             submit_button = st.form_submit_button("➕")
-        
+            
             if submit_button:
                 if not nuovo_allievo.strip() and not nuovo_giorni.strip() and not nuova_mappa.strip() and not nuovo_insegnante.strip():
                     st.warning("Compila almeno un campo prima di inviare.")
@@ -425,9 +436,34 @@ with center_col:
                             st.rerun()
                     except Exception as ex:
                         st.error(f"Errore durante l'inserimento: {ex}")
-        
+    
+        # --- TABELLA REGISTRATI / ISCRITTI (SOLO COLONNE F E G) ---
+        st.markdown("""
+        <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-top: 20px; margin-bottom: 20px;'>
+            <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
+                ISCRITTI ACADEMY
+            </div>
+            <div class='fixed-box-header'>
+                <span style='flex: 1; text-align: left;'>INSEGNANTE (COL F)</span>
+                <span style='flex: 1; text-align: right;'>ALLIEVO (COL G)</span>
+            </div>
+        """, unsafe_allow_html=True)
+    
+        if not iscritti_rows:
+            st.markdown("<div class='fixed-box-row'><span style='color: #8b949e;'>Nessuna iscrizione presente.</span></div>", unsafe_allow_html=True)
+        else:
+            for row in iscritti_rows:
+                insegnante_txt = row[0] if row[0] else "-"
+                allievo_txt = row[1] if row[1] else "-"
+                st.markdown(f"""
+                <div class='fixed-box-row'>
+                    <span style='flex: 1; text-align: left; color: #FFFFFF;'>{insegnante_txt}</span>
+                    <span style='flex: 1; text-align: right; color: #58a6ff;'>{allievo_txt}</span>
+                </div>
+                """, unsafe_allow_html=True)
+    
+        st.markdown("</div>", unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
-
     elif current == "📋 ANAGRAFICA":
         st.subheader("📋 Anagrafica")
 
