@@ -270,7 +270,7 @@ with center_col:
                     ]
                     
                     # Lettura dinamica I18:K22 per ARES NINO
-                    raw_nino = target_ws.get("I18:K22")
+                    raw_nino = target_ws.get("I18:K23")
                     box_nino_rows = [
                         [
                             r[0] if len(r) > 0 else "",
