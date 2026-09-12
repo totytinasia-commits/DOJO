@@ -1316,6 +1316,7 @@ with center_col:
 
         st.markdown("---")
 
+
         if st.session_state.stat_tab == "⚙️ SETTINGS":
             st.markdown("<div style='background-color: #0e1117; border: 2px solid #262730; border-radius: 12px; padding: 15px;'>", unsafe_allow_html=True)
             st.markdown("### ⚙️ Settings")
