@@ -1042,8 +1042,8 @@ with center_col:
             "JFF_POTA": "596698328",
             "ITABOYZ_CASCO": "89864457",
             "JFF_CIKKO": "1697770491",
-            "JFF_SINNER": "1148507572"
-            "ITABOYZ_GIANLUCA": "2117773999"
+            "JFF_SINNER": "1148507572",
+            "ITABOYZ_GIANLUCA": "2117773999",
             "BOSS.ITA": "1752741588"
         }
 
