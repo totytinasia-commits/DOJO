@@ -1302,8 +1302,8 @@ with center_col:
 
         st.markdown("<br>", unsafe_allow_html=True)
         
-    elif current == "📊 STATISTICHE":
-        st.subheader("📊 Statistiche")
+    elif current == "📊 STATISTICHE EVENTI":
+        st.subheader("📊 STATISTICHE EVENTI")
 
         if "stat_tab" not in st.session_state:
             st.session_state.stat_tab = STATS_OPTIONS[0]
