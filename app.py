@@ -1043,6 +1043,8 @@ with center_col:
             "ITABOYZ_CASCO": "89864457",
             "JFF_CIKKO": "1697770491",
             "JFF_SINNER": "1148507572"
+            "ITABOYZ_GIANLUCA": "2117773999"
+            "BOSS.ITA": "1752741588"
         }
 
         for player_name in PLAYERS:
