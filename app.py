@@ -161,7 +161,7 @@ SECTIONS = [
 PLAYERS = [
     "JFF_ANDERWAL", "ITABOYZ_VIN", "JFF_CLIP",
     "ITABOYZ_GALLO", "ITABOYZ_IMPERATUBER", "JFF_POTA",
-    "ITABOYZ_CASCO", "JFF_CIKKO", "JFF_SINNER","ITABOYZ_GIANLUCA","BOSS.ITA"
+    "ITABOYZ_CASCO", "JFF_CIKKO", "JFF_SINNER"
 ]
 
 STATS_OPTIONS = ["⚙️ SETTINGS", "🏋️ TRAINING", "🏆 STATCOMP"]
@@ -1367,7 +1367,7 @@ with center_col:
 
             st.markdown("</div>", unsafe_allow_html=True)
 
-        elif st.session_state.stat_tab in ["📊 STATISTICHE EVENTI", "🏋️ TRAINING"]:
+        elif st.session_state.stat_tab == "🏋️ TRAINING":
             st.markdown("""
                 <div style='text-align: center; margin-bottom: 25px;'>
                     <h2 style='color: #FFD700; text-transform: uppercase;'>🏋️ Training Data</h2>
