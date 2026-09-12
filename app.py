@@ -1367,8 +1367,8 @@ with center_col:
 
             st.markdown("</div>", unsafe_allow_html=True)
 
-    elif st.session_state.stat_tab in ["📊 STATISTICHE EVENTI", "🏋️ TRAINING"]:
-        st.markdown("""
+        elif st.session_state.stat_tab in ["📊 STATISTICHE EVENTI", "🏋️ TRAINING"]:
+            st.markdown("""
                 <div style='text-align: center; margin-bottom: 25px;'>
                     <h2 style='color: #FFD700; text-transform: uppercase;'>🏋️ Training Data</h2>
                     <p style='color: #8b949e;'>Statistiche dettagliate di addestramento e armi</p>
