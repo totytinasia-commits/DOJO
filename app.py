@@ -159,7 +159,7 @@ SECTIONS = [
 ]
 
 PLAYERS = [
-    "ALFA_ANDERWAL", "ALFA_VIN", "ALFA_CLIP",
+    "ANDERWAL", "ALFA_VIN", "ALFA_CLIP",
     "ALFA_GALLO", "ALFA_IMPERATUBER", "ALFA_POTA",
     "ALFA_CASCO", "ALFA_CIKKO", "ALFA_SINNER" , "BOSS.ITA"
 ]
@@ -1034,17 +1034,15 @@ with center_col:
             st.session_state.selected_player = PLAYERS[0]
 
         player_gids = {
-            "JFF_ANDERWAL": "341001551",
-            "ITABOYZ_VIN": "1483818122",
-            "JFF_CLIP": "1771413751",
-            "ITABOYZ_GALLO": "1353776186",
-            "ITABOYZ_IMPERATUBER": "132907169",
-            "JFF_POTA": "596698328",
-            "ITABOYZ_CASCO": "89864457",
-            "JFF_CIKKO": "1697770491",
-            "JFF_SINNER": "1148507572",
-            "ITABOYZ_GIANLUCA": "2117773999",
-            "BOSS.ITA": "1752741588"
+            "ANDERWAL": "341001551",
+            "ALFA_VIN": "1483818122",
+            "ALFA_CLIP": "1771413751",
+            "ALFA_GALLO": "1353776186",
+            "ALFA_IMPERATUBER": "132907169",
+            "ALFA_POTA": "596698328",
+            "ALFA_CASCO": "89864457",
+            "ALFA_CIKKO": "1697770491",
+            "ALFA_SINNER": "1148507572"
         }
 
         for player_name in PLAYERS:
