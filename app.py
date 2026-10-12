@@ -258,7 +258,7 @@ with center_col:
                     d14_val = target_ws.acell("D14").value or ""
                     k14_val = target_ws.acell("K14").value or ""
                     
-                    # Lettura dinamica C18:E22 per ARES PIX
+                    # Lettura dinamica C18:E22 per ALFA_PIX
                     raw_pix = target_ws.get("C18:E22")
                     box_pix_rows = [
                         [
@@ -269,7 +269,7 @@ with center_col:
                         for r in raw_pix if any(str(cell).strip() for cell in r)
                     ]
                     
-                    # Lettura dinamica I18:K22 per ARES NINO
+                    # Lettura dinamica I18:K22 per ALFA_NINO
                     raw_nino = target_ws.get("I18:K23")
                     box_nino_rows = [
                         [
