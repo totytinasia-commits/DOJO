@@ -310,7 +310,7 @@ with center_col:
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
-                ARES PIX
+                ALFA_PIX
             </div>
             <div class='fixed-box-header'>
                 <span style='flex: 2;'>Allievi a carico</span>
@@ -337,7 +337,7 @@ with center_col:
         st.markdown("""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
-                ARES NINO
+                ALFA_NINO
             </div>
             <div class='fixed-box-header'>
                 <span style='flex: 2;'>Allievi a carico</span>
@@ -364,7 +364,7 @@ with center_col:
         st.markdown(f"""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 12px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
-                ALLENAMENTO ARES NINO
+                ALLENAMENTO ALFA_NINO
             </div>
             <div style='padding: 12px; text-align: center; background-color: #0f141c; color: #FFFFFF; font-size: 1.2rem;'>
                 <strong style='color: #58a6ff;'>{k14_val}</strong>
@@ -376,7 +376,7 @@ with center_col:
         st.markdown(f"""
         <div style='background-color: #000000; border: 2px solid #ff0000; border-radius: 6px; overflow: hidden; margin-bottom: 20px;'>
             <div style='background-color: #FFFF00; color: #000000; text-align: center; font-weight: bold; font-size: 1.1rem; padding: 8px;'>
-                ALLENAMENTO ARES PIX
+                ALLENAMENTO ALFA_PIX
             </div>
             <div style='padding: 12px; text-align: center; background-color: #0f141c; color: #FFFFFF; font-size: 1.2rem;'>
                 <strong style='color: #58a6ff;'>{d14_val}</strong>
